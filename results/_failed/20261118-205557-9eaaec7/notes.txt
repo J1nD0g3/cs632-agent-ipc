@@ -1,0 +1,1 @@
+Smoke run 3 (uncommitted code on 9eaaec7): in C the index listed only source documents, so the Writer read documents instead of the notes, and some agents ended without writing their file. Fixed by a workspace-maintained index and a forced final write.

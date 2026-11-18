@@ -1,0 +1,1 @@
+Smoke run 2 (uncommitted code on 9eaaec7): Researcher with write-only tools looped on write_file until the turn limit and overwrote its own notes. Fixed by stopping on repeated calls and nudging agents to finish after a write. Judge check (judge_agreement.json) is from this run.
