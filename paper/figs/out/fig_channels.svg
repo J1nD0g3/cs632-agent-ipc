@@ -1,225 +1,225 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="506pt" height="171.25pt" viewBox="0 0 506 171.25">
+<svg xmlns="http://www.w3.org/2000/svg" width="506pt" height="185.65pt" viewBox="0 0 506 185.65">
 <defs><pattern id="h_gray5_none" width="2.6" height="2.6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="2.6" stroke="#404040" stroke-width="0.9"/></pattern><pattern id="h_gray5_white" width="2.6" height="2.6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="2.6" height="2.6" fill="#FFFFFF"/><line x1="0" y1="0" x2="0" y2="2.6" stroke="#404040" stroke-width="0.9"/></pattern></defs>
-<text font-family="Inter"><tspan x="18.78" y="22.57" font-size="7" font-weight="700" fill="#000000">A1</tspan><tspan x="28.33" y="22.57" font-size="7" font-weight="700" fill="#000000">broadcast</tspan><tspan x="15.51" y="29.73" font-size="6.07" font-weight="600" fill="#000000">copy</tspan><tspan x="31.52" y="29.73" font-size="6.07" font-weight="600" fill="#000000">the</tspan><tspan x="42.51" y="29.73" font-size="6.07" font-weight="600" fill="#000000">history</tspan></text>
-<text font-family="Inter"><tspan x="36.81" y="39.27" font-size="7" font-weight="700" fill="#000000">A2</tspan><tspan x="48.11" y="39.27" font-size="7" font-weight="700" fill="#000000">pipe</tspan><tspan x="16.84" y="46.43" font-size="6.07" font-weight="600" fill="#000000">previous</tspan><tspan x="43.8" y="46.43" font-size="6.07" font-weight="600" fill="#000000">output</tspan></text>
-<text font-family="Inter"><tspan x="41.98" y="65.87" font-size="7" font-weight="700" fill="#000000">B</tspan><tspan x="48.27" y="65.87" font-size="7" font-weight="700" fill="#000000">files</tspan><tspan x="23.71" y="73.03" font-size="6.07" font-weight="600" fill="#000000">read</tspan><tspan x="38.44" y="73.03" font-size="6.07" font-weight="600" fill="#000000">via</tspan><tspan x="48.6" y="73.03" font-size="6.07" font-weight="600" fill="#000000">tools</tspan></text>
-<text font-family="Inter"><tspan x="14.61" y="99.07" font-size="7" font-weight="700" fill="#000000">C</tspan><tspan x="21.45" y="99.07" font-size="7" font-weight="700" fill="#000000">files</tspan><tspan x="37.83" y="99.07" font-size="7" font-weight="700" fill="#000000">+</tspan><tspan x="44.24" y="99.07" font-size="7" font-weight="700" fill="#000000">index</tspan><tspan x="13.02" y="106.23" font-size="6.07" font-weight="600" fill="#000000">workspace</tspan><tspan x="47" y="106.23" font-size="6.07" font-weight="600" fill="#000000">index</tspan></text>
-<text font-family="Inter"><tspan x="29.11" y="132.27" font-size="7" font-weight="700" fill="#000000">D</tspan><tspan x="35.82" y="132.27" font-size="7" font-weight="700" fill="#000000">handles</tspan><tspan x="15.34" y="139.43" font-size="6.07" font-weight="600" fill="#000000">pushed</tspan><tspan x="38.8" y="139.43" font-size="6.07" font-weight="600" fill="#000000">pointers</tspan></text>
-<rect x="67" y="20.3" width="2.37" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="20.3" width="2.37" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="20.3" width="2.37" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="69.37" y="20.3" width="12.14" height="6.6" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="81.5" y="20.3" width="315.39" height="6.6" rx="0" fill="#9CBBBE" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="396.89" y="20.3" width="33.3" height="6.6" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="432.69" y="25.78" font-size="6" font-weight="500" fill="#404040">reply</tspan></text>
-<rect x="67" y="37" width="2.37" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="37" width="2.37" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="37" width="2.37" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="69.37" y="37" width="13.76" height="6.6" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="83.13" y="37" width="36.48" height="6.6" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="122.11" y="42.48" font-size="6" font-weight="500" fill="#404040">reply</tspan></text>
-<rect x="67" y="50.4" width="2.37" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="50.4" width="2.37" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="50.4" width="2.37" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="69.37" y="50.4" width="38.63" height="6.6" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="110.5" y="55.88" font-size="6" font-weight="500" fill="#404040">list</tspan><tspan x="120.39" y="55.88" font-size="6" font-weight="500" fill="#404040">files</tspan></text>
-<rect x="67" y="57" width="40.26" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="57" width="40.26" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="57" width="40.26" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="107.26" y="57" width="0.74" height="6.6" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="108" y="57" width="1.18" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="109.18" y="57" width="54.17" height="6.6" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="165.85" y="62.48" font-size="6" font-weight="500" fill="#404040">read</tspan><tspan x="180.35" y="62.48" font-size="6" font-weight="500" fill="#404040">d007</tspan></text>
-<rect x="67" y="63.6" width="41" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="63.6" width="41" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="63.6" width="41" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="108" y="63.6" width="1.18" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="108" y="63.6" width="1.18" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="108" y="63.6" width="1.18" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="109.18" y="63.6" width="53.72" height="6.6" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="109.18" y="63.6" width="53.72" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="109.18" y="63.6" width="53.72" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="162.9" y="63.6" width="0.44" height="6.6" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="163.35" y="63.6" width="3.26" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="166.6" y="63.6" width="7.03" height="6.6" rx="0" fill="#9CBBBE" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="176.13" y="69.08" font-size="6" font-weight="500" fill="#404040">read</tspan><tspan x="190.64" y="69.08" font-size="6" font-weight="500" fill="#404040">d006</tspan></text>
-<rect x="67" y="70.2" width="41" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="70.2" width="41" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="70.2" width="41" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="108" y="70.2" width="1.18" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="108" y="70.2" width="1.18" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="108" y="70.2" width="1.18" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="109.18" y="70.2" width="54.17" height="6.6" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="109.18" y="70.2" width="54.17" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="109.18" y="70.2" width="54.17" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="163.35" y="70.2" width="3.26" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="163.35" y="70.2" width="3.26" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="163.35" y="70.2" width="3.26" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="166.6" y="70.2" width="5.77" height="6.6" rx="0" fill="#9CBBBE" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="166.6" y="70.2" width="5.77" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="166.6" y="70.2" width="5.77" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="172.38" y="70.2" width="1.26" height="6.6" rx="0" fill="#9CBBBE" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="173.63" y="70.2" width="3.11" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="176.74" y="70.2" width="5.62" height="6.6" rx="0" fill="#9CBBBE" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="184.87" y="75.68" font-size="6" font-weight="500" fill="#404040">reply</tspan></text>
-<rect x="67" y="76.8" width="41" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="76.8" width="41" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="76.8" width="41" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="108" y="76.8" width="1.18" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="108" y="76.8" width="1.18" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="108" y="76.8" width="1.18" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="109.18" y="76.8" width="54.17" height="6.6" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="109.18" y="76.8" width="54.17" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="109.18" y="76.8" width="54.17" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="163.35" y="76.8" width="3.26" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="163.35" y="76.8" width="3.26" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="163.35" y="76.8" width="3.26" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="166.6" y="76.8" width="7.03" height="6.6" rx="0" fill="#9CBBBE" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="166.6" y="76.8" width="7.03" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="166.6" y="76.8" width="7.03" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="173.63" y="76.8" width="3.11" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="173.63" y="76.8" width="3.11" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="173.63" y="76.8" width="3.11" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="176.74" y="76.8" width="5.11" height="6.6" rx="0" fill="#9CBBBE" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="176.74" y="76.8" width="5.11" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="176.74" y="76.8" width="5.11" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="181.85" y="76.8" width="0.52" height="6.6" rx="0" fill="#9CBBBE" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="182.37" y="76.8" width="14.43" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="199.3" y="82.28" font-size="6" font-weight="500" fill="#404040">write</tspan><tspan x="215.26" y="82.28" font-size="6" font-weight="500" fill="#404040">draft</tspan><tspan x="230.37" y="82.28" font-size="6" font-weight="500" fill="#404040">(forced)</tspan></text>
-<rect x="67" y="86.9" width="2.37" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="86.9" width="2.37" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="86.9" width="2.37" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="69.37" y="86.9" width="40.48" height="6.6" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="112.35" y="92.38" font-size="6" font-weight="500" fill="#404040">list</tspan><tspan x="122.24" y="92.38" font-size="6" font-weight="500" fill="#404040">files</tspan></text>
-<rect x="67" y="93.5" width="41.44" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="93.5" width="41.44" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="93.5" width="41.44" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="108.44" y="93.5" width="1.41" height="6.6" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="109.85" y="93.5" width="1.18" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="111.03" y="93.5" width="55.65" height="6.6" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="169.18" y="98.98" font-size="6" font-weight="500" fill="#404040">read</tspan><tspan x="183.68" y="98.98" font-size="6" font-weight="500" fill="#404040">notes</tspan></text>
-<rect x="67" y="100.1" width="42.85" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="100.1" width="42.85" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="100.1" width="42.85" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="109.85" y="100.1" width="1.18" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="109.85" y="100.1" width="1.18" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="109.85" y="100.1" width="1.18" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="111.03" y="100.1" width="54.24" height="6.6" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="111.03" y="100.1" width="54.24" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="111.03" y="100.1" width="54.24" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="165.27" y="100.1" width="1.41" height="6.6" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="166.68" y="100.1" width="3.11" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="169.79" y="100.1" width="25.53" height="6.6" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="197.82" y="105.58" font-size="6" font-weight="500" fill="#404040">write</tspan><tspan x="213.78" y="105.58" font-size="6" font-weight="500" fill="#404040">draft</tspan></text>
-<rect x="67" y="106.7" width="42.85" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="106.7" width="42.85" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="106.7" width="42.85" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="109.85" y="106.7" width="1.18" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="109.85" y="106.7" width="1.18" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="109.85" y="106.7" width="1.18" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="111.03" y="106.7" width="55.65" height="6.6" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="111.03" y="106.7" width="55.65" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="111.03" y="106.7" width="55.65" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="166.68" y="106.7" width="3.11" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="166.68" y="106.7" width="3.11" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="166.68" y="106.7" width="3.11" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="169.79" y="106.7" width="25.09" height="6.6" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="169.79" y="106.7" width="25.09" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="169.79" y="106.7" width="25.09" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="194.87" y="106.7" width="0.44" height="6.6" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="195.32" y="106.7" width="23.09" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="220.9" y="112.18" font-size="6" font-weight="500" fill="#404040">reply</tspan></text>
-<rect x="67" y="116.8" width="2.37" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="116.8" width="2.37" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="116.8" width="2.37" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="69.37" y="116.8" width="35.89" height="6.6" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="105.26" y="116.8" width="28.86" height="6.6" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="136.62" y="122.28" font-size="6" font-weight="500" fill="#404040">list</tspan><tspan x="146.51" y="122.28" font-size="6" font-weight="500" fill="#404040">files</tspan></text>
-<rect x="67" y="123.4" width="38.26" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="123.4" width="38.26" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="123.4" width="38.26" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="105.26" y="123.4" width="28.05" height="6.6" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="105.26" y="123.4" width="28.05" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="105.26" y="123.4" width="28.05" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="133.3" y="123.4" width="0.81" height="6.6" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="134.12" y="123.4" width="1.63" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="135.75" y="123.4" width="54.17" height="6.6" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="192.41" y="128.88" font-size="6" font-weight="500" fill="#404040">read</tspan><tspan x="206.92" y="128.88" font-size="6" font-weight="500" fill="#404040">(no</tspan><tspan x="218" y="128.88" font-size="6" font-weight="500" fill="#404040">such</tspan><tspan x="233.51" y="128.88" font-size="6" font-weight="500" fill="#404040">file)</tspan></text>
-<rect x="67" y="130" width="38.26" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="130" width="38.26" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="130" width="38.26" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="105.26" y="130" width="28.86" height="6.6" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="105.26" y="130" width="28.86" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="105.26" y="130" width="28.86" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="134.12" y="130" width="1.63" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="134.12" y="130" width="1.63" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="134.12" y="130" width="1.63" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="135.75" y="130" width="53.21" height="6.6" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="135.75" y="130" width="53.21" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="135.75" y="130" width="53.21" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="188.95" y="130" width="0.96" height="6.6" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="189.91" y="130" width="6.07" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="198.48" y="135.48" font-size="6" font-weight="500" fill="#404040">read</tspan><tspan x="212.99" y="135.48" font-size="6" font-weight="500" fill="#404040">notes</tspan></text>
-<rect x="67" y="136.6" width="38.26" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="136.6" width="38.26" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="136.6" width="38.26" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="105.26" y="136.6" width="28.86" height="6.6" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="105.26" y="136.6" width="28.86" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="105.26" y="136.6" width="28.86" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="134.12" y="136.6" width="1.63" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="134.12" y="136.6" width="1.63" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="134.12" y="136.6" width="1.63" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="135.75" y="136.6" width="54.17" height="6.6" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="135.75" y="136.6" width="54.17" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="135.75" y="136.6" width="54.17" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="189.91" y="136.6" width="4.96" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="189.91" y="136.6" width="4.96" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="189.91" y="136.6" width="4.96" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="194.87" y="136.6" width="3.85" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="198.72" y="136.6" width="16.8" height="6.6" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="218.02" y="142.08" font-size="6" font-weight="500" fill="#404040">write</tspan><tspan x="233.98" y="142.08" font-size="6" font-weight="500" fill="#404040">draft</tspan></text>
-<rect x="67" y="143.2" width="38.26" height="6.6" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="143.2" width="38.26" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="67" y="143.2" width="38.26" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="105.26" y="143.2" width="28.86" height="6.6" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="105.26" y="143.2" width="28.86" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="105.26" y="143.2" width="28.86" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="134.12" y="143.2" width="1.63" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="134.12" y="143.2" width="1.63" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="134.12" y="143.2" width="1.63" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="135.75" y="143.2" width="54.17" height="6.6" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="135.75" y="143.2" width="54.17" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="135.75" y="143.2" width="54.17" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="189.91" y="143.2" width="8.81" height="6.6" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="189.91" y="143.2" width="8.81" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="189.91" y="143.2" width="8.81" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="198.72" y="143.2" width="16.28" height="6.6" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="198.72" y="143.2" width="16.28" height="6.6" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
-<rect x="198.72" y="143.2" width="16.28" height="6.6" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="215" y="143.2" width="0.52" height="6.6" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<rect x="215.52" y="143.2" width="16.95" height="6.6" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
-<text font-family="Inter"><tspan x="234.96" y="148.68" font-size="6" font-weight="500" fill="#404040">reply</tspan></text>
-<path d="M67,152.8 L437.8,152.8" fill="none" stroke="#000000" stroke-width="0.75" stroke-linejoin="miter" stroke-linecap="butt"/>
-<polygon points="441,152.8 437.24,154.5 437.24,151.1" fill="#000000"/>
-<path d="M67,152.8 L67,154.8" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
-<text font-family="Inter"><tspan x="63.09" y="160.33" font-size="6.5" font-weight="500" fill="#000000">0k</tspan></text>
-<path d="M141,152.8 L141,154.8" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
-<text font-family="Inter"><tspan x="137.83" y="160.33" font-size="6.5" font-weight="500" fill="#000000">1k</tspan></text>
-<path d="M215,152.8 L215,154.8" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
-<text font-family="Inter"><tspan x="211.18" y="160.33" font-size="6.5" font-weight="500" fill="#000000">2k</tspan></text>
-<path d="M289,152.8 L289,154.8" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
-<text font-family="Inter"><tspan x="285.15" y="160.33" font-size="6.5" font-weight="500" fill="#000000">3k</tspan></text>
-<path d="M363,152.8 L363,154.8" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
-<text font-family="Inter"><tspan x="359.05" y="160.33" font-size="6.5" font-weight="500" fill="#000000">4k</tspan></text>
-<path d="M437,152.8 L437,154.8" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
-<text font-family="Inter"><tspan x="433.22" y="160.33" font-size="6.5" font-weight="500" fill="#000000">5k</tspan></text>
-<text font-family="Inter"><tspan x="197.01" y="168.88" font-size="6.5" font-weight="500" fill="#000000">Writer</tspan><tspan x="217.72" y="168.88" font-size="6.5" font-weight="500" fill="#000000">prompt</tspan><tspan x="241.79" y="168.88" font-size="6.5" font-weight="500" fill="#000000">per</tspan><tspan x="253.88" y="168.88" font-size="6.5" font-weight="500" fill="#000000">LLM</tspan><tspan x="268.89" y="168.88" font-size="6.5" font-weight="500" fill="#000000">call</tspan><tspan x="281.41" y="168.88" font-size="6.5" font-weight="500" fill="#000000">(tokens)</tspan></text>
+<text font-family="Inter"><tspan x="18.78" y="23.37" font-size="7" font-weight="700" fill="#000000">A1</tspan><tspan x="28.33" y="23.37" font-size="7" font-weight="700" fill="#000000">broadcast</tspan><tspan x="15.51" y="30.53" font-size="6.07" font-weight="600" fill="#000000">copy</tspan><tspan x="31.52" y="30.53" font-size="6.07" font-weight="600" fill="#000000">the</tspan><tspan x="42.51" y="30.53" font-size="6.07" font-weight="600" fill="#000000">history</tspan></text>
+<text font-family="Inter"><tspan x="36.81" y="41.67" font-size="7" font-weight="700" fill="#000000">A2</tspan><tspan x="48.11" y="41.67" font-size="7" font-weight="700" fill="#000000">pipe</tspan><tspan x="16.84" y="48.83" font-size="6.07" font-weight="600" fill="#000000">previous</tspan><tspan x="43.8" y="48.83" font-size="6.07" font-weight="600" fill="#000000">output</tspan></text>
+<text font-family="Inter"><tspan x="41.98" y="71.07" font-size="7" font-weight="700" fill="#000000">B</tspan><tspan x="48.27" y="71.07" font-size="7" font-weight="700" fill="#000000">files</tspan><tspan x="23.71" y="78.23" font-size="6.07" font-weight="600" fill="#000000">read</tspan><tspan x="38.44" y="78.23" font-size="6.07" font-weight="600" fill="#000000">via</tspan><tspan x="48.6" y="78.23" font-size="6.07" font-weight="600" fill="#000000">tools</tspan></text>
+<text font-family="Inter"><tspan x="14.61" y="107.87" font-size="7" font-weight="700" fill="#000000">C</tspan><tspan x="21.45" y="107.87" font-size="7" font-weight="700" fill="#000000">files</tspan><tspan x="37.83" y="107.87" font-size="7" font-weight="700" fill="#000000">+</tspan><tspan x="44.24" y="107.87" font-size="7" font-weight="700" fill="#000000">index</tspan><tspan x="13.02" y="115.03" font-size="6.07" font-weight="600" fill="#000000">workspace</tspan><tspan x="47" y="115.03" font-size="6.07" font-weight="600" fill="#000000">index</tspan></text>
+<text font-family="Inter"><tspan x="29.11" y="144.67" font-size="7" font-weight="700" fill="#000000">D</tspan><tspan x="35.82" y="144.67" font-size="7" font-weight="700" fill="#000000">handles</tspan><tspan x="15.34" y="151.83" font-size="6.07" font-weight="600" fill="#000000">pushed</tspan><tspan x="38.8" y="151.83" font-size="6.07" font-weight="600" fill="#000000">pointers</tspan></text>
+<rect x="67" y="20.7" width="2.37" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="20.7" width="2.37" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="20.7" width="2.37" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="69.37" y="20.7" width="12.14" height="7.4" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="81.5" y="20.7" width="315.39" height="7.4" rx="0" fill="#9CBBBE" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="396.89" y="20.7" width="33.3" height="7.4" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="432.69" y="26.58" font-size="6" font-weight="500" fill="#404040">reply</tspan></text>
+<rect x="67" y="39" width="2.37" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="39" width="2.37" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="39" width="2.37" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="69.37" y="39" width="13.76" height="7.4" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="83.13" y="39" width="36.48" height="7.4" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="122.11" y="44.88" font-size="6" font-weight="500" fill="#404040">reply</tspan></text>
+<rect x="67" y="53.6" width="2.37" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="53.6" width="2.37" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="53.6" width="2.37" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="69.37" y="53.6" width="38.63" height="7.4" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="110.5" y="59.48" font-size="6" font-weight="500" fill="#404040">list</tspan><tspan x="120.39" y="59.48" font-size="6" font-weight="500" fill="#404040">files</tspan></text>
+<rect x="67" y="61" width="40.26" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="61" width="40.26" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="61" width="40.26" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="107.26" y="61" width="0.74" height="7.4" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="108" y="61" width="1.18" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="109.18" y="61" width="54.17" height="7.4" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="165.85" y="66.88" font-size="6" font-weight="500" fill="#404040">read</tspan><tspan x="180.35" y="66.88" font-size="6" font-weight="500" fill="#404040">d007</tspan></text>
+<rect x="67" y="68.4" width="41" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="68.4" width="41" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="68.4" width="41" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="108" y="68.4" width="1.18" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="108" y="68.4" width="1.18" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="108" y="68.4" width="1.18" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="109.18" y="68.4" width="53.72" height="7.4" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="109.18" y="68.4" width="53.72" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="109.18" y="68.4" width="53.72" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="162.9" y="68.4" width="0.44" height="7.4" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="163.35" y="68.4" width="3.26" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="166.6" y="68.4" width="7.03" height="7.4" rx="0" fill="#9CBBBE" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="176.13" y="74.28" font-size="6" font-weight="500" fill="#404040">read</tspan><tspan x="190.64" y="74.28" font-size="6" font-weight="500" fill="#404040">d006</tspan></text>
+<rect x="67" y="75.8" width="41" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="75.8" width="41" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="75.8" width="41" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="108" y="75.8" width="1.18" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="108" y="75.8" width="1.18" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="108" y="75.8" width="1.18" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="109.18" y="75.8" width="54.17" height="7.4" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="109.18" y="75.8" width="54.17" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="109.18" y="75.8" width="54.17" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="163.35" y="75.8" width="3.26" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="163.35" y="75.8" width="3.26" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="163.35" y="75.8" width="3.26" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="166.6" y="75.8" width="5.77" height="7.4" rx="0" fill="#9CBBBE" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="166.6" y="75.8" width="5.77" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="166.6" y="75.8" width="5.77" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="172.38" y="75.8" width="1.26" height="7.4" rx="0" fill="#9CBBBE" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="173.63" y="75.8" width="3.11" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="176.74" y="75.8" width="5.62" height="7.4" rx="0" fill="#9CBBBE" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="184.87" y="81.68" font-size="6" font-weight="500" fill="#404040">reply</tspan></text>
+<rect x="67" y="83.2" width="41" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="83.2" width="41" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="83.2" width="41" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="108" y="83.2" width="1.18" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="108" y="83.2" width="1.18" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="108" y="83.2" width="1.18" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="109.18" y="83.2" width="54.17" height="7.4" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="109.18" y="83.2" width="54.17" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="109.18" y="83.2" width="54.17" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="163.35" y="83.2" width="3.26" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="163.35" y="83.2" width="3.26" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="163.35" y="83.2" width="3.26" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="166.6" y="83.2" width="7.03" height="7.4" rx="0" fill="#9CBBBE" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="166.6" y="83.2" width="7.03" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="166.6" y="83.2" width="7.03" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="173.63" y="83.2" width="3.11" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="173.63" y="83.2" width="3.11" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="173.63" y="83.2" width="3.11" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="176.74" y="83.2" width="5.11" height="7.4" rx="0" fill="#9CBBBE" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="176.74" y="83.2" width="5.11" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="176.74" y="83.2" width="5.11" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="181.85" y="83.2" width="0.52" height="7.4" rx="0" fill="#9CBBBE" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="182.37" y="83.2" width="14.43" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="199.3" y="89.08" font-size="6" font-weight="500" fill="#404040">write</tspan><tspan x="215.26" y="89.08" font-size="6" font-weight="500" fill="#404040">draft</tspan><tspan x="230.37" y="89.08" font-size="6" font-weight="500" fill="#404040">(forced)</tspan></text>
+<rect x="67" y="94.1" width="2.37" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="94.1" width="2.37" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="94.1" width="2.37" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="69.37" y="94.1" width="40.48" height="7.4" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="112.35" y="99.98" font-size="6" font-weight="500" fill="#404040">list</tspan><tspan x="122.24" y="99.98" font-size="6" font-weight="500" fill="#404040">files</tspan></text>
+<rect x="67" y="101.5" width="41.44" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="101.5" width="41.44" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="101.5" width="41.44" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="108.44" y="101.5" width="1.41" height="7.4" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="109.85" y="101.5" width="1.18" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="111.03" y="101.5" width="55.65" height="7.4" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="169.18" y="107.38" font-size="6" font-weight="500" fill="#404040">read</tspan><tspan x="183.68" y="107.38" font-size="6" font-weight="500" fill="#404040">notes</tspan></text>
+<rect x="67" y="108.9" width="42.85" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="108.9" width="42.85" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="108.9" width="42.85" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="109.85" y="108.9" width="1.18" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="109.85" y="108.9" width="1.18" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="109.85" y="108.9" width="1.18" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="111.03" y="108.9" width="54.24" height="7.4" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="111.03" y="108.9" width="54.24" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="111.03" y="108.9" width="54.24" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="165.27" y="108.9" width="1.41" height="7.4" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="166.68" y="108.9" width="3.11" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="169.79" y="108.9" width="25.53" height="7.4" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="197.82" y="114.78" font-size="6" font-weight="500" fill="#404040">write</tspan><tspan x="213.78" y="114.78" font-size="6" font-weight="500" fill="#404040">draft</tspan></text>
+<rect x="67" y="116.3" width="42.85" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="116.3" width="42.85" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="116.3" width="42.85" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="109.85" y="116.3" width="1.18" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="109.85" y="116.3" width="1.18" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="109.85" y="116.3" width="1.18" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="111.03" y="116.3" width="55.65" height="7.4" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="111.03" y="116.3" width="55.65" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="111.03" y="116.3" width="55.65" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="166.68" y="116.3" width="3.11" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="166.68" y="116.3" width="3.11" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="166.68" y="116.3" width="3.11" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="169.79" y="116.3" width="25.09" height="7.4" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="169.79" y="116.3" width="25.09" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="169.79" y="116.3" width="25.09" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="194.87" y="116.3" width="0.44" height="7.4" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="195.32" y="116.3" width="23.09" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="220.9" y="122.18" font-size="6" font-weight="500" fill="#404040">reply</tspan></text>
+<rect x="67" y="127.2" width="2.37" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="127.2" width="2.37" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="127.2" width="2.37" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="69.37" y="127.2" width="35.89" height="7.4" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="105.26" y="127.2" width="28.86" height="7.4" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="136.62" y="133.08" font-size="6" font-weight="500" fill="#404040">list</tspan><tspan x="146.51" y="133.08" font-size="6" font-weight="500" fill="#404040">files</tspan></text>
+<rect x="67" y="134.6" width="38.26" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="134.6" width="38.26" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="134.6" width="38.26" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="105.26" y="134.6" width="28.05" height="7.4" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="105.26" y="134.6" width="28.05" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="105.26" y="134.6" width="28.05" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="133.3" y="134.6" width="0.81" height="7.4" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="134.12" y="134.6" width="1.63" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="135.75" y="134.6" width="54.17" height="7.4" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="192.41" y="140.48" font-size="6" font-weight="500" fill="#404040">read</tspan><tspan x="206.92" y="140.48" font-size="6" font-weight="500" fill="#404040">(no</tspan><tspan x="218" y="140.48" font-size="6" font-weight="500" fill="#404040">such</tspan><tspan x="233.51" y="140.48" font-size="6" font-weight="500" fill="#404040">file)</tspan></text>
+<rect x="67" y="142" width="38.26" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="142" width="38.26" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="142" width="38.26" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="105.26" y="142" width="28.86" height="7.4" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="105.26" y="142" width="28.86" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="105.26" y="142" width="28.86" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="134.12" y="142" width="1.63" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="134.12" y="142" width="1.63" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="134.12" y="142" width="1.63" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="135.75" y="142" width="53.21" height="7.4" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="135.75" y="142" width="53.21" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="135.75" y="142" width="53.21" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="188.95" y="142" width="0.96" height="7.4" rx="0" fill="#D7C26E" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="189.91" y="142" width="6.07" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="198.48" y="147.88" font-size="6" font-weight="500" fill="#404040">read</tspan><tspan x="212.99" y="147.88" font-size="6" font-weight="500" fill="#404040">notes</tspan></text>
+<rect x="67" y="149.4" width="38.26" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="149.4" width="38.26" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="149.4" width="38.26" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="105.26" y="149.4" width="28.86" height="7.4" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="105.26" y="149.4" width="28.86" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="105.26" y="149.4" width="28.86" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="134.12" y="149.4" width="1.63" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="134.12" y="149.4" width="1.63" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="134.12" y="149.4" width="1.63" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="135.75" y="149.4" width="54.17" height="7.4" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="135.75" y="149.4" width="54.17" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="135.75" y="149.4" width="54.17" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="189.91" y="149.4" width="4.96" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="189.91" y="149.4" width="4.96" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="189.91" y="149.4" width="4.96" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="194.87" y="149.4" width="3.85" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="198.72" y="149.4" width="16.8" height="7.4" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="218.02" y="155.28" font-size="6" font-weight="500" fill="#404040">write</tspan><tspan x="233.98" y="155.28" font-size="6" font-weight="500" fill="#404040">draft</tspan></text>
+<rect x="67" y="156.8" width="38.26" height="7.4" rx="0" fill="#D9D9D9" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="156.8" width="38.26" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="67" y="156.8" width="38.26" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="105.26" y="156.8" width="28.86" height="7.4" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="105.26" y="156.8" width="28.86" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="105.26" y="156.8" width="28.86" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="134.12" y="156.8" width="1.63" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="134.12" y="156.8" width="1.63" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="134.12" y="156.8" width="1.63" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="135.75" y="156.8" width="54.17" height="7.4" rx="0" fill="#D7C26E" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="135.75" y="156.8" width="54.17" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="135.75" y="156.8" width="54.17" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="189.91" y="156.8" width="8.81" height="7.4" rx="0" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="189.91" y="156.8" width="8.81" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="189.91" y="156.8" width="8.81" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="198.72" y="156.8" width="16.28" height="7.4" rx="0" fill="#8597B6" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="198.72" y="156.8" width="16.28" height="7.4" rx="0" fill="url(#h_gray5_none)" stroke="none" stroke-width="0" stroke-linejoin="round"/>
+<rect x="198.72" y="156.8" width="16.28" height="7.4" rx="0" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="215" y="156.8" width="0.52" height="7.4" rx="0" fill="#8597B6" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<rect x="215.52" y="156.8" width="16.95" height="7.4" rx="0" fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<text font-family="Inter"><tspan x="234.96" y="162.68" font-size="6" font-weight="500" fill="#404040">reply</tspan></text>
+<path d="M67,167.2 L437.8,167.2" fill="none" stroke="#000000" stroke-width="0.75" stroke-linejoin="miter" stroke-linecap="butt"/>
+<polygon points="441,167.2 437.24,168.9 437.24,165.5" fill="#000000"/>
+<path d="M67,167.2 L67,169.2" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="63.09" y="174.73" font-size="6.5" font-weight="500" fill="#000000">0k</tspan></text>
+<path d="M141,167.2 L141,169.2" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="137.83" y="174.73" font-size="6.5" font-weight="500" fill="#000000">1k</tspan></text>
+<path d="M215,167.2 L215,169.2" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="211.18" y="174.73" font-size="6.5" font-weight="500" fill="#000000">2k</tspan></text>
+<path d="M289,167.2 L289,169.2" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="285.15" y="174.73" font-size="6.5" font-weight="500" fill="#000000">3k</tspan></text>
+<path d="M363,167.2 L363,169.2" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="359.05" y="174.73" font-size="6.5" font-weight="500" fill="#000000">4k</tspan></text>
+<path d="M437,167.2 L437,169.2" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="433.22" y="174.73" font-size="6.5" font-weight="500" fill="#000000">5k</tspan></text>
+<text font-family="Inter"><tspan x="197.01" y="183.28" font-size="6.5" font-weight="500" fill="#000000">Writer</tspan><tspan x="217.72" y="183.28" font-size="6.5" font-weight="500" fill="#000000">prompt</tspan><tspan x="241.79" y="183.28" font-size="6.5" font-weight="500" fill="#000000">per</tspan><tspan x="253.88" y="183.28" font-size="6.5" font-weight="500" fill="#000000">LLM</tspan><tspan x="268.89" y="183.28" font-size="6.5" font-weight="500" fill="#000000">call</tspan><tspan x="281.41" y="183.28" font-size="6.5" font-weight="500" fill="#000000">(tokens)</tspan></text>
 <text font-family="Inter"><tspan x="448.14" y="12.86" font-size="6.5" font-weight="700" fill="#000000">sent</tspan><tspan x="463.62" y="12.86" font-size="6.5" font-weight="700" fill="#000000">/</tspan><tspan x="467.68" y="12.86" font-size="6.5" font-weight="700" fill="#000000">computed</tspan></text>
-<text font-family="Inter"><tspan x="455.79" y="26.15" font-size="7" font-weight="500" fill="#000000">4.9k</tspan><tspan x="472.4" y="26.15" font-size="7" font-weight="500" fill="#000000">/</tspan><tspan x="476.85" y="26.15" font-size="7" font-weight="700" fill="#000000">4.9k</tspan></text>
-<text font-family="Inter"><tspan x="456.32" y="42.85" font-size="7" font-weight="500" fill="#000000">0.7k</tspan><tspan x="472.42" y="42.85" font-size="7" font-weight="500" fill="#000000">/</tspan><tspan x="476.88" y="42.85" font-size="7" font-weight="700" fill="#000000">0.7k</tspan></text>
-<text font-family="Inter"><tspan x="456.73" y="69.45" font-size="7" font-weight="500" fill="#000000">6.6k</tspan><tspan x="473.04" y="69.45" font-size="7" font-weight="500" fill="#000000">/</tspan><tspan x="477.49" y="69.45" font-size="7" font-weight="700" fill="#000000">1.8k</tspan></text>
-<text font-family="Inter"><tspan x="457.27" y="102.65" font-size="7" font-weight="500" fill="#000000">5.7k</tspan><tspan x="473.09" y="102.65" font-size="7" font-weight="500" fill="#000000">/</tspan><tspan x="477.54" y="102.65" font-size="7" font-weight="700" fill="#000000">2.1k</tspan></text>
-<text font-family="Inter"><tspan x="455.98" y="135.85" font-size="7" font-weight="500" fill="#000000">8.6k</tspan><tspan x="472.35" y="135.85" font-size="7" font-weight="500" fill="#000000">/</tspan><tspan x="476.81" y="135.85" font-size="7" font-weight="700" fill="#000000">2.2k</tspan></text>
+<text font-family="Inter"><tspan x="455.79" y="26.95" font-size="7" font-weight="500" fill="#000000">4.9k</tspan><tspan x="472.4" y="26.95" font-size="7" font-weight="500" fill="#000000">/</tspan><tspan x="476.85" y="26.95" font-size="7" font-weight="700" fill="#000000">4.9k</tspan></text>
+<text font-family="Inter"><tspan x="456.32" y="45.25" font-size="7" font-weight="500" fill="#000000">0.7k</tspan><tspan x="472.42" y="45.25" font-size="7" font-weight="500" fill="#000000">/</tspan><tspan x="476.88" y="45.25" font-size="7" font-weight="700" fill="#000000">0.7k</tspan></text>
+<text font-family="Inter"><tspan x="456.73" y="74.65" font-size="7" font-weight="500" fill="#000000">6.6k</tspan><tspan x="473.04" y="74.65" font-size="7" font-weight="500" fill="#000000">/</tspan><tspan x="477.49" y="74.65" font-size="7" font-weight="700" fill="#000000">1.8k</tspan></text>
+<text font-family="Inter"><tspan x="457.27" y="111.45" font-size="7" font-weight="500" fill="#000000">5.7k</tspan><tspan x="473.09" y="111.45" font-size="7" font-weight="500" fill="#000000">/</tspan><tspan x="477.54" y="111.45" font-size="7" font-weight="700" fill="#000000">2.1k</tspan></text>
+<text font-family="Inter"><tspan x="455.98" y="148.25" font-size="7" font-weight="500" fill="#000000">8.6k</tspan><tspan x="472.35" y="148.25" font-size="7" font-weight="500" fill="#000000">/</tspan><tspan x="476.81" y="148.25" font-size="7" font-weight="700" fill="#000000">2.2k</tspan></text>
 <rect x="72.33" y="1" width="361.34" height="11.6" fill="white" stroke="#000" stroke-width="0.7"/>
 <rect x="75.13" y="3.8" width="6" height="6" fill="#D9D9D9" stroke="#000" stroke-width="0.7"/>
 <text font-family="Inter"><tspan x="83.13" y="9.16" font-size="6.5" font-weight="500" fill="#000000">Task,</tspan><tspan x="101.36" y="9.16" font-size="6.5" font-weight="500" fill="#000000">instructions</tspan></text>

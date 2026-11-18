@@ -51,7 +51,7 @@ fig = Figure("text")
 legend_strip, body = fig.area.take("top", 12, gap=4)
 plot, values = body.take("right", 62, gap=6)
 n_rows = [len(DATA["channels"][c]["calls"]) for c, _, _ in ORDER]
-row_h = 6.6
+row_h = 7.4
 lane_h = [max(n, 2) * row_h for n in n_rows]
 gaps = 3.5
 tl_h = sum(lane_h) + gaps * (len(lane_h) - 1)
