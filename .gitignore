@@ -1,0 +1,26 @@
+# Local-only instructions and secrets
+CLAUDE.md
+.claude/
+.env
+env.local.sh
+
+# Large or machine-local data (kept on nvme, not in git)
+.venv
+venv/
+data
+logs
+results_raw
+docs/*.pdf
+docs/*.pptx
+hf/
+.cache/
+*.safetensors
+*.bin
+*.pt
+*.pth
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/

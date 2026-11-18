@@ -1,0 +1,19 @@
+[project]
+name = "agentipc"
+version = "0.1.0"
+description = "Shared files vs. message passing for LLM multi-agent communication"
+requires-python = ">=3.10"
+dependencies = ["httpx", "pyyaml", "numpy", "pandas", "scipy", "matplotlib"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
