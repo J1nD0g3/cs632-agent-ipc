@@ -49,7 +49,8 @@ class ChatClient:
             if r.status_code >= 500 and attempt < 2:
                 await asyncio.sleep(2 ** attempt)
                 continue
-            r.raise_for_status()
+            if r.status_code >= 400:
+                raise RuntimeError(f"HTTP {r.status_code}: {r.text[:300]}")
             break
         d = r.json()
         ch = d["choices"][0]

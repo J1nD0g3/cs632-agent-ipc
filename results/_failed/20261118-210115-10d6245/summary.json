@@ -1,0 +1,146 @@
+{
+ "2wiki|k1|A1": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k1|A1zc": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k1|A2": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k1|B": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k1|C": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k1|D": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k3|A1": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k3|A1zc": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k3|A2": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k3|B": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k3|C": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k3|D": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k5|A1": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k5|A1zc": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k5|A2": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k5|B": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k5|C": {
+  "n": 10,
+  "errors": 10
+ },
+ "2wiki|k5|D": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k1|A1": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k1|A1zc": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k1|A2": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k1|B": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k1|C": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k1|D": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k3|A1": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k3|A1zc": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k3|A2": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k3|B": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k3|C": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k3|D": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k5|A1": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k5|A1zc": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k5|A2": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k5|B": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k5|C": {
+  "n": 10,
+  "errors": 10
+ },
+ "hotpotqa|k5|D": {
+  "n": 10,
+  "errors": 10
+ }
+}

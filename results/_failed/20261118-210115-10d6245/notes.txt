@@ -1,0 +1,1 @@
+Pilot 1: every request failed with HTTP 400 because cache_salt contained "/", which vLLM rejects. Salt now uses "." and HTTP errors carry the server message.
