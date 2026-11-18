@@ -161,3 +161,22 @@ def test_batched_read(questions, tmp_path):
     assert rec["io"]["writer"]["reads"] == 2 and len(rec["agents"]["writer"]["calls"]) == 3
     b = MockClient(["x"])
     assert "read_files" not in system_prompt("writer", "B")
+
+
+def test_parallel_researchers(questions, tmp_path):
+    task = make_tasks(questions, 1, 3, seed=0)[0]
+    client = MockClient(["N1", "N2", "N3", "DRAFT", _final(3)])
+    rec = asyncio.run(run_task(task, "A2", client, tmp_path, researchers=3))
+    first = [c["messages"][1]["content"] for c in client.calls[:3]]
+    assert all(f.count("\nQ") == 1 for f in first) and "Q2:" in first[1]
+    writer = client.calls[3]["messages"][1]["content"]
+    assert all(n in writer for n in ("N1", "N2", "N3")) and "Documents:" not in writer
+    assert "Researchers (several, in parallel)" in client.calls[0]["messages"][0]["content"]
+    assert rec["stage"]["notes"] == "N1\nN2\nN3"
+    files = MockClient([[("write_file", {"path": "r1.md", "content": "A"})], "D1",
+                        [("write_file", {"path": "r2.md", "content": "B"})], "D2",
+                        [("write_file", {"path": "r3.md", "content": "C"})], "D3",
+                        [("write_file", {"path": "draft.md", "content": _final(3)})], "DONE",
+                        [("write_file", {"path": "final.md", "content": _final(3)})], "DONE"])
+    rec = asyncio.run(run_task(task, "B", files, tmp_path, researchers=3))
+    assert sorted(rec["io"]) == ["researcher1", "researcher2", "researcher3", "reviewer", "writer"]

@@ -5,6 +5,7 @@ A2 pipe (previous output only), B files, C files + index, D handles (short pushe
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import time
 from dataclasses import dataclass, field
@@ -39,7 +40,16 @@ ROLE_TEXT = {
     "reviewer": ("You are the Reviewer. Check the latest draft, fix answers that are wrong or unsupported, "
                  "and produce the final answers."),
 }
-NAME = {"researcher": "Researcher", "writer": "Writer", "checker": "Fact-checker", "reviewer": "Reviewer"}
+NAME = {"researcher": "Researcher", "writer": "Writer", "checker": "Fact-checker", "reviewer": "Reviewer",
+        "researchers": "Researchers (several, in parallel)"}
+
+
+def base_role(role: str) -> str:
+    return "researcher" if role.startswith("researcher") else role
+
+
+def display(role: str) -> str:
+    return f"Researcher {role[10:]}" if role.startswith("researcher") and role[10:].isdigit() else NAME[role]
 
 OUTPUT_MSG = {
     "researcher": "Reply with your notes. Your reply is passed on to the next agents.",
@@ -115,11 +125,12 @@ def team_text(chain: tuple[str, ...]) -> str:
 
 def instruction(role: str, channel: str, chain: tuple[str, ...]) -> str:
     """Role and channel instructions (everything an agent is told besides its inputs)."""
+    role = base_role(role)
     parts = [ROLE_TEXT[role]]
     if channel in MESSAGE_CHANNELS:
         parts.append(OUTPUT_MSG[role])
     else:
-        i = chain.index(role)
+        i = chain.index(role) if role in chain else 0
         prev_file = OUT_FILE.get(chain[i - 1], "draft.md") if i > 0 else ""
         parts.append(OUTPUT_FILES[role].format(prev_file=prev_file))
         parts.append(HANDOFF_RULE if channel == "D" and role != "reviewer" else DONE_RULE)
@@ -199,7 +210,7 @@ async def run_agent(client, ws: Workspace | None, role: str, messages: list[dict
                     out_file: str | None = None, full_tools: list[dict] = TOOLS) -> AgentRun:
     """Tool loop. An agent that stops without leaving its output gets one forced write_file turn."""
     run = AgentRun(role)
-    tools = None if ws is None else (WRITE_ONLY if role == "researcher" else full_tools)
+    tools = None if ws is None else (WRITE_ONLY if base_role(role) == "researcher" else full_tools)
     prev_sig, plain_reply = None, False
     for turn in range(max_turns if ws is not None else 1):
         r, call = await _chat(client, run, messages, tools, turn, False)
@@ -245,84 +256,130 @@ def seed_workspace(ws: Workspace, task: Task, channel: str) -> None:
         ws.refresh_index()
 
 
-def build_messages(role: str, channel: str, chain: tuple[str, ...], task: Task, replies: dict[str, str]) -> list[dict]:
+def build_messages(role: str, channel: str, chain: tuple[str, ...], task: Task, replies: dict[str, str],
+                   flat: list[str] | None = None, rtask: Task | None = None) -> list[dict]:
+    """Messages for one agent. flat lists every agent in order (parallel Researchers expanded); rtask is the
+    part of the task a parallel Researcher covers."""
+    flat = flat or list(chain)
     qs, docs = questions_block(task), documents_block(task)
-    i = chain.index(role)
-    before = chain[:i]
-    if role == "researcher":
-        # The Researcher's input is the same in every channel: the questions and the documents.
+    before = flat[:flat.index(role)]
+    if base_role(role) == "researcher":
+        # A Researcher's input is the same in every channel: its questions and their documents.
+        if rtask is not None:
+            qs, docs = rtask_block(rtask), documents_block(rtask)
         if channel == "A1zc":
             return [{"role": "system", "content": team_text(chain)},
                     {"role": "user", "content": f"{qs}\n\n{docs}"},
                     {"role": "user", "content": instruction(role, channel, chain)}]
         return [{"role": "system", "content": system_prompt(role, channel, chain)},
                 {"role": "user", "content": f"{qs}\n\n{docs}"}]
-    if channel == "A1":
-        msgs = [{"role": "system", "content": system_prompt(role, channel, chain)},
-                {"role": "user", "content": f"{qs}\n\n{docs}"}]
-        msgs += [{"role": "user", "content": f"[{NAME[r]}]\n{replies[r]}"} for r in before]
-        return msgs
-    if channel == "A1zc":
-        # Same content as A1, but the shared history comes first and the role instruction last,
-        # so consecutive agents share a prompt prefix that the serving engine can reuse.
-        msgs = [{"role": "system", "content": team_text(chain)},
-                {"role": "user", "content": f"{qs}\n\n{docs}"}]
-        msgs += [{"role": "user", "content": f"[{NAME[r]}]\n{replies[r]}"} for r in before]
-        msgs.append({"role": "user", "content": instruction(role, channel, chain)})
-        return msgs
+    if channel in ("A1", "A1zc"):
+        # A1 copies everything said so far: the task (all questions and documents) and every earlier output.
+        history = [{"role": "user", "content": f"{qs}\n\n{docs}"}]
+        history += [{"role": "user", "content": f"[{display(r)}]\n{replies[r]}"} for r in before]
+        if channel == "A1":
+            return [{"role": "system", "content": system_prompt(role, channel, chain)}] + history
+        # A1zc: same content, shared history first and the role instruction last, so consecutive agents
+        # share a prompt prefix that the serving engine can reuse.
+        return ([{"role": "system", "content": team_text(chain)}] + history +
+                [{"role": "user", "content": instruction(role, channel, chain)}])
     if channel == "A2":
-        prev = before[-1]
+        # A pipe carries only the previous stage's output (all parallel Researchers, if that stage had several).
+        prev = [r for r in before if base_role(r) == base_role(before[-1])] if base_role(before[-1]) == "researcher" \
+            else [before[-1]]
+        body = "\n\n".join(f"[{display(r)}]\n{replies[r]}" for r in prev)
         return [{"role": "system", "content": system_prompt(role, channel, chain)},
-                {"role": "user", "content": f"{qs}\n\n[{NAME[prev]}]\n{replies[prev]}"}]
+                {"role": "user", "content": f"{qs}\n\n{body}"}]
     msgs = [{"role": "system", "content": system_prompt(role, channel, chain)},
             {"role": "user", "content": qs}]
     if channel == "D":
-        msgs.append({"role": "user", "content": "\n\n".join(f"[{NAME[r]} handoff]\n{replies[r]}" for r in before)})
+        msgs.append({"role": "user", "content": "\n\n".join(f"[{display(r)} handoff]\n{replies[r]}" for r in before)})
     return msgs
 
 
+def rtask_block(rtask: Task) -> str:
+    """Questions of a parallel Researcher, keeping their numbers in the whole task."""
+    return ("Your questions (other Researchers cover the rest):\n" +
+            "\n".join(f"Q{n}: {q.question}" for n, q in zip(rtask.numbers, rtask.questions)))
+
+
+def split_task(task: Task, n: int) -> list[Task]:
+    """Split a task's questions into n contiguous groups, each with the documents of its questions."""
+    size = -(-len(task.questions) // n)
+    by_title = {d.title: d for d in task.docs}
+    parts = []
+    for g in range(n):
+        idx = list(range(g * size, min(len(task.questions), (g + 1) * size)))
+        if not idx:
+            continue
+        qs = [task.questions[i] for i in idx]
+        titles = {t for q in qs for t, _ in q.paragraphs}
+        sub = Task(f"{task.task_id}.r{g + 1}", task.dataset, qs, [d for d in task.docs if d.title in titles])
+        sub.numbers = [i + 1 for i in idx]
+        parts.append(sub)
+    return parts
+
+
 async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: int = 12,
-                   chain: tuple[str, ...] = ("researcher", "writer", "reviewer")) -> dict:
+                   chain: tuple[str, ...] = ("researcher", "writer", "reviewer"), researchers: int = 1) -> dict:
     assert channel in CHANNELS and chain[0] == "researcher" and chain[-1] == "reviewer"
     t0 = time.perf_counter()
-    client = SaltedClient(client, f"{task.task_id}.{channel}.{len(chain)}.{time.time_ns()}")
+    client = SaltedClient(client, f"{task.task_id}.{channel}.{len(chain)}.{researchers}.{time.time_ns()}"
+                          if researchers > 1 else f"{task.task_id}.{channel}.{len(chain)}.{time.time_ns()}")
     files = channel in FILE_CHANNELS
-    ws = Workspace(Path(workdir) / f"{task.task_id}_{channel}_{len(chain)}") if files else None
+    tag = f"{len(chain)}" if researchers == 1 else f"{len(chain)}r{researchers}"
+    ws = Workspace(Path(workdir) / f"{task.task_id}_{channel}_{tag}") if files else None
     if ws is not None:
         seed_workspace(ws, task, channel)
+    tools = TOOLS_BATCH if channel == "Bb" else TOOLS
+    turns = max_turns if files else 1
+
+    if researchers > 1:
+        parts = split_task(task, researchers)
+        rroles = [f"researcher{i + 1}" for i in range(len(parts))]
+        shown = ("researchers",) + tuple(chain[1:])
+    else:
+        parts, rroles, shown = [None], ["researcher"], chain
+    flat = rroles + list(chain[1:])
 
     runs: dict[str, AgentRun] = {}
     replies: dict[str, str] = {}
     stage: dict[str, str] = {}
-    for i, role in enumerate(chain):
-        msgs = build_messages(role, channel, chain, task, replies)
-        runs[role] = await run_agent(client, ws, role, msgs, max_turns if files else 1, OUT_FILE.get(role),
-                                     TOOLS_BATCH if channel == "Bb" else TOOLS)
+    # Parallel Researchers run concurrently, as in an orchestrator-worker fan-out.
+    res = await asyncio.gather(*(run_agent(client, ws, r, build_messages(r, channel, shown, task, replies, flat, sub),
+                                           turns, None, tools) for r, sub in zip(rroles, parts)))
+    for r, run in zip(rroles, res):
+        runs[r], replies[r] = run, run.reply
+    if files:
+        stage["notes"] = "\n".join(ws.written_by(r) for r in rroles)
+        if channel == "D":
+            stage["notes"] += "\n" + "\n".join(replies[r] for r in rroles)
+    else:
+        stage["notes"] = "\n".join(replies[r] for r in rroles)
+
+    for role in chain[1:]:
+        msgs = build_messages(role, channel, shown, task, replies, flat)
+        runs[role] = await run_agent(client, ws, role, msgs, turns, OUT_FILE.get(role), tools)
         replies[role] = runs[role].reply
-        if role == "researcher":
-            stage["notes"] = replies[role] if not files else ws.written_by("researcher")
-            if channel == "D":
-                stage["notes"] += "\n" + replies[role]
-        else:
-            out = replies[role]
-            if files:
-                f = ws.root / OUT_FILE[role]
-                out = f.read_text() if f.is_file() else ""
-            stage[{"writer": "draft", "reviewer": "final"}.get(role, role)] = out
+        out = replies[role]
+        if files:
+            f = ws.root / OUT_FILE[role]
+            out = f.read_text() if f.is_file() else ""
+        stage[{"writer": "draft", "reviewer": "final"}.get(role, role)] = out
         if role == "writer":
-            # What actually reached the Writer from the Researcher.
+            # What actually reached the Writer from the Researchers.
+            pushed = "\n".join(replies[r] for r in rroles)
             if channel in MESSAGE_CHANNELS:
-                stage["writer_input"] = replies["researcher"]
+                stage["writer_input"] = pushed
             else:
-                pushed = replies["researcher"] if channel == "D" else ""
-                stage["writer_input"] = "\n".join([pushed] + ws.reads_by.get("writer", []))
+                stage["writer_input"] = "\n".join([pushed if channel == "D" else ""] + ws.reads_by.get("writer", []))
     if files and not stage.get("final"):
         stage["final"] = replies.get("reviewer", "")
         stage["final_from_reply"] = "1"
 
     return {
         "task_id": task.task_id, "channel": channel, "dataset": task.dataset, "k": len(task.questions),
-        "chain": list(chain), "wall_s": round(time.perf_counter() - t0, 2),
+        "chain": list(chain), "researchers": researchers, "wall_s": round(time.perf_counter() - t0, 2),
         "agents": {r: {"calls": a.calls, "hit_turn_limit": a.hit_turn_limit, "overflow": a.overflow,
                        "reply": a.reply} for r, a in runs.items()},
         "io": {r: s.as_dict() for r, s in ws.stats.items()} if ws else {},

@@ -88,7 +88,8 @@ async def run(cfg: dict, run_dir: Path, raw_dir: Path) -> list[dict]:
         async with sems[i % len(clients)]:
             try:
                 rec = await run_task(task, ch, client, work, cfg.get("max_turns", 12),
-                                     tuple(cfg.get("chain", ["researcher", "writer", "reviewer"])))
+                                     tuple(cfg.get("chain", ["researcher", "writer", "reviewer"])),
+                                     cfg.get("researchers", 1))
             except Exception as e:  # keep going; a failed run is recorded, not dropped
                 rec = {"task_id": task.task_id, "channel": ch, "dataset": task.dataset, "k": len(task.questions),
                        "error": f"{type(e).__name__}: {e}"[:500], "agents": {}, "stage": {}}
