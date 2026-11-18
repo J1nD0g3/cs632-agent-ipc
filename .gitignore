@@ -24,3 +24,11 @@ __pycache__/
 *.pyc
 .pytest_cache/
 *.egg-info/
+
+# LaTeX build files
+paper/*.aux
+paper/*.log
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.out
