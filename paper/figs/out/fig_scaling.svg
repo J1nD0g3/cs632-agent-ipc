@@ -1,68 +1,81 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="506pt" height="128.03pt" viewBox="0 0 506 128.03">
-<defs><clipPath id="plot65968"><rect x="28.65" y="19.86" width="215.35" height="77.72"/></clipPath><clipPath id="plot72016"><rect x="286.69" y="19.86" width="218.31" height="77.72"/></clipPath></defs>
+<defs><clipPath id="plot46640"><rect x="28.65" y="19.86" width="215.35" height="77.72"/></clipPath><clipPath id="plot52688"><rect x="286.94" y="19.86" width="218.06" height="77.72"/></clipPath></defs>
 <line x1="28.65" y1="79.92" x2="244" y2="79.92" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
 <line x1="28.65" y1="62.26" x2="244" y2="62.26" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
 <line x1="28.65" y1="44.59" x2="244" y2="44.59" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
 <line x1="28.65" y1="26.93" x2="244" y2="26.93" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="200.93" y1="19.86" x2="200.93" y2="97.59" stroke="#7F7F7F" stroke-width="0.5" stroke-dasharray="2.4 1.6"/>
 <path d="M28.65,62.26 L244,62.26" fill="none" stroke="#000000" stroke-width="0.6" stroke-dasharray="2.4 1.6" stroke-linejoin="miter" stroke-linecap="butt"/>
 <text font-family="Inter"><tspan x="30.15" y="59.5" font-size="6.5" font-weight="500" fill="#000000">A1</tspan><tspan x="38.93" y="59.5" font-size="6.5" font-weight="500" fill="#000000">=</tspan><tspan x="45.01" y="59.5" font-size="6.5" font-weight="500" fill="#000000">1</tspan></text>
-<path d="M55.57,80.96 L109.41,83.9 L163.24,84.11 L217.08,68.28" fill="none" stroke="#F2B53A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot65968)"/>
-<polygon points="55.57,78.75 56.12,80.21 57.67,80.28 56.46,81.25 56.87,82.75 55.57,81.9 54.27,82.75 54.68,81.25 53.47,80.28 55.02,80.21" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
-<polygon points="109.41,81.69 109.96,83.15 111.51,83.22 110.3,84.19 110.7,85.69 109.41,84.84 108.11,85.69 108.52,84.19 107.3,83.22 108.86,83.15" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
-<polygon points="163.24,81.9 163.79,83.36 165.35,83.43 164.13,84.4 164.54,85.9 163.24,85.05 161.94,85.9 162.35,84.4 161.14,83.43 162.69,83.36" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
-<polygon points="217.08,66.07 217.63,67.52 219.18,67.59 217.97,68.57 218.38,70.07 217.08,69.21 215.78,70.07 216.19,68.57 214.98,67.59 216.53,67.52" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
-<path d="M55.57,82.95 L109.41,84.1 L163.24,84.32 L217.08,84.47" fill="none" stroke="#7F7F7F" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot65968)"/>
-<circle cx="55.57" cy="82.95" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
-<circle cx="109.41" cy="84.1" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
-<circle cx="163.24" cy="84.32" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
-<circle cx="217.08" cy="84.47" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
-<path d="M55.57,59.65 L109.41,69.65 L163.24,73.8 L217.08,54.55" fill="none" stroke="#C0D8DA" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot65968)"/>
-<rect x="54.04" y="58.12" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
-<rect x="107.88" y="68.12" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
-<rect x="161.71" y="72.27" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
-<rect x="215.55" y="53.02" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
-<path d="M55.57,54.57 L109.41,69.64 L163.24,73.18 L217.08,52.04" fill="none" stroke="#3D5E64" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot65968)"/>
-<rect x="54.04" y="53.04" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
-<rect x="107.88" y="68.11" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
-<rect x="161.71" y="71.65" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
-<rect x="215.55" y="50.51" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
-<path d="M55.57,62.08 L109.41,76.91 L163.24,78.8 L217.08,66.6" fill="none" stroke="#9CBBBE" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot65968)"/>
-<polygon points="55.57,60.13 57.43,63.45 53.71,63.45" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
-<polygon points="109.41,74.95 111.26,78.28 107.55,78.28" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
-<polygon points="163.24,76.85 165.1,80.17 161.39,80.17" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
-<polygon points="217.08,64.65 218.94,67.97 215.22,67.97" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
+<path d="M50.18,80.96 L93.25,83.9 L136.32,84.11 L179.39,68.28 L222.46,62.18" fill="none" stroke="#F2B53A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot46640)"/>
+<polygon points="50.18,78.75 50.73,80.21 52.29,80.28 51.07,81.25 51.48,82.75 50.18,81.9 48.89,82.75 49.3,81.25 48.08,80.28 49.63,80.21" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
+<polygon points="93.25,81.69 93.8,83.15 95.36,83.22 94.14,84.19 94.55,85.69 93.25,84.84 91.96,85.69 92.37,84.19 91.15,83.22 92.7,83.15" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
+<polygon points="136.32,81.9 136.87,83.36 138.43,83.43 137.21,84.4 137.62,85.9 136.32,85.05 135.03,85.9 135.44,84.4 134.22,83.43 135.78,83.36" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
+<polygon points="179.39,66.07 179.94,67.52 181.5,67.59 180.28,68.57 180.69,70.07 179.39,69.21 178.1,70.07 178.51,68.57 177.29,67.59 178.85,67.52" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
+<polygon points="222.46,59.97 223.01,61.42 224.57,61.49 223.35,62.47 223.76,63.96 222.46,63.11 221.17,63.96 221.58,62.47 220.36,61.49 221.92,61.42" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
+<path d="M50.18,82.95 L93.25,84.1 L136.32,84.32 L179.39,84.47 L222.46,84.44" fill="none" stroke="#7F7F7F" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot46640)"/>
+<circle cx="50.18" cy="82.95" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
+<circle cx="93.25" cy="84.1" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
+<circle cx="136.32" cy="84.32" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
+<circle cx="179.39" cy="84.47" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
+<circle cx="222.46" cy="84.44" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
+<path d="M50.18,59.65 L93.25,69.65 L136.32,73.8 L179.39,54.55 L222.46,33.09" fill="none" stroke="#C0D8DA" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot46640)"/>
+<rect x="48.65" y="58.12" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
+<rect x="91.72" y="68.12" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
+<rect x="134.79" y="72.27" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
+<rect x="177.86" y="53.02" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
+<rect x="220.93" y="31.56" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
+<path d="M50.18,54.57 L93.25,69.64 L136.32,73.18 L179.39,52.04 L222.46,35" fill="none" stroke="#3D5E64" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot46640)"/>
+<rect x="48.65" y="53.04" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
+<rect x="91.72" y="68.11" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
+<rect x="134.79" y="71.65" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
+<rect x="177.86" y="50.51" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
+<rect x="220.93" y="33.47" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
+<path d="M50.18,62.08 L93.25,76.91 L136.32,78.8 L179.39,66.6 L222.46,61.74" fill="none" stroke="#9CBBBE" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot46640)"/>
+<polygon points="50.18,60.13 52.04,63.45 48.33,63.45" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
+<polygon points="93.25,74.95 95.11,78.28 91.4,78.28" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
+<polygon points="136.32,76.85 138.18,80.17 134.47,80.17" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
+<polygon points="179.39,64.65 181.25,67.97 177.54,67.97" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
+<polygon points="222.46,59.79 224.32,63.11 220.61,63.11" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
 <text font-family="Inter"><tspan x="30.09" y="125.46" font-size="7.5" font-weight="600" fill="#000000">(a)</tspan><tspan x="41.88" y="125.46" font-size="7.5" font-weight="600" fill="#000000">Compute:</tspan><tspan x="79.29" y="125.46" font-size="7.5" font-weight="600" fill="#000000">cache</tspan><tspan x="103.33" y="125.46" font-size="7.5" font-weight="600" fill="#000000">savings</tspan><tspan x="133.28" y="125.46" font-size="7.5" font-weight="600" fill="#000000">fade</tspan><tspan x="151.37" y="125.46" font-size="7.5" font-weight="600" fill="#000000">as</tspan><tspan x="161.69" y="125.46" font-size="7.5" font-weight="600" fill="#000000">payloads</tspan><tspan x="196.66" y="125.46" font-size="7.5" font-weight="600" fill="#000000">grow</tspan></text>
-<line x1="286.69" y1="76" x2="505" y2="76" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<line x1="286.69" y1="54.41" x2="505" y2="54.41" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<line x1="286.69" y1="32.82" x2="505" y2="32.82" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<path d="M286.69,32.82 L505,32.82" fill="none" stroke="#000000" stroke-width="0.6" stroke-dasharray="2.4 1.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<text font-family="Inter"><tspan x="288.19" y="30.06" font-size="6.5" font-weight="500" fill="#000000">A1</tspan></text>
-<path d="M313.98,32.82 L368.56,34.5 L423.13,33.1 L477.71,35.24" fill="none" stroke="#F2B53A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot72016)"/>
-<polygon points="313.98,30.61 314.53,32.06 316.08,32.13 314.87,33.11 315.28,34.61 313.98,33.75 312.68,34.61 313.09,33.11 311.88,32.13 313.43,32.06" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
-<polygon points="368.56,32.29 369.11,33.75 370.66,33.82 369.45,34.79 369.86,36.29 368.56,35.44 367.26,36.29 367.67,34.79 366.46,33.82 368.01,33.75" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
-<polygon points="423.13,30.89 423.68,32.34 425.24,32.42 424.02,33.39 424.43,34.89 423.13,34.03 421.84,34.89 422.25,33.39 421.03,32.42 422.58,32.34" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
-<polygon points="477.71,33.03 478.26,34.48 479.81,34.55 478.6,35.52 479.01,37.02 477.71,36.17 476.41,37.02 476.82,35.52 475.61,34.55 477.16,34.48" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
-<path d="M313.98,43.61 L368.56,54.88 L423.13,52.25 L477.71,39.29" fill="none" stroke="#7F7F7F" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot72016)"/>
-<circle cx="313.98" cy="43.61" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
-<circle cx="368.56" cy="54.88" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
-<circle cx="423.13" cy="52.25" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
-<circle cx="477.71" cy="39.29" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
-<path d="M313.98,55.85 L368.56,53.46 L423.13,50.52 L477.71,50.22" fill="none" stroke="#C0D8DA" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot72016)"/>
-<rect x="312.45" y="54.32" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
-<rect x="367.03" y="51.93" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
-<rect x="421.6" y="48.99" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
-<rect x="476.18" y="48.69" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
-<path d="M313.98,33.53 L368.56,45.77 L423.13,38.86 L477.71,47.93" fill="none" stroke="#3D5E64" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot72016)"/>
-<rect x="312.45" y="32" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
-<rect x="367.03" y="44.24" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
-<rect x="421.6" y="37.33" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
-<rect x="476.18" y="46.4" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
-<path d="M313.98,37.85 L368.56,48.41 L423.13,52.83 L477.71,56.44" fill="none" stroke="#9CBBBE" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot72016)"/>
-<polygon points="313.98,35.89 315.84,39.22 312.12,39.22" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
-<polygon points="368.56,46.45 370.41,49.77 366.7,49.77" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
-<polygon points="423.13,50.88 424.99,54.2 421.28,54.2" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
-<polygon points="477.71,54.48 479.57,57.8 475.85,57.8" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
-<text font-family="Inter"><tspan x="302.26" y="125.46" font-size="7.5" font-weight="600" fill="#000000">(b)</tspan><tspan x="314.43" y="125.46" font-size="7.5" font-weight="600" fill="#000000">Accuracy:</tspan><tspan x="353.24" y="125.46" font-size="7.5" font-weight="600" fill="#000000">files</tspan><tspan x="370.57" y="125.46" font-size="7.5" font-weight="600" fill="#000000">fall</tspan><tspan x="383.47" y="125.46" font-size="7.5" font-weight="600" fill="#000000">behind</tspan><tspan x="410.3" y="125.46" font-size="7.5" font-weight="600" fill="#000000">unless</tspan><tspan x="436.01" y="125.46" font-size="7.5" font-weight="600" fill="#000000">indexed</tspan></text>
+<line x1="286.94" y1="80.69" x2="505" y2="80.69" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="286.94" y1="63.79" x2="505" y2="63.79" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="286.94" y1="46.9" x2="505" y2="46.9" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="286.94" y1="30" x2="505" y2="30" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="461.39" y1="19.86" x2="461.39" y2="97.59" stroke="#7F7F7F" stroke-width="0.5" stroke-dasharray="2.4 1.6"/>
+<path d="M286.94,30 L505,30" fill="none" stroke="#000000" stroke-width="0.6" stroke-dasharray="2.4 1.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="288.44" y="27.24" font-size="6.5" font-weight="500" fill="#000000">A1</tspan></text>
+<path d="M308.75,30 L352.36,31.32 L395.97,30.22 L439.58,31.89 L483.19,28.94" fill="none" stroke="#F2B53A" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot52688)"/>
+<polygon points="308.75,27.79 309.3,29.25 310.85,29.32 309.64,30.29 310.05,31.79 308.75,30.94 307.45,31.79 307.86,30.29 306.65,29.32 308.2,29.25" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
+<polygon points="352.36,29.11 352.91,30.56 354.46,30.64 353.25,31.61 353.66,33.11 352.36,32.25 351.06,33.11 351.47,31.61 350.26,30.64 351.81,30.56" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
+<polygon points="395.97,28.01 396.52,29.47 398.07,29.54 396.86,30.51 397.27,32.01 395.97,31.16 394.67,32.01 395.08,30.51 393.87,29.54 395.42,29.47" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
+<polygon points="439.58,29.68 440.13,31.14 441.68,31.21 440.47,32.18 440.88,33.68 439.58,32.83 438.28,33.68 438.69,32.18 437.48,31.21 439.03,31.14" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
+<polygon points="483.19,26.73 483.74,28.18 485.3,28.25 484.08,29.23 484.49,30.73 483.19,29.87 481.9,30.73 482.3,29.23 481.09,28.25 482.64,28.18" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
+<path d="M308.75,38.45 L352.36,47.27 L395.97,45.21 L439.58,35.07 L483.19,30.88" fill="none" stroke="#7F7F7F" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot52688)"/>
+<circle cx="308.75" cy="38.45" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
+<circle cx="352.36" cy="47.27" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
+<circle cx="395.97" cy="45.21" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
+<circle cx="439.58" cy="35.07" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
+<circle cx="483.19" cy="30.88" r="1.7" fill="#7F7F7F" stroke="#000000" stroke-width="0.45"/>
+<path d="M308.75,48.03 L352.36,46.15 L395.97,43.86 L439.58,43.62 L483.19,87.19" fill="none" stroke="#C0D8DA" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot52688)"/>
+<rect x="307.22" y="46.5" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
+<rect x="350.83" y="44.62" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
+<rect x="394.44" y="42.33" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
+<rect x="438.05" y="42.09" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
+<rect x="481.66" y="85.66" width="3.06" height="3.06" fill="#C0D8DA" stroke="#000000" stroke-width="0.45"/>
+<path d="M308.75,30.56 L352.36,40.14 L395.97,34.73 L439.58,41.83 L483.19,38.62" fill="none" stroke="#3D5E64" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot52688)"/>
+<rect x="307.22" y="29.03" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
+<rect x="350.83" y="38.61" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
+<rect x="394.44" y="33.2" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
+<rect x="438.05" y="40.3" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
+<rect x="481.66" y="37.09" width="3.06" height="3.06" fill="#3D5E64" stroke="#000000" stroke-width="0.45"/>
+<path d="M308.75,33.94 L352.36,42.2 L395.97,45.66 L439.58,48.49 L483.19,49.18" fill="none" stroke="#9CBBBE" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#plot52688)"/>
+<polygon points="308.75,31.98 310.61,35.31 306.89,35.31" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
+<polygon points="352.36,40.25 354.22,43.57 350.5,43.57" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
+<polygon points="395.97,43.71 397.83,47.03 394.11,47.03" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
+<polygon points="439.58,46.53 441.44,49.85 437.73,49.85" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
+<polygon points="483.19,47.22 485.05,50.55 481.34,50.55" fill="#9CBBBE" stroke="#000000" stroke-width="0.45"/>
+<text font-family="Inter"><tspan x="273.19" y="125.46" font-size="7.5" font-weight="600" fill="#000000">(b)</tspan><tspan x="285.35" y="125.46" font-size="7.5" font-weight="600" fill="#000000">Accuracy:</tspan><tspan x="324.16" y="125.46" font-size="7.5" font-weight="600" fill="#000000">plain</tspan><tspan x="343.56" y="125.46" font-size="7.5" font-weight="600" fill="#000000">files</tspan><tspan x="360.88" y="125.46" font-size="7.5" font-weight="600" fill="#000000">collapse</tspan><tspan x="393.18" y="125.46" font-size="7.5" font-weight="600" fill="#000000">at</tspan><tspan x="402.02" y="125.46" font-size="7.5" font-weight="600" fill="#000000">large</tspan><tspan x="422.12" y="125.46" font-size="7.5" font-weight="600" fill="#000000">k;</tspan><tspan x="430.75" y="125.46" font-size="7.5" font-weight="600" fill="#000000">the</tspan><tspan x="444.33" y="125.46" font-size="7.5" font-weight="600" fill="#000000">pipe</tspan><tspan x="461.97" y="125.46" font-size="7.5" font-weight="600" fill="#000000">recovers</tspan></text>
 <rect x="124.01" y="1" width="257.97" height="11.6" fill="white" stroke="#000" stroke-width="0.5"/>
 <line x1="125.81" y1="6.8" x2="140.81" y2="6.8" stroke="#F2B53A" stroke-width="1.1"/>
 <polygon points="133.31,4.59 133.86,6.04 135.41,6.12 134.2,7.09 134.61,8.59 133.31,7.73 132.01,8.59 132.42,7.09 131.21,6.12 132.76,6.04" fill="#F2B53A" stroke="#000000" stroke-width="0.45"/>
@@ -91,24 +104,28 @@
 <line x1="26.65" y1="26.93" x2="28.65" y2="26.93" stroke="#000" stroke-width="0.6"/>
 <text font-family="Inter"><tspan x="16.71" y="29.29" font-size="6.5" font-weight="500" fill="#000000">2×</tspan></text>
 <text font-family="Inter" transform="rotate(-90 4.75 58.72)"><tspan x="-37.91" y="61.45" font-size="7.5" font-weight="600" fill="#000000">Tokens</tspan><tspan x="-9.84" y="61.45" font-size="7.5" font-weight="600" fill="#000000">computed</tspan><tspan x="28.7" y="61.45" font-size="7.5" font-weight="600" fill="#000000">vs</tspan><tspan x="39.11" y="61.45" font-size="7.5" font-weight="600" fill="#000000">A1</tspan></text>
-<text font-family="Inter"><tspan x="54.22" y="106.11" font-size="6.5" font-weight="500" fill="#000000">1</tspan></text>
-<text font-family="Inter"><tspan x="107.37" y="106.11" font-size="6.5" font-weight="500" fill="#000000">3</tspan></text>
-<text font-family="Inter"><tspan x="161.28" y="106.11" font-size="6.5" font-weight="500" fill="#000000">5</tspan></text>
-<text font-family="Inter"><tspan x="215.04" y="106.11" font-size="6.5" font-weight="500" fill="#000000">8</tspan></text>
+<text font-family="Inter"><tspan x="48.84" y="106.11" font-size="6.5" font-weight="500" fill="#000000">1</tspan></text>
+<text font-family="Inter"><tspan x="91.22" y="106.11" font-size="6.5" font-weight="500" fill="#000000">3</tspan></text>
+<text font-family="Inter"><tspan x="134.36" y="106.11" font-size="6.5" font-weight="500" fill="#000000">5</tspan></text>
+<text font-family="Inter"><tspan x="177.35" y="106.11" font-size="6.5" font-weight="500" fill="#000000">8</tspan></text>
+<text font-family="Inter"><tspan x="204.6" y="106.11" font-size="6.5" font-weight="500" fill="#000000">16 (fan-out)</tspan></text>
 <text font-family="Inter"><tspan x="96.36" y="115.2" font-size="7.5" font-weight="600" fill="#000000">Questions</tspan><tspan x="135.08" y="115.2" font-size="7.5" font-weight="600" fill="#000000">per</tspan><tspan x="149.06" y="115.2" font-size="7.5" font-weight="600" fill="#000000">task</tspan><tspan x="166.33" y="115.2" font-size="7.5" font-weight="600" fill="#000000">(k)</tspan></text>
-<rect x="286.69" y="19.86" width="218.31" height="77.72" fill="none" stroke="#000" stroke-width="0.75"/>
-<line x1="284.69" y1="97.59" x2="286.69" y2="97.59" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="271.88" y="99.95" font-size="6.5" font-weight="500" fill="#000000">-30</tspan></text>
-<line x1="284.69" y1="76" x2="286.69" y2="76" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="272.08" y="78.36" font-size="6.5" font-weight="500" fill="#000000">-20</tspan></text>
-<line x1="284.69" y1="54.41" x2="286.69" y2="54.41" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="273.19" y="56.77" font-size="6.5" font-weight="500" fill="#000000">-10</tspan></text>
-<line x1="284.69" y1="32.82" x2="286.69" y2="32.82" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="278.9" y="35.18" font-size="6.5" font-weight="500" fill="#000000">0</tspan></text>
+<rect x="286.94" y="19.86" width="218.06" height="77.72" fill="none" stroke="#000" stroke-width="0.75"/>
+<line x1="284.94" y1="97.59" x2="286.94" y2="97.59" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="271.88" y="99.95" font-size="6.5" font-weight="500" fill="#000000">-40</tspan></text>
+<line x1="284.94" y1="80.69" x2="286.94" y2="80.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="272.13" y="83.05" font-size="6.5" font-weight="500" fill="#000000">-30</tspan></text>
+<line x1="284.94" y1="63.79" x2="286.94" y2="63.79" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="272.33" y="66.16" font-size="6.5" font-weight="500" fill="#000000">-20</tspan></text>
+<line x1="284.94" y1="46.9" x2="286.94" y2="46.9" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="273.44" y="49.26" font-size="6.5" font-weight="500" fill="#000000">-10</tspan></text>
+<line x1="284.94" y1="30" x2="286.94" y2="30" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="279.15" y="32.37" font-size="6.5" font-weight="500" fill="#000000">0</tspan></text>
 <text font-family="Inter" transform="rotate(-90 265.75 58.72)"><tspan x="223.15" y="61.45" font-size="7.5" font-weight="600" fill="#000000">Accuracy</tspan><tspan x="259.57" y="61.45" font-size="7.5" font-weight="600" fill="#000000">vs</tspan><tspan x="269.98" y="61.45" font-size="7.5" font-weight="600" fill="#000000">A1</tspan><tspan x="280.16" y="61.45" font-size="7.5" font-weight="600" fill="#000000">(points)</tspan></text>
-<text font-family="Inter"><tspan x="312.63" y="106.11" font-size="6.5" font-weight="500" fill="#000000">1</tspan></text>
-<text font-family="Inter"><tspan x="366.52" y="106.11" font-size="6.5" font-weight="500" fill="#000000">3</tspan></text>
-<text font-family="Inter"><tspan x="421.17" y="106.11" font-size="6.5" font-weight="500" fill="#000000">5</tspan></text>
-<text font-family="Inter"><tspan x="475.67" y="106.11" font-size="6.5" font-weight="500" fill="#000000">8</tspan></text>
-<text font-family="Inter"><tspan x="355.88" y="115.2" font-size="7.5" font-weight="600" fill="#000000">Questions</tspan><tspan x="394.6" y="115.2" font-size="7.5" font-weight="600" fill="#000000">per</tspan><tspan x="408.58" y="115.2" font-size="7.5" font-weight="600" fill="#000000">task</tspan><tspan x="425.85" y="115.2" font-size="7.5" font-weight="600" fill="#000000">(k)</tspan></text>
+<text font-family="Inter"><tspan x="307.4" y="106.11" font-size="6.5" font-weight="500" fill="#000000">1</tspan></text>
+<text font-family="Inter"><tspan x="350.32" y="106.11" font-size="6.5" font-weight="500" fill="#000000">3</tspan></text>
+<text font-family="Inter"><tspan x="394.01" y="106.11" font-size="6.5" font-weight="500" fill="#000000">5</tspan></text>
+<text font-family="Inter"><tspan x="437.54" y="106.11" font-size="6.5" font-weight="500" fill="#000000">8</tspan></text>
+<text font-family="Inter"><tspan x="465.33" y="106.11" font-size="6.5" font-weight="500" fill="#000000">16 (fan-out)</tspan></text>
+<text font-family="Inter"><tspan x="356.01" y="115.2" font-size="7.5" font-weight="600" fill="#000000">Questions</tspan><tspan x="394.73" y="115.2" font-size="7.5" font-weight="600" fill="#000000">per</tspan><tspan x="408.71" y="115.2" font-size="7.5" font-weight="600" fill="#000000">task</tspan><tspan x="425.98" y="115.2" font-size="7.5" font-weight="600" fill="#000000">(k)</tspan></text>
 </svg>

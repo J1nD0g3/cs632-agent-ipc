@@ -209,14 +209,18 @@ pooled). $k=16$ uses three parallel Researchers.}
 \label{fig:scaling}
 \end{figure*}
 
-% TODO(numbers pending): k=16 (fan-out), cache pressure (1/2/6 concurrent runs), fan-out at k=3, Qwen3-4B.
+% TODO(numbers pending): cache pressure (1/2/6 concurrent runs), fan-out at k=3, Qwen3-4B.
 
 \paragraph{Larger payloads leave the cache behind.} With eight questions per task each prompt holds about 80
 paragraphs, and six concurrent runs no longer fit the server's KV cache together. Zero-copy broadcast then
 computes \nCompAZcKEight{}$\times$ the prefill of broadcast instead of \nCompAZcKThree{}$\times$, and B
 and C compute more than broadcast (\nCompBKEight{}$\times$ and \nCompCKEight{}$\times$): the prefixes they
 resend no longer stay cached between calls (Figure~\ref{fig:scaling}a). The pipe is now the cheap channel that
-loses little (\nGapATwoKEight points).
+loses little (\nGapATwoKEight points). At sixteen questions, which we split among three parallel Researchers,
+zero-copy broadcast saves nothing (\nCompAZcKSixteen{}$\times$), the pipe matches broadcast's accuracy (within
+\nGapATwoKSixteen point) at \nCompATwoKSixteen{}$\times$ its compute, and plain files collapse: B answers
+\nGapBKSixteen points fewer questions than broadcast, while the index holds C to \nGapCKSixteen points and
+handles hold D to \nGapDKSixteen (Figure~\ref{fig:scaling}b).
 
 \paragraph{A longer pipeline multiplies copies, not cached ones.} Adding a Fact-checker between the Writer and
 the Reviewer adds one more receiver. Broadcast then computes \nChainAOneComp\% more, because the history is

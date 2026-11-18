@@ -43,14 +43,14 @@ for ch, (col, mk, name) in STYLE.items():
 fig.caption(left.cx, ca.t + 1, "(a) Compute: cache savings fade as payloads grow", size=7.5, weight=600)
 
 pb, cb = right.take("bottom", 10, gap=2)
-bx = fig.axes(pb, cats=CATS, y=(-0.3, 0.06), yticks=[-0.3, -0.2, -0.1, 0], yfmt=lambda v: f"{v * 100:+.0f}" if v else "0",
+bx = fig.axes(pb, cats=CATS, y=(-0.4, 0.06), yticks=[-0.4, -0.3, -0.2, -0.1, 0], yfmt=lambda v: f"{v * 100:+.0f}" if v else "0",
               ylabel="Accuracy vs A1 (points)", xlabel="Questions per task (k)", seps=seps)
 bx.hline(0, label="A1", label_at="left")
 for ch, (col, mk, name) in STYLE.items():
     ys = series(ch, "acc_diff")
     bx.line([x for x, y in zip(xs, ys) if y is not None], [y for y in ys if y is not None], color=col, marker=mk,
             label=name)
-fig.caption(right.cx, cb.t + 1, "(b) Accuracy: files fall behind unless indexed", size=7.5, weight=600)
+fig.caption(right.cx, cb.t + 1, "(b) Accuracy: plain files collapse at large k; the pipe recovers", size=7.5, weight=600)
 
 fig.legend(ax.legend_items, fig.width / 2, strip.y)
 fig.save(str(Path(__file__).parent / "out" / "fig_scaling"))

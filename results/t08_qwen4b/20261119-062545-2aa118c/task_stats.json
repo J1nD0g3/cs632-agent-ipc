@@ -1,0 +1,74 @@
+{
+ "hotpotqa_k1_s2": {
+  "tasks": 100,
+  "questions": 100,
+  "docs_mean": 10.0,
+  "doc_chars_mean": 5407.6,
+  "support_facts_mean": 2.4,
+  "types": {
+   "bridge": 80,
+   "comparison": 20
+  }
+ },
+ "hotpotqa_k3_s2": {
+  "tasks": 100,
+  "questions": 300,
+  "docs_mean": 30.0,
+  "doc_chars_mean": 16243.1,
+  "support_facts_mean": 7.3,
+  "types": {
+   "bridge": 252,
+   "comparison": 48
+  }
+ },
+ "hotpotqa_k5_s2": {
+  "tasks": 100,
+  "questions": 500,
+  "docs_mean": 49.8,
+  "doc_chars_mean": 27311.9,
+  "support_facts_mean": 12.2,
+  "types": {
+   "bridge": 426,
+   "comparison": 74
+  }
+ },
+ "2wiki_k1_s2": {
+  "tasks": 100,
+  "questions": 100,
+  "docs_mean": 10.0,
+  "doc_chars_mean": 3328.4,
+  "support_facts_mean": 2.5,
+  "types": {
+   "bridge_comparison": 24,
+   "compositional": 44,
+   "inference": 9,
+   "comparison": 23
+  }
+ },
+ "2wiki_k3_s2": {
+  "tasks": 100,
+  "questions": 300,
+  "docs_mean": 29.5,
+  "doc_chars_mean": 10395.2,
+  "support_facts_mean": 7.3,
+  "types": {
+   "bridge_comparison": 67,
+   "compositional": 127,
+   "inference": 37,
+   "comparison": 69
+  }
+ },
+ "2wiki_k5_s2": {
+  "tasks": 100,
+  "questions": 500,
+  "docs_mean": 48.5,
+  "doc_chars_mean": 17499.4,
+  "support_facts_mean": 12.2,
+  "types": {
+   "bridge_comparison": 107,
+   "compositional": 224,
+   "inference": 64,
+   "comparison": 105
+  }
+ }
+}
