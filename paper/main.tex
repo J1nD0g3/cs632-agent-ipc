@@ -28,13 +28,13 @@ ways: they copy the conversation into the next agent's prompt, or they let agent
 the message-passing versus shared-memory question that operating systems answered decades ago, and we
 replay it on a Researcher--Writer--Reviewer pipeline with Qwen3-8B on vLLM, changing only the channel.
 Counting cost three ways (tokens sent, tokens the engine computes after prefix caching, and time) changes
-the answer. Shared files send \nFileSentMin--\nFileSentMax$\times$ the tokens of copying, because every
+the answer. Shared files send \nFileSentMin--\nFileSentMax{}$\times$ the tokens of copying, because every
 file access is a model call that resends the conversation, yet the prefix cache absorbs most of the
 resend. Copying the history and ordering the prompt so the cache reuses it, a zero-copy broadcast, keeps
-broadcast's accuracy (\nAccAZc\% vs \nAccAOne\%) while computing \nZcRatioMin--\nZcRatioMax\% of its prefill.
+broadcast's accuracy (\nAccAZc{}\% vs \nAccAOne{}\%) while computing \nZcRatioMin--\nZcRatioMax{}\% of its prefill.
 Channels also lose information at different stages: a pipe's Reviewer breaks answers it cannot check,
-an agent that writes to files writes \nNotesShorter\% shorter notes, and readers without an index miss
-part of them; an index restores delivery to \nDelivCMin--\nDelivCMax\%.
+an agent that writes to files writes \nNotesShorter{}\% shorter notes, and readers without an index miss
+part of them; an index restores delivery to \nDelivCMin--\nDelivCMax{}\%.
 \end{abstract}
 
 \maketitle
@@ -60,10 +60,10 @@ changes both, because its prefix cache reuses the KV of a repeated prefix~\cite{
 This paper replays the comparison under control. We keep the task, the model, the roles, and their order
 fixed, and change only how the Researcher's and Writer's results reach the next agent, over five channels
 (\S\ref{sec:channels}). Our key observation is that \emph{cost has to be counted three ways}, because the
-channels trade one cost for another. Shared files send \nSentRatioB$\times$ the tokens of copying the
+channels trade one cost for another. Shared files send \nSentRatioB{}$\times$ the tokens of copying the
 history at three questions per task, which is what an API bills, yet the engine computes only
-\nCompRatioB$\times$ as much prefill, which is what a self-hosted deployment pays. Copying the history with
-the shared part first (zero-copy broadcast) keeps copying's accuracy while computing \nZcCut\% less.
+\nCompRatioB{}$\times$ as much prefill, which is what a self-hosted deployment pays. Copying the history with
+the shared part first (zero-copy broadcast) keeps copying's accuracy while computing \nZcCut{}\% less.
 
 We make three contributions:
 \begin{itemize}
@@ -158,9 +158,9 @@ expensive one; counted by tokens computed (b), zero-copy broadcast keeps that ac
 \label{fig:tradeoff}
 \end{figure*}
 
-\paragraph{Copying is the most accurate, and zero-copy makes it cheap.} Broadcast answers \nAccAOne\% of the
+\paragraph{Copying is the most accurate, and zero-copy makes it cheap.} Broadcast answers \nAccAOne{}\% of the
 questions at $k=3$ (Figure~\ref{fig:tradeoff}). Zero-copy broadcast is within the noise of it in every
-dataset and $k$ (\nAccAZc\%) and computes \nCompAZc tokens per task instead of \nCompAOne, about as little
+dataset and $k$ (\nAccAZc{}\%) and computes \nCompAZc tokens per task instead of \nCompAOne, about as little
 as the pipe (\nCompATwo), because the Writer and the Reviewer reuse the documents the Researcher already
 prefilled. Its tokens sent stay those of broadcast (\nSentAZc), so the gain is for self-hosted serving or
 APIs that discount cached input.
@@ -169,14 +169,14 @@ APIs that discount cached input.
 \nGapATwoMin--\nGapATwoMax points fewer questions than broadcast, significantly in \nGapATwoSig of six
 settings. Its losses are not in delivery: the Writer receives everything the Researcher wrote. They come at
 the end, where the Reviewer sees only the draft and changes right answers to wrong ones in up to
-\nPipeBrokeMax\% of the questions, against at most \nPipeBrokeAOne\% when it also sees the notes and documents
+\nPipeBrokeMax{}\% of the questions, against at most \nPipeBrokeAOne{}\% when it also sees the notes and documents
 (Figure~\ref{fig:loss}b).
 
-\paragraph{Files cost more tokens.} B and C send \nSentRatioB$\times$ and \nSentRatioC$\times$ the tokens of
-broadcast at $k=3$ (\nFileSentMin--\nFileSentMax$\times$ across settings), because their Writer and Reviewer
+\paragraph{Files cost more tokens.} B and C send \nSentRatioB{}$\times$ and \nSentRatioC{}$\times$ the tokens of
+broadcast at $k=3$ (\nFileSentMin--\nFileSentMax{}$\times$ across settings), because their Writer and Reviewer
 make \nCallsB and \nCallsC calls instead of one and each call resends the conversation. The cache absorbs
-most of it: B and C compute \nCompRatioB$\times$ the tokens of broadcast. D's handoffs replace most reads,
-so it sends only \nSentRatioD$\times$ and computes \nCompRatioD$\times$.
+most of it: B and C compute \nCompRatioB{}$\times$ the tokens of broadcast. D's handoffs replace most reads,
+so it sends only \nSentRatioD{}$\times$ and computes \nCompRatioD{}$\times$.
 
 \begin{figure*}[t]
 \centering
@@ -188,15 +188,15 @@ fault.}
 \end{figure*}
 
 \paragraph{Files lose information on both sides; an index fixes the reading side.} Writing to a file
-changes the writer: the same Researcher, given the same input, writes \nNotesShorter\% shorter notes when
-they go to files (\nNotesCharsFile vs \nNotesCharsMsg characters at $k=3$), and in B its notes state \nNotesB\% of the
-supporting facts instead of \nNotesAOne\% (Figure~\ref{fig:loss}a). On the reading side, only
-\nDelivBMin--\nDelivBMax\% of the facts in B's notes reach its Writer. The file list does not say which file
-holds the notes, so \nDocReadsB\% of B's Writer reads go to source documents and in \nNoNotesB\% of the tasks it
+changes the writer: the same Researcher, given the same input, writes \nNotesShorter{}\% shorter notes when
+they go to files (\nNotesCharsFile vs \nNotesCharsMsg characters at $k=3$), and in B its notes state \nNotesB{}\% of the
+supporting facts instead of \nNotesAOne{}\% (Figure~\ref{fig:loss}a). On the reading side, only
+\nDelivBMin--\nDelivBMax{}\% of the facts in B's notes reach its Writer. The file list does not say which file
+holds the notes, so \nDocReadsB{}\% of B's Writer reads go to source documents and in \nNoNotesB{}\% of the tasks it
 never opens the notes. With handles the Writer trusts the handoff and opens even less
-(\nDelivDMin--\nDelivDMax\% delivered). The index names the notes: C's Writer skips them in \nNoNotesC\% of
-the tasks, delivery rises to \nDelivCMin--\nDelivCMax\%, and C's accuracy comes within \nGapCMax points of
-broadcast (\nAccC\% vs \nAccAOne\%), while B loses \nGapBMin--\nGapBMax points.
+(\nDelivDMin--\nDelivDMax{}\% delivered). The index names the notes: C's Writer skips them in \nNoNotesC{}\% of
+the tasks, delivery rises to \nDelivCMin--\nDelivCMax{}\%, and C's accuracy comes within \nGapCMax points of
+broadcast (\nAccC{}\% vs \nAccAOne{}\%), while B loses \nGapBMin--\nGapBMax points.
 
 \section{Sensitivity}
 \label{sec:sensitivity}
@@ -205,7 +205,7 @@ broadcast (\nAccC\% vs \nAccAOne\%), while B loses \nGapBMin--\nGapBMax points.
 % four-agent chain, fan-out at k=3, Qwen3-4B, batched reads (Bb), 24-turn budget, nondeterminism.
 
 \paragraph{Run-to-run noise.} Greedy decoding on a batching server is not deterministic: two channels whose
-Researcher receives the identical prompt produce identical output in \nSamePrompt\% of tasks. Differences of
+Researcher receives the identical prompt produce identical output in \nSamePrompt{}\% of tasks. Differences of
 a few points need the paired tasks we use.
 
 \section{Related Work}
