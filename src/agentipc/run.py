@@ -70,7 +70,8 @@ async def run(cfg: dict, run_dir: Path, raw_dir: Path) -> list[dict]:
         questions = LOADERS[name](ROOT / path)
         for seed in cfg["seeds"]:
             for k in cfg["k"]:
-                tasks = make_tasks(questions, cfg["n_tasks"], k, seed)
+                # use_tasks keeps the first N of the same draw, so smaller runs stay paired with larger ones.
+                tasks = make_tasks(questions, cfg["n_tasks"], k, seed)[:cfg.get("use_tasks", cfg["n_tasks"])]
                 tstats[f"{name}_k{k}_s{seed}"] = task_stats(tasks)
                 jobs += [(t, ch) for t in tasks for ch in cfg["channels"]]
     # Interleave channels and task sizes so server load and drift hit every condition alike.

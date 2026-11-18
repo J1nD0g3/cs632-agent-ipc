@@ -37,7 +37,8 @@ def parse(reply: str, n: int) -> list[bool | None]:
     return out
 
 
-async def judge_run_dir(run_dir: Path, concurrency: int, max_chars: int) -> Path:
+async def judge_run_dir(run_dir: Path, concurrency: int, max_chars: int, urls: list[str] | None = None,
+                        judge_name: str = "qwen3-8b") -> Path:
     cfg = yaml.safe_load((run_dir / "config.yaml").read_text())
     raw = ROOT / "results_raw" / cfg["exp"] / run_dir.name
     by_task = {}
@@ -47,8 +48,9 @@ async def judge_run_dir(run_dir: Path, concurrency: int, max_chars: int) -> Path
             for k in cfg["k"]:
                 for t in make_tasks(qs, cfg["n_tasks"], k, s):
                     by_task[t.task_id] = t
-    urls = cfg["server"].get("base_urls") or [cfg["server"]["base_url"]]
-    clients = [ChatClient(u, cfg["server"].get("served_name", cfg["model"]), max_tokens=64) for u in urls]
+    # The judge is always Qwen3-8B, whichever model produced the runs.
+    urls = urls or cfg["server"].get("base_urls") or [cfg["server"]["base_url"]]
+    clients = [ChatClient(u, judge_name, max_tokens=64) for u in urls]
     sems = [asyncio.Semaphore(concurrency) for _ in clients]
     recs = [json.loads(l) for l in gzip.open(raw / "records.jsonl.gz", "rt")]
     jobs = []
@@ -119,9 +121,11 @@ def main() -> int:
     ap.add_argument("run_dir")
     ap.add_argument("--concurrency", type=int, default=16)
     ap.add_argument("--max-chars", type=int, default=60000)
+    ap.add_argument("--urls", nargs="*", default=None, help="judge servers (default: the run's servers)")
+    ap.add_argument("--judge-name", default="qwen3-8b")
     a = ap.parse_args()
     run_dir = Path(a.run_dir)
-    path = asyncio.run(judge_run_dir(run_dir, a.concurrency, a.max_chars))
+    path = asyncio.run(judge_run_dir(run_dir, a.concurrency, a.max_chars, a.urls, a.judge_name))
     (run_dir / "summary_judge.json").write_text(json.dumps(summarize(path), indent=1))
     print(f"judged: {path}")
     return 0
