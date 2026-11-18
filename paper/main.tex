@@ -209,8 +209,7 @@ pooled). $k=16$ uses three parallel Researchers.}
 \label{fig:scaling}
 \end{figure*}
 
-% TODO(numbers pending): k=16 (fan-out), cache pressure (1/2/6 concurrent runs), four-agent chain,
-% fan-out at k=3, Qwen3-4B.
+% TODO(numbers pending): k=16 (fan-out), cache pressure (1/2/6 concurrent runs), fan-out at k=3, Qwen3-4B.
 
 \paragraph{Larger payloads leave the cache behind.} With eight questions per task each prompt holds about 80
 paragraphs, and six concurrent runs no longer fit the server's KV cache together. Zero-copy broadcast then
@@ -218,6 +217,14 @@ computes \nCompAZcKEight{}$\times$ the prefill of broadcast instead of \nCompAZc
 and C compute more than broadcast (\nCompBKEight{}$\times$ and \nCompCKEight{}$\times$): the prefixes they
 resend no longer stay cached between calls (Figure~\ref{fig:scaling}a). The pipe is now the cheap channel that
 loses little (\nGapATwoKEight points).
+
+\paragraph{A longer pipeline multiplies copies, not cached ones.} Adding a Fact-checker between the Writer and
+the Reviewer adds one more receiver. Broadcast then computes \nChainAOneComp\% more, because the history is
+copied once more; zero-copy broadcast computes only \nChainAZcComp\% more, because the new agent reuses the
+cached history. The extra check helps the pipe, whose Reviewer was the weak point (\nChainATwoAccRef\% to
+\nChainATwoAcc\%), and hurts plain files, where one more agent has to find the notes on its own
+(\nChainBAccRef\% to \nChainBAcc\%); both changes exclude zero at 95\% on \nChainN paired tasks, and the other
+channels move by at most \nChainOtherMax point.
 
 \paragraph{Cheaper reads make the Writer skip the notes.} A \texttt{read\_files} tool that reads several files
 in one call, the agent's \texttt{readv}, cuts B's calls from \nBbCallsB to \nBbCalls and its tokens by

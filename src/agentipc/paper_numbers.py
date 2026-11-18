@@ -209,7 +209,21 @@ def scaling(m: Macros) -> None:
             m.add(f"Gap{NAME[ch]}K{kk}", f"{-get(k, ch, 'acc_diff') * 100:.0f}")
 
 
-SECTIONS = [main_run, setup, batch_and_budget, scaling]
+def chain4(m: Macros) -> None:
+    d = paired_with_main(latest("t08_chain4"), CH)
+    m.add("ChainN", d["A1"]["n"])
+    for ch in CH:
+        n, new, ref = NAME[ch], d[ch]["new"], d[ch]["ref"]
+        m.add(f"Chain{n}Sent", f"{(new['total_tokens'] / ref['total_tokens'] - 1) * 100:.0f}")
+        m.add(f"Chain{n}Comp", f"{(new['prefill_tokens'] / ref['prefill_tokens'] - 1) * 100:.0f}")
+        m.add(f"Chain{n}Acc", pct(new["acc"]))
+        m.add(f"Chain{n}AccRef", pct(ref["acc"]))
+        m.add(f"Chain{n}Delta", f"{abs(new['acc'] - ref['acc']) * 100:.0f}")
+    others = [abs(d[ch]["new"]["acc"] - d[ch]["ref"]["acc"]) for ch in ("A1", "A1zc", "C", "D")]
+    m.add("ChainOtherMax", f"{max(others) * 100:.0f}")
+
+
+SECTIONS = [main_run, setup, batch_and_budget, scaling, chain4]
 
 
 def main() -> int:
