@@ -1,10 +1,12 @@
 """Fig. 1: what the Writer's prompt holds, call by call, under each channel (one pilot task, to scale).
 
+Claim at a glance: message passing sends one big prompt that is all computed; file channels resend a
+growing conversation on every tool call, so they send more tokens, yet almost all of it is reused from
+the prefix cache and little is computed.
 Plan: one lane per channel on a shared token axis; each LLM call of the Writer is a bar whose segments
-are colored by content (task, documents, Researcher notes, file list, the Writer's own earlier turns);
-the prefix the serving engine reused from its cache is hatched. A1 is one long call; the file channels
-are several short calls that resend a growing conversation. The right column states the totals:
-prompt tokens summed over calls (what an API bills) and tokens actually computed (prompt minus cached).
+are colored by content. Newly computed tokens are drawn in full tone, tokens reused from the prefix
+cache pale and hatched, so the eye sees "dark = work". The right panel repeats the totals as a pair of
+bars per channel on one scale: sent (what an API bills) and computed (prompt minus cached).
 Data: figs/data/fig1_writer_calls.json (agentipc.fig1_data on the pilot run).
 """
 import json
@@ -17,8 +19,11 @@ DATA = json.loads((Path(__file__).parent / "data" / "fig1_writer_calls.json").re
 ORDER = [("A1", "A1 broadcast", "copy the history"), ("A2", "A2 pipe", "previous output"),
          ("B", "B files", "read via tools"), ("C", "C files + index", "workspace index"),
          ("D", "D handles", "pushed pointers")]
-FILL = {"task": "gray2", "own": "white", "docs": "teal3", "notes": "navy3", "list": "gold3"}
-T1 = 5000
+FILL = {"task": "gray3", "own": "gray1", "docs": "teal4", "notes": "navy4", "list": "gold3"}
+PALE = {"task": "gray1", "own": "white", "docs": "teal1", "notes": "navy1", "list": "gold1"}
+SENT, COMP = "white", "red4"
+VMAX = 9000
+T1 = 5600
 
 
 def label_of(call, reads):
@@ -49,7 +54,7 @@ def merged(segs):
 
 fig = Figure("text")
 legend_strip, body = fig.area.take("top", 12, gap=4)
-plot, values = body.take("right", 62, gap=6)
+plot, values = body.take("right", 92, gap=8)
 n_rows = [len(DATA["channels"][c]["calls"]) for c, _, _ in ORDER]
 row_h = 7.4
 lane_h = [max(n, 2) * row_h for n in n_rows]
@@ -69,9 +74,10 @@ for (ch, _, _), n in zip(ORDER, n_rows):
         y, x = top + i * row_h, 0
         for kind, tok in merged(call["segments"]):
             # Split at the cached prefix: reused tokens hatched, newly computed ones plain.
-            for a, b, hatch in ((x, min(x + tok, call["cached"]), "gray5"), (max(x, call["cached"]), x + tok, None)):
+            for a, b, cached in ((x, min(x + tok, call["cached"]), True), (max(x, call["cached"]), x + tok, False)):
                 if b > a:
-                    fig.box(Rect(tl.x(a), y, tl.x(b) - tl.x(a), row_h), fill=FILL[kind], hatch=hatch, sw=0.5, r=0)
+                    fig.box(Rect(tl.x(a), y, tl.x(b) - tl.x(a), row_h), fill=PALE[kind] if cached else FILL[kind],
+                            hatch="gray3" if cached else None, sw=0.5, r=0)
             x += tok
         fig.text(tl.x(call["prompt"]) + 2.5, y + row_h / 2, label_of(call, reads), size=6, anchor="start",
                  color="gray5")
@@ -79,19 +85,28 @@ for (ch, _, _), n in zip(ORDER, n_rows):
 axis_y = tl.axis(ticks=[0, 1000, 2000, 3000, 4000, 5000], fmt=lambda v: f"{v / 1000:g}k",
                  title="Writer prompt per LLM call (tokens)")
 
-# Totals per channel: tokens sent over all calls, and tokens the engine actually computed.
-fig.text(values.cx, tl_rect.t - 6.5, "**sent / computed**", size=6.5, anchor="middle")
+# Totals per channel as bars on one scale: tokens sent over all calls vs tokens actually computed.
+bar_x0 = values.l
+scale = lambda v: (values.w - 22) * v / VMAX
+fig.text(values.l, tl.bottom + 14, "Writer total over all calls", size=7.5, anchor="start")
 for idx, (ch, _, _) in enumerate(ORDER):
     calls = DATA["channels"][ch]["calls"]
     sent = sum(c["prompt"] for c in calls)
     comp = sum(c["prompt"] - c["cached"] for c in calls)
     lane = tl.lane(idx)
-    fig.text(values.cx, lane.cy, f"{sent / 1000:.1f}k / **{comp / 1000:.1f}k**", size=7, anchor="middle")
+    h = 5.2
+    for k, (v, fill) in enumerate(((sent, SENT), (comp, COMP))):
+        r = Rect(bar_x0, lane.cy - h - 0.6 if k == 0 else lane.cy + 0.6, scale(v), h)
+        fig.box(r, fill=fill, sw=0.5, r=0)
+        fig.text(r.r + 2, r.cy, f"{v / 1000:.1f}k", size=6, anchor="start",
+                 weight=700 if k else 400, color="ink" if k else "gray5")
+fig.line((bar_x0, tl_rect.t - 2), (bar_x0, tl_rect.b + 2), sw=0.5)
 
-fig.legend([("box", FILL["task"], "Task, instructions"), ("box", FILL["docs"], "Documents"),
+fig.legend([("box", FILL["task"], "Task"), ("box", FILL["docs"], "Documents"),
             ("box", FILL["notes"], "Researcher notes"), ("box", FILL["list"], "File list"),
-            ("box", FILL["own"], "Own earlier turns"), ("hatch", "gray5/white", "Reused from cache")],
-           fig.width / 2, legend_strip.y, ncols=6)
+            ("box", FILL["own"], "Own turns"), ("hatch", "gray3/white", "Reused from cache (pale)"),
+            ("box", SENT, "Sent"), ("box", COMP, "Computed")],
+           fig.width / 2, legend_strip.y, ncols=8)
 # Segment widths are token counts, so neighbouring bars differ by fractions of a point on purpose.
 fig.ignore.add("align")
 # The figure is read in color (gold file list vs teal documents); the cache hatch carries the main contrast.
