@@ -1,0 +1,60 @@
+{
+ "2wiki|k3|Bb": {
+  "n": 100,
+  "clean": 100,
+  "judge_recall_notes": {
+   "mean": 0.5576,
+   "lo": 0.503,
+   "hi": 0.614
+  },
+  "judge_kept_writer_input": {
+   "mean": 0.7338,
+   "lo": 0.6727,
+   "hi": 0.7932
+  },
+  "judge_kept_final": {
+   "mean": 0.4152,
+   "lo": 0.349,
+   "hi": 0.4836
+  },
+  "judge_info_loss": {
+   "mean": 0.5848,
+   "lo": 0.5164,
+   "hi": 0.651
+  },
+  "judge_recall_final": {
+   "mean": 0.329,
+   "lo": 0.2852,
+   "hi": 0.3754
+  }
+ },
+ "hotpotqa|k3|Bb": {
+  "n": 100,
+  "clean": 100,
+  "judge_recall_notes": {
+   "mean": 0.6299,
+   "lo": 0.5791,
+   "hi": 0.679
+  },
+  "judge_kept_writer_input": {
+   "mean": 0.7294,
+   "lo": 0.6758,
+   "hi": 0.7852
+  },
+  "judge_kept_final": {
+   "mean": 0.5154,
+   "lo": 0.4572,
+   "hi": 0.5714
+  },
+  "judge_info_loss": {
+   "mean": 0.4846,
+   "lo": 0.4286,
+   "hi": 0.5428
+  },
+  "judge_recall_final": {
+   "mean": 0.4049,
+   "lo": 0.3661,
+   "hi": 0.4433
+  }
+ }
+}

@@ -1,0 +1,380 @@
+{
+ "2wiki|k3|Bb": {
+  "n": 100,
+  "errors": 0,
+  "acc": {
+   "mean": 0.4967,
+   "lo": 0.4333,
+   "hi": 0.56
+  },
+  "all_correct": {
+   "mean": 0.16,
+   "lo": 0.09,
+   "hi": 0.24
+  },
+  "em": {
+   "mean": 0.4433,
+   "lo": 0.3833,
+   "hi": 0.5033
+  },
+  "f1": {
+   "mean": 0.5275,
+   "lo": 0.4693,
+   "hi": 0.5838
+  },
+  "answered": {
+   "mean": 1.0,
+   "lo": 1.0,
+   "hi": 1.0
+  },
+  "total_tokens": {
+   "mean": 33215.71,
+   "lo": 30959.768,
+   "hi": 35781.3135
+  },
+  "prompt_tokens": {
+   "mean": 31658.86,
+   "lo": 29505.4088,
+   "hi": 34164.6793
+  },
+  "completion_tokens": {
+   "mean": 1556.85,
+   "lo": 1372.0045,
+   "hi": 1767.5265
+  },
+  "prefill_tokens": {
+   "mean": 9984.3,
+   "lo": 9593.3743,
+   "hi": 10394.5015
+  },
+  "llm_calls": {
+   "mean": 13.7,
+   "lo": 12.99,
+   "hi": 14.48
+  },
+  "tokens_researcher": {
+   "mean": 7894.13,
+   "lo": 7513.0843,
+   "hi": 8298.091
+  },
+  "tokens_writer": {
+   "mean": 11870.56,
+   "lo": 10545.6578,
+   "hi": 13338.071
+  },
+  "tokens_reviewer": {
+   "mean": 13451.02,
+   "lo": 12049.6907,
+   "hi": 15013.1575
+  },
+  "file_io": {
+   "mean": 20.11,
+   "lo": 18.6795,
+   "hi": 21.6702
+  },
+  "file_reads": {
+   "mean": 15.15,
+   "lo": 13.68,
+   "hi": 16.7
+  },
+  "file_writes": {
+   "mean": 2.96,
+   "lo": 2.9,
+   "hi": 3.03
+  },
+  "file_lists": {
+   "mean": 2.0,
+   "lo": 2.0,
+   "hi": 2.0
+  },
+  "read_chars": {
+   "mean": 8505.7,
+   "lo": 7519.7538,
+   "hi": 9568.4497
+  },
+  "write_chars": {
+   "mean": 2309.94,
+   "lo": 2133.5878,
+   "hi": 2535.874
+  },
+  "fact_recall_notes": {
+   "mean": 0.2888,
+   "lo": 0.2426,
+   "hi": 0.3405
+  },
+  "fact_kept_writer_input": {
+   "mean": 0.609,
+   "lo": 0.5327,
+   "hi": 0.693
+  },
+  "fact_kept_draft": {
+   "mean": 0.3551,
+   "lo": 0.2782,
+   "hi": 0.4417
+  },
+  "fact_kept_final": {
+   "mean": 0.3929,
+   "lo": 0.3119,
+   "hi": 0.4798
+  },
+  "info_loss": {
+   "mean": 0.6071,
+   "lo": 0.5202,
+   "hi": 0.6881
+  },
+  "fact_recall_final": {
+   "mean": 0.1583,
+   "lo": 0.1292,
+   "hi": 0.1927
+  },
+  "triple_recall_notes": {
+   "mean": 0.6783,
+   "lo": 0.6244,
+   "hi": 0.7323
+  },
+  "triple_recall_final": {
+   "mean": 0.524,
+   "lo": 0.4779,
+   "hi": 0.5718
+  },
+  "overflow": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "turn_limit": {
+   "mean": 0.1,
+   "lo": 0.05,
+   "hi": 0.16
+  },
+  "wall_s": {
+   "mean": 54.5132,
+   "lo": 48.4292,
+   "hi": 61.4628
+  },
+  "q_ok": {
+   "mean": 0.3733,
+   "lo": 0.31,
+   "hi": 0.4367
+  },
+  "q_reviewer_fixed": {
+   "mean": 0.1233,
+   "lo": 0.0833,
+   "hi": 0.17
+  },
+  "q_overflow": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "q_no_answer": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "q_research_miss": {
+   "mean": 0.4,
+   "lo": 0.34,
+   "hi": 0.46
+  },
+  "q_delivery_miss": {
+   "mean": 0.0333,
+   "lo": 0.0133,
+   "hi": 0.0567
+  },
+  "q_writer_wrong": {
+   "mean": 0.0467,
+   "lo": 0.0233,
+   "hi": 0.0733
+  },
+  "q_reviewer_broke": {
+   "mean": 0.0233,
+   "lo": 0.0067,
+   "hi": 0.0433
+  }
+ },
+ "hotpotqa|k3|Bb": {
+  "n": 100,
+  "errors": 0,
+  "acc": {
+   "mean": 0.5433,
+   "lo": 0.4833,
+   "hi": 0.6033
+  },
+  "all_correct": {
+   "mean": 0.21,
+   "lo": 0.14,
+   "hi": 0.29
+  },
+  "em": {
+   "mean": 0.46,
+   "lo": 0.4,
+   "hi": 0.5233
+  },
+  "f1": {
+   "mean": 0.5931,
+   "lo": 0.5385,
+   "hi": 0.6451
+  },
+  "answered": {
+   "mean": 1.0,
+   "lo": 1.0,
+   "hi": 1.0
+  },
+  "total_tokens": {
+   "mean": 36127.81,
+   "lo": 33996.7862,
+   "hi": 38269.817
+  },
+  "prompt_tokens": {
+   "mean": 34634.58,
+   "lo": 32557.0058,
+   "hi": 36709.293
+  },
+  "completion_tokens": {
+   "mean": 1493.23,
+   "lo": 1334.8262,
+   "hi": 1688.1565
+  },
+  "prefill_tokens": {
+   "mean": 10973.14,
+   "lo": 10654.1845,
+   "hi": 11287.6695
+  },
+  "llm_calls": {
+   "mean": 14.44,
+   "lo": 13.63,
+   "hi": 15.2502
+  },
+  "tokens_researcher": {
+   "mean": 10140.94,
+   "lo": 9842.4525,
+   "hi": 10448.6213
+  },
+  "tokens_writer": {
+   "mean": 12684.81,
+   "lo": 11375.6457,
+   "hi": 14094.5367
+  },
+  "tokens_reviewer": {
+   "mean": 13302.06,
+   "lo": 11819.3403,
+   "hi": 14951.655
+  },
+  "file_io": {
+   "mean": 20.33,
+   "lo": 18.7598,
+   "hi": 21.9402
+  },
+  "file_reads": {
+   "mean": 15.32,
+   "lo": 13.7498,
+   "hi": 16.93
+  },
+  "file_writes": {
+   "mean": 3.01,
+   "lo": 2.93,
+   "hi": 3.1
+  },
+  "file_lists": {
+   "mean": 2.0,
+   "lo": 2.0,
+   "hi": 2.0
+  },
+  "read_chars": {
+   "mean": 8298.12,
+   "lo": 7354.0003,
+   "hi": 9291.1225
+  },
+  "write_chars": {
+   "mean": 2600.42,
+   "lo": 2466.5115,
+   "hi": 2740.6903
+  },
+  "fact_recall_notes": {
+   "mean": 0.4394,
+   "lo": 0.3848,
+   "hi": 0.4979
+  },
+  "fact_kept_writer_input": {
+   "mean": 0.7439,
+   "lo": 0.6767,
+   "hi": 0.812
+  },
+  "fact_kept_draft": {
+   "mean": 0.4578,
+   "lo": 0.381,
+   "hi": 0.5325
+  },
+  "fact_kept_final": {
+   "mean": 0.4857,
+   "lo": 0.4118,
+   "hi": 0.5601
+  },
+  "info_loss": {
+   "mean": 0.5143,
+   "lo": 0.4399,
+   "hi": 0.5882
+  },
+  "fact_recall_final": {
+   "mean": 0.2455,
+   "lo": 0.2092,
+   "hi": 0.2824
+  },
+  "overflow": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "turn_limit": {
+   "mean": 0.16,
+   "lo": 0.09,
+   "hi": 0.24
+  },
+  "wall_s": {
+   "mean": 52.7594,
+   "lo": 47.3945,
+   "hi": 59.3909
+  },
+  "q_ok": {
+   "mean": 0.4767,
+   "lo": 0.4167,
+   "hi": 0.54
+  },
+  "q_reviewer_fixed": {
+   "mean": 0.0667,
+   "lo": 0.0333,
+   "hi": 0.1067
+  },
+  "q_overflow": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "q_no_answer": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "q_research_miss": {
+   "mean": 0.35,
+   "lo": 0.29,
+   "hi": 0.41
+  },
+  "q_delivery_miss": {
+   "mean": 0.04,
+   "lo": 0.0167,
+   "hi": 0.0667
+  },
+  "q_writer_wrong": {
+   "mean": 0.0533,
+   "lo": 0.03,
+   "hi": 0.08
+  },
+  "q_reviewer_broke": {
+   "mean": 0.0133,
+   "lo": 0.0033,
+   "hi": 0.0267
+  }
+ }
+}
