@@ -9,18 +9,18 @@
 | T04 Channels A1/A2/B/C/D and zero-copy A1 | Build | Must | Done | 2026-11-18 | Six channels, per-run cache_salt | Five-agent chain ready |
 | T05 Metrics: success, tokens, latency, I/O, loss, failure types | Build | Must | Done | 2026-11-18 | LLM judge for facts (lexical agrees 87.5%, kappa 0.72) | |
 | T06 Pilot run and checks | Experiments | Must | Done | 2026-11-18 | results/t06_pilot/20261118-210200-08f1221 | 360 runs, 0 errors |
-| T07 Main experiments: 5 channels x 2 datasets x 3 k | Experiments | Must | In progress | 2026-11-18 | | 5400 runs, about 4.5 h |
-| T08 Sensitivity: k = 8, five agents, zero-copy A1, Qwen3-4B | Experiments | Should | Not started | | | |
-| T09 Analysis and figures | Report | Must | Not started | | | |
+| T07 Main experiments: 5 channels x 2 datasets x 3 k | Experiments | Must | Done | 2026-11-19 | results/t07_main/20261118-212337-5d6c70f | 5400 runs, 0 errors, judged |
+| T08 Sensitivity: k = 8, five agents, zero-copy A1, Qwen3-4B | Experiments | Should | In progress | 2026-11-19 | Bb, 24-turn done | k8, chain4, 4B, k16, pressure, fan-out queued |
+| T09 Analysis and figures | Report | Must | In progress | 2026-11-19 | Figs. 1-3 drafted | paper/figs/out |
 | T10 Workshop paper and review rounds | Report | Must | Not started | | | 6 pages |
 
 ## Key numbers
 | Key | Metric | Result | Source |
 | --- | --- | --- | --- |
-| success | Task success rate: A / B / C | | |
-| tokens | Total tokens per task: A / B / C | | |
-| file_io | File reads and writes per task: A / B / C | | |
-| info_loss | Key facts lost between stages: A / B / C | | |
+| success | Task success rate: A / B / C | k=3 pooled: A1 72.3%, A1-zc 71.6%, A2 62.1%, B 62.8%, C 66.3%, D 65.1% | results/t07_main/20261118-212337-5d6c70f |
+| tokens | Total tokens per task: A / B / C | k=3 sent / computed: A1 13.3k/12.4k, A1-zc 13.6k/4.8k, A2 5.6k/4.7k, B 38.2k/9.8k, C 37.4k/9.8k, D 17.5k/7.2k | results/t07_main/20261118-212337-5d6c70f |
+| file_io | File reads and writes per task: A / B / C | k=3 file I/O ops: B 13.4-15.3, C 12.1-14.4, D 5.6-5.8 (message channels 0) | results/t07_main/20261118-212337-5d6c70f |
+| info_loss | Key facts lost between stages: A / B / C | k=3 facts in Researcher output / share delivered: A1 73%/99%, A2 72%/99%, B 59%/84%, C 63%/93%, D 50%/71% | results/t07_main/20261118-212337-5d6c70f (judge) |
 | recommendation | Which channel, and when | | |
 
 ## Log
@@ -60,3 +60,17 @@
   (at k = 1-3) B. Researchers write sparser notes when they write files. Lexical fact matching
   under-counts against the judge, so the judge (batched per question and stage, about 3 min for
   the pilot) is the primary fact measure. Main run started (seed 2, 150 tasks per cell).
+- 2026-11-19 T07 main run (150 paired tasks per cell, 5400 runs, 0 errors, 3.7 h on GPUs 5/1/2):
+  zero-copy broadcast matches broadcast's accuracy while computing 38-40% of its prefill, the same
+  as the pipe. The pipe loses 3-15 points because its Reviewer, without the facts, changes right
+  answers (15-16% of 2Wiki questions). File channels send 2-4x the tokens of broadcast; B loses 6-14
+  points; the index (C) keeps delivery at 91-97% and accuracy within 1-8 points of broadcast. Writing
+  to files makes the Researcher's notes 25-30% shorter, and with handles (D) the Writer rarely opens
+  the files (delivery 61-76%).
+- 2026-11-19 T08 so far: batched reads (Bb) cut round trips (13 vs 16-19 calls) and tokens but did
+  not help accuracy on 64 paired tasks; a 24-turn budget adds 24-36% tokens to B and C with no
+  accuracy change, so the 12-turn limit does not drive the results. Same-prompt Researcher outputs
+  are identical only 72-77% of the time (vLLM batch nondeterminism), a noise floor for small gaps.
+  k=16 (partial): the prefix cache stops helping (computed close to sent) and B drops sharply while C
+  holds. Queue rescheduled so that k=8, four agents, Qwen3-4B, k=16, cache pressure (1/2 concurrent
+  runs) and fan-out (50 tasks) all finish by about 10:00.
