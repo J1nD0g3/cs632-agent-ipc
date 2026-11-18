@@ -23,18 +23,19 @@
 \affiliation{\institution{Institution}\country{Country}}
 
 \begin{abstract}
-LLM agents that work as a team must pass results to each other, and frameworks do it in one of two
-ways: they copy the conversation into the next agent's prompt, or they let agents share files. This is
-the message-passing versus shared-memory question that operating systems answered decades ago, and we
-replay it on a Researcher--Writer--Reviewer pipeline with Qwen3-8B on vLLM, changing only the channel.
-Counting cost three ways (tokens sent, tokens the engine computes after prefix caching, and time) changes
-the answer. Shared files send \nFileSentMin--\nFileSentMax{}$\times$ the tokens of copying, because every
-file access is a model call that resends the conversation, yet the prefix cache absorbs most of the
-resend. Copying the history and ordering the prompt so the cache reuses it, a zero-copy broadcast, keeps
-broadcast's accuracy (\nAccAZc{}\% vs \nAccAOne{}\%) while computing \nZcRatioMin--\nZcRatioMax{}\% of its prefill.
-Channels also lose information at different stages: a pipe's Reviewer breaks answers it cannot check,
-an agent that writes to files writes \nNotesShorter{}\% shorter notes, and readers without an index miss
-part of them; an index restores delivery to \nDelivCMin--\nDelivCMax{}\%.
+LLM agents that work as a team pass results to each other in one of two ways: they copy the conversation
+into the next agent's prompt, or they share files. This is the message-passing versus shared-memory
+question of operating systems. We replay it on a Researcher--Writer--Reviewer pipeline with Qwen3-8B on
+vLLM, changing only the channel, and count cost both as tokens sent, which an API bills, and as tokens the
+engine computes after prefix caching. With small payloads, copying is the most accurate channel, and
+ordering the prompt so the prefix cache reuses the shared history, a zero-copy broadcast, keeps its
+accuracy at \nZcRatioMin--\nZcRatioMax{}\% of its compute. Shared files send \nFileSentMin--\nFileSentMax{}$\times$
+the tokens, because every access is a model call that resends the conversation, and they lose
+information on both sides: agents write \nNotesShorter{}\% shorter notes to files, and readers without an
+index skip them. These results are conditional. Once prompts outgrow the KV cache, zero-copy saves nothing
+and a pipe matches copying at \nCompATwoKSixteen{}$\times$ its compute; at large payloads plain files lose
+\nGapBKSixteen points while an index loses \nGapCKSixteen; and a 4B model loses up to \nSmallCGapMax points with
+files even with an index.
 \end{abstract}
 
 \maketitle
@@ -63,7 +64,10 @@ fixed, and change only how the Researcher's and Writer's results reach the next 
 channels trade one cost for another. Shared files send \nSentRatioB{}$\times$ the tokens of copying the
 history at three questions per task, which is what an API bills, yet the engine computes only
 \nCompRatioB{}$\times$ as much prefill, which is what a self-hosted deployment pays. Copying the history with
-the shared part first (zero-copy broadcast) keeps copying's accuracy while computing \nZcCut{}\% less.
+the shared part first (zero-copy broadcast) keeps copying's accuracy while computing \nZcCut{}\% less. The
+second observation is that these savings come from the cache and the model, not from the channel alone:
+they disappear when the agents' prompts no longer fit the KV cache, and the file channels need a model
+that uses tools well.
 
 We make three contributions:
 \begin{itemize}
@@ -73,8 +77,9 @@ latency, file I/O, and where each supporting fact is lost (\S\ref{sec:method}).
 the most accurate; zero-copy ordering makes it as cheap to compute as a pipe; files cost more tokens and
 lose information on both the writing and the reading side; an index recovers most of the reading side
 (\S\ref{sec:results}).
-\item Sensitivity results on payload size, cache pressure, pipeline shape, tool budget, batched reads,
-and model size, which mark where each channel is the right choice (\S\ref{sec:sensitivity}).
+\item Sensitivity results on payload size, pipeline length, tool budget, batched reads, and model size,
+which turn the comparison into rules for when each channel is the right choice
+(\S\ref{sec:sensitivity}, \S\ref{sec:conclusion}).
 \end{itemize}
 
 \section{Five Channels}
@@ -275,12 +280,18 @@ depend on the system~\cite{lauer-needham}; L4 made messages cheap by cutting cop
 agent analogues are the same: the prefix cache plays zero-copy, and the index plays the directory.
 
 \section{Conclusion}
+\label{sec:conclusion}
 
-Which channel a pipeline of LLM agents should use depends on what it pays for. Copying the history is the
-most accurate channel we measured, and ordering it so the prefix cache applies removes most of its compute.
-Files pay a model call for every access and change what the writer writes; if used, they need an index.
-Our results come from one model family, one pipeline, and multi-hop QA; larger artifacts than ours are
-where files should pay off, which \S\ref{sec:sensitivity} begins to test.
+Which channel a pipeline of LLM agents should use depends on what it pays for, how large its payloads are
+next to the KV cache, and how well its model uses tools. Our measurements give four rules. When the shared
+history fits the cache, copy it and order prompts so the cache reuses it: zero-copy broadcast was the most
+accurate channel and computed about as little as a pipe. When it does not fit, the pipe is the cheap choice
+and loses little, and a checking stage helps it more than any other channel. Share files only with an
+index, and only with a model that handles tools: plain files cost more tokens and lost accuracy everywhere,
+and cheaper bulk reads made it worse. Count the cost the deployment pays: files send \nFileSentMin--\nFileSentMax{}$\times$ the tokens of
+copying, but with up to five questions per task they compute \nFileCompMin--\nFileCompMax{}$\times$ as much. Our results come from one model
+family, linear pipelines, and multi-hop QA; artifacts larger than a context window, such as code bases,
+are where files should be indispensable, and we have not measured them.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}

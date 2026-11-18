@@ -1,0 +1,32 @@
+exp: t08_pressure_c2
+datasets:
+  hotpotqa: data/raw/hotpot_distractor_validation.parquet
+  2wiki: data/raw/2wiki_dev.json
+model: Qwen/Qwen3-8B
+server:
+  base_url: http://localhost:8101
+  base_urls:
+  - http://localhost:8101
+  served_name: qwen3-8b
+  gpu: 1
+  gpus:
+  - 1
+  vllm_src: /mnt/sda/heojin/cs506-store/vllm
+  flags: --max-model-len 32768 --gpu-memory-utilization 0.90 --enable-prefix-caching
+    --enable-prompt-tokens-details --enable-auto-tool-choice --tool-call-parser hermes
+    --seed 0
+channels:
+- A1zc
+- B
+- C
+- D
+k:
+- 16
+seeds:
+- 4
+n_tasks: 30
+max_tokens: 2048
+max_turns: 12
+concurrency: 2
+researchers: 3
+use_tasks: 5

@@ -64,6 +64,9 @@ def main_run(m: Macros) -> None:
         m.add(f"Notes{n}", f"{pool(ch, 3, 'judge_recall_notes') * 100:.0f}")
         m.add(f"Deliv{n}", f"{pool(ch, 3, 'judge_kept_writer_input') * 100:.0f}")
         m.add(f"Calls{n}", f"{pool(ch, 3, 'llm_calls'):.1f}")
+    for ch in ("A1zc", "A2", "B", "C", "D"):
+        m.add(f"Wall{NAME[ch]}", f"{pool(ch, 3, 'wall_s') / pool('A1', 3, 'wall_s'):.1f}")
+    m.add("WallAOne", f"{pool('A1', 3, 'wall_s'):.0f}")
     a1c, zc = pool("A1", 3, "prefill_tokens"), pool("A1zc", 3, "prefill_tokens")
     m.add("ZcCut", f"{(1 - zc / a1c) * 100:.0f}")
     for ch in ("B", "C", "D", "A2"):
@@ -209,6 +212,13 @@ def scaling(m: Macros) -> None:
             m.add(f"Gap{NAME[ch]}K{kk}", f"{-get(k, ch, 'acc_diff') * 100:.0f}")
 
 
+def file_compute_range(m: Macros) -> None:
+    rows = json.loads((ROOT / "paper/figs/data/fig4_scaling.json").read_text())["rows"]
+    v = [r["comp_rel"] for r in rows if r["channel"] in ("B", "C") and r["k"] <= 5]
+    m.add("FileCompMin", f"{min(v):.1f}")
+    m.add("FileCompMax", f"{max(v):.1f}")
+
+
 def chain4(m: Macros) -> None:
     d = paired_with_main(latest("t08_chain4"), CH)
     m.add("ChainN", d["A1"]["n"])
@@ -266,7 +276,7 @@ def kv_tokens(model: str) -> int:
     raise ValueError(f"no server log for {model}")
 
 
-SECTIONS = [main_run, setup, batch_and_budget, scaling, chain4, qwen4b]
+SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, qwen4b]
 
 
 def main() -> int:
