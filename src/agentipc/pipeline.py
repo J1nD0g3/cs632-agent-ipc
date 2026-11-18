@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .data import Task
-from .llm import ContextOverflow
+from .llm import ContextOverflow, SaltedClient
 from .workspace import Workspace
 
 CHANNELS = ("A1", "A1zc", "A2", "B", "C", "D")
@@ -273,6 +273,7 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
                    chain: tuple[str, ...] = ("researcher", "writer", "reviewer")) -> dict:
     assert channel in CHANNELS and chain[0] == "researcher" and chain[-1] == "reviewer"
     t0 = time.perf_counter()
+    client = SaltedClient(client, f"{task.task_id}/{channel}/{len(chain)}/{time.time_ns()}")
     files = channel in FILE_CHANNELS
     ws = Workspace(Path(workdir) / f"{task.task_id}_{channel}_{len(chain)}") if files else None
     if ws is not None:

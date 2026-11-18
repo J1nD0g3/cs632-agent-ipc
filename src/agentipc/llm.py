@@ -31,10 +31,13 @@ class ChatClient:
         self.enable_thinking = enable_thinking
         self.http = httpx.AsyncClient(timeout=timeout)
 
-    async def chat(self, messages: list[dict], tools: list[dict] | None = None, tool_choice=None) -> Reply:
+    async def chat(self, messages: list[dict], tools: list[dict] | None = None, tool_choice=None,
+                   cache_salt: str | None = None) -> Reply:
         body = {"model": self.model, "messages": messages, "max_tokens": self.max_tokens,
                 "temperature": self.temperature, "seed": self.seed,
                 "chat_template_kwargs": {"enable_thinking": self.enable_thinking}}
+        if cache_salt:
+            body["cache_salt"] = cache_salt
         if tools:
             body["tools"] = tools
             body["tool_choice"] = tool_choice or "auto"
@@ -68,7 +71,7 @@ class MockClient:
         self.script = list(script)
         self.calls: list[dict] = []
 
-    async def chat(self, messages, tools=None, tool_choice=None) -> Reply:
+    async def chat(self, messages, tools=None, tool_choice=None, cache_salt=None) -> Reply:
         self.calls.append({"messages": [dict(m) for m in messages], "tools": tools, "tool_choice": tool_choice})
         item = self.script.pop(0) if self.script else "done"
         n_prompt = sum(len(str(m.get("content") or "")) for m in messages) // 4
@@ -81,3 +84,14 @@ class MockClient:
 
     async def aclose(self):
         pass
+
+
+class SaltedClient:
+    """Gives one pipeline run its own prefix-cache namespace, so runs never reuse each other's KV."""
+
+    def __init__(self, client, salt: str):
+        self.client, self.salt = client, salt
+        self.url = getattr(client, "url", "")
+
+    async def chat(self, messages, tools=None, tool_choice=None):
+        return await self.client.chat(messages, tools, tool_choice, cache_salt=self.salt)
