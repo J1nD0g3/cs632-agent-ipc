@@ -209,7 +209,7 @@ pooled). $k=16$ uses three parallel Researchers.}
 \label{fig:scaling}
 \end{figure*}
 
-% TODO(numbers pending): cache pressure (1/2/6 concurrent runs), fan-out at k=3, Qwen3-4B.
+% TODO(numbers pending): cache pressure (1/2/6 concurrent runs), fan-out at k=3.
 
 \paragraph{Larger payloads leave the cache behind.} With eight questions per task each prompt holds about 80
 paragraphs, and six concurrent runs no longer fit the server's KV cache together. Zero-copy broadcast then
@@ -236,6 +236,16 @@ in one call, the agent's \texttt{readv}, cuts B's calls from \nBbCallsB to \nBbC
 \nBbAccB\%). Given a cheap bulk read, the Writer reads the source documents itself: \nBbDocReads\% of its reads
 are documents, and in \nBbNoNotes\% of the tasks it never opens the Researcher's notes. Cheap access is not
 enough; the reader also has to know where the result is.
+
+\paragraph{A smaller model needs simpler channels.} With Qwen3-4B, whose smaller weights leave a larger cache
+(\nSmallKv tokens vs \nBigKv), the file channels fall far behind broadcast: B by \nSmallBGapMin--\nSmallBGapMax
+points and C by \nSmallCGapMinThreeFive--\nSmallCGapMaxThreeFive at three and five questions. The index no longer
+helps: C uses up its tool budget in \nSmallCLimitMin--\nSmallCLimitMax\% of those runs (B in
+\nSmallBLimitMin--\nSmallBLimitMax\%). Handles lose
+\nSmallDGapMin--\nSmallDGapMax points, and the pipe at most \nSmallATwoGapMaxThreeFive at three and five
+questions. Zero-copy ordering, free for Qwen3-8B, costs the smaller model \nSmallAZcGapMinThreeFive--\nSmallAZcGapMaxThreeFive
+points there (significant in \nSmallAZcSigThreeFive of four settings): it reads its instruction last, after
+thousands of tokens of documents.
 
 \paragraph{The tool budget does not drive the results.} With 24 tool calls instead of 12, B and C send
 \nTwFourTokMin--\nTwFourTokMax\% more tokens and change accuracy by at most \nTwFourAccMax points on \nTwFourN

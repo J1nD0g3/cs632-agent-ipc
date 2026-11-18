@@ -223,7 +223,50 @@ def chain4(m: Macros) -> None:
     m.add("ChainOtherMax", f"{max(others) * 100:.0f}")
 
 
-SECTIONS = [main_run, setup, batch_and_budget, scaling, chain4]
+def qwen4b(m: Macros) -> None:
+    run = latest("t08_qwen4b")
+    rows = load_rows(run)
+    m.add("SmallN", len({r["task_id"] for r in rows}) // 3)
+    res = analyze(rows, "A1")
+    big = analyze(load_rows(latest("t07_main")), "A1")
+    for ch in ("A1zc", "A2", "B", "C", "D"):
+        gaps = [-g["acc_diff"][0] for key, g in res.items() if key.endswith(f"|{ch}") and "acc_diff" in g]
+        gaps35 = [-g["acc_diff"][0] for key, g in res.items() if key.endswith(f"|{ch}") and "acc_diff" in g
+                  and ("|k3|" in key or "|k5|" in key)]
+        m.add(f"Small{NAME[ch]}GapMin", f"{min(gaps) * 100:.0f}")
+        m.add(f"Small{NAME[ch]}GapMax", f"{max(gaps) * 100:.0f}")
+        m.add(f"Small{NAME[ch]}GapMinThreeFive", f"{min(gaps35) * 100:.0f}")
+        m.add(f"Small{NAME[ch]}GapMaxThreeFive", f"{max(gaps35) * 100:.0f}")
+        sig = sum(1 for key, g in res.items() if key.endswith(f"|{ch}") and "acc_diff" in g and g["acc_diff"][2] < 0
+                  and ("|k3|" in key or "|k5|" in key))
+        m.add(f"Small{NAME[ch]}SigThreeFive", sig)
+    pool = lambda rs, ch, k: np.mean([r["acc"] for r in rs if r["channel"] == ch and r["k"] == k])
+    m.add("SmallAccAOneK", pct(np.mean([r["acc"] for r in rows if r["channel"] == "A1"])))
+    m.add("SmallAccBK", pct(np.mean([r["acc"] for r in rows if r["channel"] == "B"])))
+    m.add("SmallAccCK", pct(np.mean([r["acc"] for r in rows if r["channel"] == "C"])))
+    m.add("SmallAccDK", pct(np.mean([r["acc"] for r in rows if r["channel"] == "D"])))
+    for ch in ("B", "C"):
+        lims = [np.mean([r["turn_limit"] for r in rows if r["channel"] == ch and r["k"] == k and r["dataset"] == ds])
+                for k in (3, 5) for ds in ("hotpotqa", "2wiki")]
+        m.add(f"Small{ch}LimitMin", f"{min(lims) * 100:.0f}")
+        m.add(f"Small{ch}LimitMax", f"{max(lims) * 100:.0f}")
+    m.add("SmallKv", f"{kv_tokens('Qwen3-4B'):,}")
+    m.add("BigKv", f"{kv_tokens('Qwen3-8B'):,}")
+
+
+def kv_tokens(model: str) -> int:
+    """KV cache capacity the vLLM server reported at startup for this model (server logs)."""
+    import re
+    for log in sorted((ROOT / "logs").glob("vllm_gpu*_*.log"), reverse=True):
+        text = log.read_text(errors="replace")
+        if f"models--Qwen--{model}" in text or f"'{'Qwen/' + model}'" in text:
+            hit = re.search(r"GPU KV cache size: ([0-9,]+) tokens", text)
+            if hit:
+                return int(hit.group(1).replace(",", ""))
+    raise ValueError(f"no server log for {model}")
+
+
+SECTIONS = [main_run, setup, batch_and_budget, scaling, chain4, qwen4b]
 
 
 def main() -> int:
