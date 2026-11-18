@@ -18,7 +18,8 @@ ROOT = Path(__file__).resolve().parents[2]
 METRICS = ("acc", "total_tokens", "prefill_tokens", "completion_tokens", "llm_calls", "file_io", "wall_s",
            "turn_limit", "judge_recall_notes", "judge_kept_writer_input", "judge_kept_final", "judge_info_loss",
            "q_research_miss", "q_delivery_miss", "q_writer_wrong", "q_reviewer_broke", "q_reviewer_fixed",
-           "q_no_answer")
+           "q_no_answer", "jq_research_miss", "jq_delivery_miss", "jq_writer_wrong", "jq_reviewer_broke",
+           "jq_reviewer_fixed", "jq_no_answer", "jq_overflow")
 
 
 def load_rows(run_dir: Path) -> list[dict]:
@@ -30,7 +31,7 @@ def load_rows(run_dir: Path) -> list[dict]:
         for j in map(json.loads, gzip.open(judged, "rt")):
             r = rows.get((j["task_id"], j["channel"]))
             if r is not None:
-                r.update({k: v for k, v in j.items() if k.startswith("judge_")})
+                r.update({k: v for k, v in j.items() if k.startswith(("judge_", "jq_"))})
     return [r for r in rows.values() if not r.get("error")]
 
 

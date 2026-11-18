@@ -16,6 +16,7 @@ import yaml
 
 from .data import LOADERS, make_tasks
 from .llm import ChatClient
+from .metrics import correct, parse_answers
 from .run import datasets
 from .stats import ci
 
@@ -80,8 +81,9 @@ async def judge_run_dir(run_dir: Path, concurrency: int, max_chars: int, urls: l
         await c.aclose()
     per = {}
     for (ri, stage, qi, facts, _), (vals, clean) in zip(jobs, res):
-        d = per.setdefault(ri, {s: [] for s in STAGES} | {"clean": True})
+        d = per.setdefault(ri, {s: [] for s in STAGES} | {"clean": True, "per_q": {s: {} for s in STAGES}})
         d[stage] += vals
+        d["per_q"][stage][qi] = vals
         d["clean"] &= bool(clean)
     out = raw / "judged.jsonl.gz"
     with gzip.open(out, "wt") as f:
@@ -96,8 +98,40 @@ async def judge_run_dir(run_dir: Path, concurrency: int, max_chars: int, urls: l
                    "judge_kept_final": sum(final[i] for i in found) / len(found) if found else 0.0,
                    "judge_recall_final": sum(final) / len(final)}
             row["judge_info_loss"] = 1 - row["judge_kept_final"] if found else 1.0
+            row.update(judged_failures(rec, by_task[rec["task_id"]].questions, d["per_q"]))
             f.write(json.dumps(row) + "\n")
     return out
+
+
+def judged_failures(rec: dict, questions, per_q: dict) -> dict:
+    """metrics.failure_types with fact presence from the judge instead of lexical matching."""
+    n = len(questions)
+    final = parse_answers(rec["stage"].get("final", ""), n)
+    draft = parse_answers(rec["stage"].get("draft", ""), n)
+    overflow = any(a["overflow"] for a in rec["agents"].values())
+    kinds = ("ok", "reviewer_fixed", "overflow", "no_answer", "research_miss", "delivery_miss", "writer_wrong",
+             "reviewer_broke")
+    counts = dict.fromkeys(kinds, 0)
+    for qi, q in enumerate(questions):
+        good, d_ok = correct(final[qi], q.answer), correct(draft[qi], q.answer)
+        notes_has = all(per_q["notes"].get(qi, [False]))
+        got_has = all(per_q["writer_input"].get(qi, [False]))
+        if good:
+            kind = "ok" if d_ok else "reviewer_fixed"
+        elif overflow:
+            kind = "overflow"
+        elif not final[qi]:
+            kind = "no_answer"
+        elif d_ok:
+            kind = "reviewer_broke"
+        elif not notes_has:
+            kind = "research_miss"
+        elif not got_has:
+            kind = "delivery_miss"
+        else:
+            kind = "writer_wrong"
+        counts[kind] += 1
+    return {f"jq_{k}": v / n for k, v in counts.items()}
 
 
 def summarize(path: Path) -> dict:
