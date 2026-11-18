@@ -1,0 +1,290 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{23}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{} and \showURL{}.  The latter does
+%%% not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showURL}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showURL #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+\makeatletter
+\@ifundefined{NAT@parse@date}{}{\let\NAT@parse@date@orig\NAT@parse@date}
+\@ifundefined{NAT@parse@date}{}{\def\NAT@parse@date#1#2#3#4#5#6@@{\NAT@parse@date@orig#1#2#3#4#5#6@@\def\NAT@tempyear{0000}\def\NAT@tempexlab{{?}}\ifx\NAT@year\NAT@tempyear\ifx\NAT@exlab\NAT@tempexlab\def\NAT@date{[n.\,d.]}\else\edef\NAT@date{[n.\,d.]\NAT@exlab}\fi\fi}}
+\makeatother
+
+\bibitem[{Anthropic}(2025)]%
+        {anthropic-multiagent}
+\bibfield{author}{\bibinfo{person}{{Anthropic}}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{How we built our multi-agent research system}.
+\newblock
+  \bibinfo{howpublished}{\url{https://www.anthropic.com/engineering/multi-agent-research-system}}.
+\newblock
+
+
+\bibitem[Bian et~al\mbox{.}(2026)]%
+        {tokendance}
+\bibfield{author}{\bibinfo{person}{Z. Bian} {et~al\mbox{.}}}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \bibinfo{title}{{TokenDance}: Scaling Multi-Agent {LLM} Serving via
+  Collective {KV} Cache Sharing}.
+\newblock
+\newblock
+\shownote{arXiv:2604.03143}.
+
+
+\bibitem[Cemri et~al\mbox{.}(2025)]%
+        {mast}
+\bibfield{author}{\bibinfo{person}{Mert Cemri} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Why Do Multi-Agent {LLM} Systems Fail?}. In
+  \bibinfo{booktitle}{\emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}}.
+\newblock
+\newblock
+\shownote{arXiv:2503.13657}.
+
+
+\bibitem[Chen et~al\mbox{.}(2025)]%
+        {optima}
+\bibfield{author}{\bibinfo{person}{Weize Chen} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Optima: Optimizing Effectiveness and Efficiency for
+  {LLM}-Based Multi-Agent System}. In \bibinfo{booktitle}{\emph{Findings of the
+  Association for Computational Linguistics (ACL)}}.
+\newblock
+\newblock
+\shownote{arXiv:2410.08115}.
+
+
+\bibitem[Han and Zhang(2025)]%
+        {lbmas}
+\bibfield{author}{\bibinfo{person}{Bochen Han} {and} \bibinfo{person}{Songmao
+  Zhang}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{Exploring Advanced {LLM} Multi-Agent Systems Based on
+  Blackboard Architecture}.
+\newblock
+\newblock
+\shownote{arXiv:2507.01701}.
+
+
+\bibitem[Ho et~al\mbox{.}(2020)]%
+        {2wiki}
+\bibfield{author}{\bibinfo{person}{Xanh Ho} {et~al\mbox{.}}}
+  \bibinfo{year}{2020}\natexlab{}.
+\newblock \showarticletitle{Constructing A Multi-hop {QA} Dataset for
+  Comprehensive Evaluation of Reasoning Steps}. In
+  \bibinfo{booktitle}{\emph{International Conference on Computational
+  Linguistics (COLING)}}.
+\newblock
+
+
+\bibitem[Hong et~al\mbox{.}(2024)]%
+        {metagpt}
+\bibfield{author}{\bibinfo{person}{Sirui Hong} {et~al\mbox{.}}}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{{MetaGPT}: Meta Programming for A Multi-Agent
+  Collaborative Framework}. In \bibinfo{booktitle}{\emph{International
+  Conference on Learning Representations (ICLR)}}.
+\newblock
+
+
+\bibitem[Huang et~al\mbox{.}(2026)]%
+        {pact}
+\bibfield{author}{\bibinfo{person}{C. Huang} {et~al\mbox{.}}}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \bibinfo{title}{What Should Agents Say? Action-state Communication
+  for Efficient Multi-Agent Systems}.
+\newblock
+\newblock
+\shownote{arXiv:2606.05304}.
+
+
+\bibitem[Kwon et~al\mbox{.}(2023)]%
+        {vllm}
+\bibfield{author}{\bibinfo{person}{Woosuk Kwon} {et~al\mbox{.}}}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Efficient Memory Management for Large Language
+  Model Serving with {PagedAttention}}. In \bibinfo{booktitle}{\emph{ACM
+  Symposium on Operating Systems Principles (SOSP)}}.
+\newblock
+
+
+\bibitem[Lauer and Needham(1979)]%
+        {lauer-needham}
+\bibfield{author}{\bibinfo{person}{Hugh~C. Lauer} {and}
+  \bibinfo{person}{Roger~M. Needham}.} \bibinfo{year}{1979}\natexlab{}.
+\newblock \showarticletitle{On the Duality of Operating System Structures}.
+\newblock \bibinfo{journal}{\emph{ACM SIGOPS Operating Systems Review}}
+  \bibinfo{volume}{13}, \bibinfo{number}{2} (\bibinfo{year}{1979}).
+\newblock
+\href{https://doi.org/10.1145/850657.850658}{doi:\nolinkurl{10.1145/850657.850658}}
+
+
+\bibitem[Liedtke(1993)]%
+        {liedtke-ipc}
+\bibfield{author}{\bibinfo{person}{Jochen Liedtke}.}
+  \bibinfo{year}{1993}\natexlab{}.
+\newblock \showarticletitle{Improving {IPC} by Kernel Design}. In
+  \bibinfo{booktitle}{\emph{ACM Symposium on Operating Systems Principles
+  (SOSP)}}.
+\newblock
+\href{https://doi.org/10.1145/168619.168633}{doi:\nolinkurl{10.1145/168619.168633}}
+
+
+\bibitem[Qian et~al\mbox{.}(2024)]%
+        {chatdev}
+\bibfield{author}{\bibinfo{person}{Chen Qian} {et~al\mbox{.}}}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{{ChatDev}: Communicative Agents for Software
+  Development}. In \bibinfo{booktitle}{\emph{Annual Meeting of the Association
+  for Computational Linguistics (ACL)}}.
+\newblock
+
+
+\bibitem[Salemi et~al\mbox{.}(2025)]%
+        {blackboard-ds}
+\bibfield{author}{\bibinfo{person}{Alireza Salemi} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{{LLM}-Based Multi-Agent Blackboard System for
+  Information Discovery in Data Science}.
+\newblock
+\newblock
+\shownote{arXiv:2510.01285}.
+
+
+\bibitem[Wang et~al\mbox{.}(2025a)]%
+        {openhands}
+\bibfield{author}{\bibinfo{person}{Xingyao Wang} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{a}.
+\newblock \showarticletitle{{OpenHands}: An Open Platform for {AI} Software
+  Developers as Generalist Agents}. In \bibinfo{booktitle}{\emph{International
+  Conference on Learning Representations (ICLR)}}.
+\newblock
+
+
+\bibitem[Wang et~al\mbox{.}(2025b)]%
+        {agentdropout}
+\bibfield{author}{\bibinfo{person}{Zhexuan Wang} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{b}.
+\newblock \showarticletitle{{AgentDropout}: Dynamic Agent Elimination for
+  Token-Efficient and High-Performance {LLM}-Based Multi-Agent Collaboration}.
+  In \bibinfo{booktitle}{\emph{Annual Meeting of the Association for
+  Computational Linguistics (ACL)}}.
+\newblock
+
+
+\bibitem[Wu et~al\mbox{.}(2024)]%
+        {autogen}
+\bibfield{author}{\bibinfo{person}{Qingyun Wu} {et~al\mbox{.}}}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{{AutoGen}: Enabling Next-Gen {LLM} Applications via
+  Multi-Agent Conversation}. In \bibinfo{booktitle}{\emph{Conference on
+  Language Modeling (COLM)}}.
+\newblock
+\newblock
+\shownote{arXiv:2308.08155}.
+
+
+\bibitem[Yang et~al\mbox{.}(2025)]%
+        {qwen3}
+\bibfield{author}{\bibinfo{person}{An Yang} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{{Qwen3} Technical Report}.
+\newblock
+\newblock
+\shownote{arXiv:2505.09388}.
+
+
+\bibitem[Yang et~al\mbox{.}(2024)]%
+        {sweagent}
+\bibfield{author}{\bibinfo{person}{John Yang} {et~al\mbox{.}}}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{{SWE-agent}: Agent-Computer Interfaces Enable
+  Automated Software Engineering}. In \bibinfo{booktitle}{\emph{Advances in
+  Neural Information Processing Systems (NeurIPS)}}.
+\newblock
+
+
+\bibitem[Yang et~al\mbox{.}(2018)]%
+        {hotpotqa}
+\bibfield{author}{\bibinfo{person}{Zhilin Yang} {et~al\mbox{.}}}
+  \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{{HotpotQA}: A Dataset for Diverse, Explainable
+  Multi-hop Question Answering}. In \bibinfo{booktitle}{\emph{Conference on
+  Empirical Methods in Natural Language Processing (EMNLP)}}.
+\newblock
+
+
+\bibitem[Ye et~al\mbox{.}(2025)]%
+        {kvcomm}
+\bibfield{author}{\bibinfo{person}{Hancheng Ye} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{{KVCOMM}: Online Cross-context {KV}-cache
+  Communication for Efficient {LLM}-based Multi-agent Systems}. In
+  \bibinfo{booktitle}{\emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}}.
+\newblock
+
+
+\bibitem[Zhang et~al\mbox{.}(2025a)]%
+        {agentprune}
+\bibfield{author}{\bibinfo{person}{Guibin Zhang} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{a}.
+\newblock \showarticletitle{Cut the Crap: An Economical Communication Pipeline
+  for {LLM}-based Multi-Agent Systems}. In
+  \bibinfo{booktitle}{\emph{International Conference on Learning
+  Representations (ICLR)}}.
+\newblock
+
+
+\bibitem[Zhang et~al\mbox{.}(2025b)]%
+        {gdesigner}
+\bibfield{author}{\bibinfo{person}{Guibin Zhang} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{b}.
+\newblock \showarticletitle{{G-Designer}: Architecting Multi-agent
+  Communication Topologies via Graph Neural Networks}. In
+  \bibinfo{booktitle}{\emph{International Conference on Machine Learning
+  (ICML)}}.
+\newblock
+
+
+\bibitem[Zheng et~al\mbox{.}(2024)]%
+        {sglang}
+\bibfield{author}{\bibinfo{person}{Lianmin Zheng} {et~al\mbox{.}}}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{{SGLang}: Efficient Execution of Structured
+  Language Model Programs}. In \bibinfo{booktitle}{\emph{Advances in Neural
+  Information Processing Systems (NeurIPS)}}.
+\newblock
+
+
+\end{thebibliography}
