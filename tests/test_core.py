@@ -145,3 +145,19 @@ def test_index_tracks_agent_files(tmp_path, questions):
     idx = (ws.root / "index.md").read_text()
     assert "notes.md | by researcher | 2 lines | Notes for Q1" in idx
     assert idx.index("notes.md") < idx.index("docs/")
+
+
+def test_batched_read(questions, tmp_path):
+    task = make_tasks(questions, 1, 1, seed=0)[0]
+    client = MockClient([
+        [("write_file", {"path": "a.md", "content": "AAA"}), ("write_file", {"path": "b.md", "content": "BBB"})], "DONE",
+        [("read_files", {"paths": ["a.md", "b.md"]})], [("write_file", {"path": "draft.md", "content": _final(1)})], "DONE",
+        [("write_file", {"path": "final.md", "content": _final(1)})], "DONE",
+    ])
+    rec = asyncio.run(run_task(task, "Bb", client, tmp_path))
+    names = [t["function"]["name"] for t in client.calls[2]["tools"]]
+    assert "read_files" in names and "read_files" in system_prompt("writer", "Bb")
+    assert "AAA" in rec["stage"]["writer_input"] and "BBB" in rec["stage"]["writer_input"]
+    assert rec["io"]["writer"]["reads"] == 2 and len(rec["agents"]["writer"]["calls"]) == 3
+    b = MockClient(["x"])
+    assert "read_files" not in system_prompt("writer", "B")

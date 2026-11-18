@@ -14,9 +14,9 @@ from .data import Task
 from .llm import ContextOverflow, SaltedClient
 from .workspace import Workspace
 
-CHANNELS = ("A1", "A1zc", "A2", "B", "C", "D")
+CHANNELS = ("A1", "A1zc", "A2", "B", "Bb", "C", "D")
 MESSAGE_CHANNELS = ("A1", "A1zc", "A2")
-FILE_CHANNELS = ("B", "C", "D")
+FILE_CHANNELS = ("B", "Bb", "C", "D")
 
 TEAM = ("You are one agent in a team that answers a set of questions together. The agents work in this "
         "order: {chain}.")
@@ -123,6 +123,8 @@ def instruction(role: str, channel: str, chain: tuple[str, ...]) -> str:
         prev_file = OUT_FILE.get(chain[i - 1], "draft.md") if i > 0 else ""
         parts.append(OUTPUT_FILES[role].format(prev_file=prev_file))
         parts.append(HANDOFF_RULE if channel == "D" and role != "reviewer" else DONE_RULE)
+        if channel == "Bb" and role != "researcher":
+            parts.append(BATCH_RULE)
         if channel == "C":
             parts.append(INDEX_RULE["researcher" if role == "researcher" else "other"])
         if channel == "D" and role != "researcher":
@@ -144,6 +146,14 @@ class AgentRun:
 
 
 WRITE_ONLY = [t for t in TOOLS if t["function"]["name"] == "write_file"]
+# Bb: B plus a batched read, the agent analogue of readv(): several files in one round trip.
+READ_MANY = {"type": "function", "function": {
+    "name": "read_files", "description": "Read several workspace files in one call.",
+    "parameters": {"type": "object", "properties": {
+        "paths": {"type": "array", "items": {"type": "string"}}}, "required": ["paths"]}}}
+TOOLS_BATCH = TOOLS + [READ_MANY]
+BATCH_RULE = ("To read several files, use read_files with all their paths in one call; every tool call is a "
+              "separate round trip.")
 FORCE_WRITE = {"type": "function", "function": {"name": "write_file"}}
 
 
@@ -162,6 +172,8 @@ def _do_tool(ws: Workspace, role: str, name: str, raw_args: str | None) -> str:
         return ws.list_files(role)
     if name == "read_file":
         return ws.read_file(role, args.get("path", ""), args.get("start_line"), args.get("end_line"))
+    if name == "read_files" and isinstance(args.get("paths"), list):
+        return "\n\n".join(f"=== {p} ===\n" + ws.read_file(role, str(p)) for p in args["paths"][:20])
     if name == "write_file":
         return ws.write_file(role, args.get("path", ""), args.get("content", ""), bool(args.get("append")))
     return f"ERROR: unknown tool {name}"
@@ -184,10 +196,10 @@ async def _chat(client, run: AgentRun, messages, tools, turn: int, forced: bool)
 
 
 async def run_agent(client, ws: Workspace | None, role: str, messages: list[dict], max_turns: int,
-                    out_file: str | None = None) -> AgentRun:
+                    out_file: str | None = None, full_tools: list[dict] = TOOLS) -> AgentRun:
     """Tool loop. An agent that stops without leaving its output gets one forced write_file turn."""
     run = AgentRun(role)
-    tools = None if ws is None else (WRITE_ONLY if role == "researcher" else TOOLS)
+    tools = None if ws is None else (WRITE_ONLY if role == "researcher" else full_tools)
     prev_sig, plain_reply = None, False
     for turn in range(max_turns if ws is not None else 1):
         r, call = await _chat(client, run, messages, tools, turn, False)
@@ -284,7 +296,8 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
     stage: dict[str, str] = {}
     for i, role in enumerate(chain):
         msgs = build_messages(role, channel, chain, task, replies)
-        runs[role] = await run_agent(client, ws, role, msgs, max_turns if files else 1, OUT_FILE.get(role))
+        runs[role] = await run_agent(client, ws, role, msgs, max_turns if files else 1, OUT_FILE.get(role),
+                                     TOOLS_BATCH if channel == "Bb" else TOOLS)
         replies[role] = runs[role].reply
         if role == "researcher":
             stage["notes"] = replies[role] if not files else ws.written_by("researcher")
