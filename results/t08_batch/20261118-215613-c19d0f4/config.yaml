@@ -1,0 +1,28 @@
+exp: t08_batch
+datasets:
+  hotpotqa: data/raw/hotpot_distractor_validation.parquet
+  2wiki: data/raw/2wiki_dev.json
+model: Qwen/Qwen3-8B
+server:
+  base_url: http://localhost:8103
+  base_urls:
+  - http://localhost:8103
+  served_name: qwen3-8b
+  gpu: 6
+  gpus:
+  - 6
+  vllm_src: /mnt/sda/heojin/cs506-store/vllm
+  flags: --max-model-len 32768 --gpu-memory-utilization 0.90 --enable-prefix-caching
+    --enable-prompt-tokens-details --enable-auto-tool-choice --tool-call-parser hermes
+    --seed 0
+channels:
+- Bb
+k:
+- 3
+seeds:
+- 2
+n_tasks: 150
+max_tokens: 2048
+max_turns: 12
+concurrency: 6
+use_tasks: 100
