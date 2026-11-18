@@ -1,4 +1,4 @@
-exp: t08_pressure
+exp: t08_pressure_c1
 datasets:
   hotpotqa: data/raw/hotpot_distractor_validation.parquet
   2wiki: data/raw/2wiki_dev.json
