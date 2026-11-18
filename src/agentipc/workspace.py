@@ -28,6 +28,9 @@ class Workspace:
     stats: dict[str, IOStats] = field(default_factory=dict)
     ops: list[dict] = field(default_factory=list)
     reads_by: dict[str, list[str]] = field(default_factory=dict)
+    auto_index: bool = False
+    authors: dict[str, str] = field(default_factory=dict)
+    notes: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self):
         self.root = Path(self.root)
@@ -67,7 +70,9 @@ class Workspace:
         try:
             f = self._path(path)
             if not f.is_file():
-                raise WorkspaceError(f"no such file: {path}")
+                import difflib
+                close = difflib.get_close_matches(str(path).strip().lstrip("./"), self.files(), n=3, cutoff=0.6)
+                raise WorkspaceError(f"no such file: {path}" + (f" (similar: {', '.join(close)})" if close else ""))
         except WorkspaceError as e:
             st.errors += 1
             self.ops.append({"agent": agent, "op": "read", "path": str(path), "error": str(e)})
@@ -99,8 +104,37 @@ class Workspace:
             f.write_text(content)
         st.writes += 1
         st.write_chars += len(content)
+        if self.auto_index:
+            if str(path).strip().lstrip("./") == "index.md":
+                # An agent's own index line is kept as a note on the file it names.
+                for line in content.splitlines():
+                    parts = [x.strip(" `") for x in line.split("|")]
+                    if len(parts) >= 2 and parts[0] and parts[0] != "index.md":
+                        self.notes[parts[0]] = " | ".join(parts[1:])[:160]
+            else:
+                self.authors[str(path).strip().lstrip("./")] = agent
+            self.refresh_index()
         self.ops.append({"agent": agent, "op": "write", "path": str(path), "append": bool(append), "chars": len(content)})
         return f"OK: wrote {len(content)} chars to {path}"
+
+    def refresh_index(self) -> None:
+        """Rewrite index.md: agent files first (author, size, first line, notes), then source documents."""
+        own, docs = [], []
+        for rel in self.files():
+            if rel == "index.md":
+                continue
+            text = (self.root / rel).read_text()
+            first = next((l.strip(" #") for l in text.splitlines() if l.strip()), "")[:100]
+            n = text.count("\n") + (0 if text.endswith("\n") or not text else 1)
+            if rel.startswith("docs/") and rel not in self.notes:
+                docs.append(f"{rel} | source document: {first}")
+            else:
+                note = f" | {self.notes[rel]}" if rel in self.notes else ""
+                own.append(f"{rel} | by {self.authors.get(rel, '?')} | {n} lines | {first}{note}")
+        body = ["# Workspace index (kept up to date by the workspace)", "", "## Agent files"]
+        body += own or ["(none yet)"]
+        body += ["", "## Source documents"] + docs
+        (self.root / "index.md").write_text("\n".join(body) + "\n")
 
     def written_by(self, agent: str) -> str:
         """Current text of every file this agent wrote."""

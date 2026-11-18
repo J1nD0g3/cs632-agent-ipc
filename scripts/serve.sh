@@ -6,6 +6,7 @@ source env.local.sh
 GPU=${1:?gpu index}
 PORT=${2:-8100}
 export HF_HUB_OFFLINE=1
+export PATH="$(dirname "$VLLM_BIN"):$PATH"  # ninja and other build tools the server needs
 LOG=logs/vllm_gpu${GPU}_$(date +%Y%m%d_%H%M%S).log
 CUDA_VISIBLE_DEVICES=$GPU nohup "$VLLM_BIN" serve "$MODEL" \
   --served-model-name qwen3-8b --port "$PORT" \

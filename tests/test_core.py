@@ -66,7 +66,7 @@ def _final(n):
 def test_channel_a_copies_history(questions, tmp_path):
     task = make_tasks(questions, 1, 2, seed=0)[0]
     client = MockClient(["NOTES: directed by Director", "DRAFT", _final(2)])
-    rec = asyncio.run(run_task(task, "A", client, tmp_path))
+    rec = asyncio.run(run_task(task, "A1", client, tmp_path))
     assert len(client.calls) == 3 and client.calls[0]["tools"] is None
     reviewer_prompt = " ".join(m["content"] for m in client.calls[2]["messages"])
     assert "NOTES" in reviewer_prompt and "DRAFT" in reviewer_prompt and "Documents:" in reviewer_prompt
@@ -93,3 +93,55 @@ def test_channel_b_uses_files(questions, tmp_path):
 
 def test_channel_c_prompts_mention_index():
     assert "index.md" in system_prompt("writer", "C") and "index.md" not in system_prompt("writer", "B")
+
+
+def test_pipe_passes_only_previous_output(questions, tmp_path):
+    task = make_tasks(questions, 1, 1, seed=0)[0]
+    client = MockClient(["NOTES", "DRAFT", _final(1)])
+    asyncio.run(run_task(task, "A2", client, tmp_path))
+    reviewer_prompt = " ".join(m["content"] for m in client.calls[2]["messages"])
+    assert "DRAFT" in reviewer_prompt and "NOTES" not in reviewer_prompt and "Documents:" not in reviewer_prompt
+
+
+def test_zero_copy_shares_prefix(questions, tmp_path):
+    task = make_tasks(questions, 1, 1, seed=0)[0]
+    client = MockClient(["NOTES", "DRAFT", _final(1)])
+    asyncio.run(run_task(task, "A1zc", client, tmp_path))
+    r, w, v = (c["messages"] for c in client.calls)
+    assert r[:2] == w[:2] == v[:2] and w[2] == v[2]
+    a1 = MockClient(["NOTES", "DRAFT", _final(1)])
+    asyncio.run(run_task(task, "A1", a1, tmp_path))
+    words = lambda msgs: sorted(" ".join(m["content"] for m in msgs).split())
+    assert words(v) == words(a1.calls[2]["messages"])
+
+
+def test_handles_push_short_message(questions, tmp_path):
+    task = make_tasks(questions, 1, 1, seed=0)[0]
+    client = MockClient([
+        [("write_file", {"path": "notes.md", "content": "facts"})], "HANDOFF: Q1 see notes.md",
+        [("write_file", {"path": "draft.md", "content": _final(1)})], "HANDOFF2: draft.md",
+        [("write_file", {"path": "final.md", "content": _final(1)})], "DONE",
+    ])
+    rec = asyncio.run(run_task(task, "D", client, tmp_path))
+    reviewer_prompt = " ".join(str(m.get("content")) for m in client.calls[4]["messages"])
+    assert "HANDOFF: Q1" in reviewer_prompt and "HANDOFF2" in reviewer_prompt and "Documents:" not in reviewer_prompt
+    assert rec["stage"]["writer_input"].startswith("HANDOFF")
+
+
+def test_five_agent_chain(questions, tmp_path):
+    task = make_tasks(questions, 1, 1, seed=0)[0]
+    chain = ("researcher", "writer", "checker", "reviewer")
+    client = MockClient(["NOTES", "DRAFT", "CHECKED", _final(1)])
+    rec = asyncio.run(run_task(task, "A1", client, tmp_path, chain=chain))
+    assert rec["stage"]["checker"] == "CHECKED" and "Fact-checker" in client.calls[0]["messages"][0]["content"]
+
+
+def test_index_tracks_agent_files(tmp_path, questions):
+    from agentipc.pipeline import seed_workspace
+    task = make_tasks(questions, 1, 1, seed=0)[0]
+    ws = Workspace(tmp_path / "c")
+    seed_workspace(ws, task, "C")
+    ws.write_file("researcher", "notes.md", "# Notes for Q1\nfact")
+    idx = (ws.root / "index.md").read_text()
+    assert "notes.md | by researcher | 2 lines | Notes for Q1" in idx
+    assert idx.index("notes.md") < idx.index("docs/")

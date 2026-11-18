@@ -7,7 +7,9 @@ METRICS = ("acc", "all_correct", "em", "f1", "answered", "total_tokens", "prompt
            "prefill_tokens", "llm_calls", "tokens_researcher", "tokens_writer", "tokens_reviewer",
            "file_io", "file_reads", "file_writes", "file_lists", "read_chars", "write_chars",
            "fact_recall_notes", "fact_kept_writer_input", "fact_kept_draft", "fact_kept_final", "info_loss",
-           "fact_recall_final", "triple_recall_notes", "triple_recall_final", "overflow", "turn_limit")
+           "fact_recall_final", "triple_recall_notes", "triple_recall_final", "overflow", "turn_limit",
+           "wall_s", "q_ok", "q_reviewer_fixed", "q_overflow", "q_no_answer", "q_research_miss", "q_delivery_miss",
+           "q_writer_wrong", "q_reviewer_broke")
 
 
 def ci(xs, n_boot: int = 2000, seed: int = 0) -> tuple[float, float, float]:

@@ -31,13 +31,13 @@ class ChatClient:
         self.enable_thinking = enable_thinking
         self.http = httpx.AsyncClient(timeout=timeout)
 
-    async def chat(self, messages: list[dict], tools: list[dict] | None = None) -> Reply:
+    async def chat(self, messages: list[dict], tools: list[dict] | None = None, tool_choice=None) -> Reply:
         body = {"model": self.model, "messages": messages, "max_tokens": self.max_tokens,
                 "temperature": self.temperature, "seed": self.seed,
                 "chat_template_kwargs": {"enable_thinking": self.enable_thinking}}
         if tools:
             body["tools"] = tools
-            body["tool_choice"] = "auto"
+            body["tool_choice"] = tool_choice or "auto"
         t0 = time.perf_counter()
         for attempt in range(3):
             r = await self.http.post(self.url, json=body)
@@ -68,8 +68,8 @@ class MockClient:
         self.script = list(script)
         self.calls: list[dict] = []
 
-    async def chat(self, messages, tools=None) -> Reply:
-        self.calls.append({"messages": [dict(m) for m in messages], "tools": tools})
+    async def chat(self, messages, tools=None, tool_choice=None) -> Reply:
+        self.calls.append({"messages": [dict(m) for m in messages], "tools": tools, "tool_choice": tool_choice})
         item = self.script.pop(0) if self.script else "done"
         n_prompt = sum(len(str(m.get("content") or "")) for m in messages) // 4
         if isinstance(item, str):

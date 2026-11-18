@@ -122,4 +122,37 @@ def score_run(rec: dict, task_questions: list[Question]) -> dict:
         out["triple_recall_notes"] = sum(triple_present(t, rec["stage"].get("notes", "")) for t in triples) / len(triples)
         out["triple_recall_final"] = sum(triple_present(t, rec["stage"].get("final", "")) for t in triples) / len(triples)
     out["preds"] = preds
+    out.update(failure_types(rec, task_questions, preds, ok))
     return out
+
+
+FAILURES = ("ok", "reviewer_fixed", "overflow", "no_answer", "research_miss", "delivery_miss", "writer_wrong",
+            "reviewer_broke")
+
+
+def failure_types(rec: dict, task_questions: list[Question], preds: list[str], ok: list[bool]) -> dict:
+    """Assign each question to the first stage that explains its final outcome."""
+    n = len(task_questions)
+    draft = parse_answers(rec["stage"].get("draft", ""), n)
+    overflow = any(a["overflow"] for a in rec["agents"].values())
+    counts = dict.fromkeys(FAILURES, 0)
+    for q, p, d, good in zip(task_questions, preds, draft, ok):
+        d_ok = correct(d, q.answer)
+        notes_has = all(fact_present(f, q, rec["stage"].get("notes", "")) for f in q.facts)
+        got_has = all(fact_present(f, q, rec["stage"].get("writer_input", "")) for f in q.facts)
+        if good:
+            kind = "ok" if d_ok else "reviewer_fixed"
+        elif overflow:
+            kind = "overflow"
+        elif not p:
+            kind = "no_answer"
+        elif d_ok:
+            kind = "reviewer_broke"
+        elif not notes_has:
+            kind = "research_miss"
+        elif not got_has:
+            kind = "delivery_miss"
+        else:
+            kind = "writer_wrong"
+        counts[kind] += 1
+    return {f"q_{k}": v / n for k, v in counts.items()}

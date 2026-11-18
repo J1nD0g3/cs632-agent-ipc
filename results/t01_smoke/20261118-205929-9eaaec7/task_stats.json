@@ -1,0 +1,23 @@
+{
+ "hotpotqa_k1_s0": {
+  "tasks": 2,
+  "questions": 2,
+  "docs_mean": 10.0,
+  "doc_chars_mean": 5537.5,
+  "support_facts_mean": 3.5,
+  "types": {
+   "bridge": 2
+  }
+ },
+ "hotpotqa_k3_s0": {
+  "tasks": 2,
+  "questions": 6,
+  "docs_mean": 30.0,
+  "doc_chars_mean": 15174.0,
+  "support_facts_mean": 8.5,
+  "types": {
+   "bridge": 5,
+   "comparison": 1
+  }
+ }
+}

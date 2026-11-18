@@ -32,6 +32,10 @@ def _sh(cmd: list[str], cwd=None) -> str:
         return ""
 
 
+def datasets(cfg: dict) -> dict[str, str]:
+    return cfg.get("datasets") or {cfg["dataset"]: cfg["data_path"]}
+
+
 def env_info(cfg: dict) -> dict:
     base = cfg["server"]["base_url"]
     try:
@@ -57,38 +61,43 @@ def env_info(cfg: dict) -> dict:
 
 
 async def run(cfg: dict, run_dir: Path, raw_dir: Path) -> list[dict]:
-    questions = LOADERS[cfg["dataset"]](ROOT / cfg["data_path"])
-    client = ChatClient(cfg["server"]["base_url"], cfg["server"].get("served_name", cfg["model"]),
-                        max_tokens=cfg.get("max_tokens", 2048), seed=cfg.get("llm_seed", 0))
+    # One client per server; each run stays on one server so its prefix cache stays local.
+    urls = cfg["server"].get("base_urls") or [cfg["server"]["base_url"]]
+    clients = [ChatClient(u, cfg["server"].get("served_name", cfg["model"]),
+                          max_tokens=cfg.get("max_tokens", 2048), seed=cfg.get("llm_seed", 0)) for u in urls]
     jobs, tstats = [], {}
-    for seed in cfg["seeds"]:
-        for k in cfg["k"]:
-            tasks = make_tasks(questions, cfg["n_tasks"], k, seed)
-            tstats[f"k{k}_s{seed}"] = task_stats(tasks)
-            for t in tasks:
-                for ch in cfg["channels"]:
-                    jobs.append((t, ch))
+    for name, path in datasets(cfg).items():
+        questions = LOADERS[name](ROOT / path)
+        for seed in cfg["seeds"]:
+            for k in cfg["k"]:
+                tasks = make_tasks(questions, cfg["n_tasks"], k, seed)
+                tstats[f"{name}_k{k}_s{seed}"] = task_stats(tasks)
+                jobs += [(t, ch) for t in tasks for ch in cfg["channels"]]
     # Interleave channels and task sizes so server load and drift hit every condition alike.
     random.Random(cfg.get("order_seed", 0)).shuffle(jobs)
     (run_dir / "task_stats.json").write_text(json.dumps(tstats, indent=1))
-    sem = asyncio.Semaphore(cfg.get("concurrency", 8))
+    sems = [asyncio.Semaphore(cfg.get("concurrency", 8)) for _ in clients]
     work = raw_dir / "workspaces"
     out_f = gzip.open(raw_dir / "records.jsonl.gz", "wt")
     rows, done = [], 0
 
-    async def one(task, ch):
+    async def one(i, task, ch):
         nonlocal done
-        async with sem:
+        client = clients[i % len(clients)]
+        async with sems[i % len(clients)]:
             try:
-                rec = await run_task(task, ch, client, work, cfg.get("max_turns", 12))
+                rec = await run_task(task, ch, client, work, cfg.get("max_turns", 12),
+                                     tuple(cfg.get("chain", ["researcher", "writer", "reviewer"])))
             except Exception as e:  # keep going; a failed run is recorded, not dropped
                 rec = {"task_id": task.task_id, "channel": ch, "dataset": task.dataset, "k": len(task.questions),
                        "error": f"{type(e).__name__}: {e}"[:500], "agents": {}, "stage": {}}
         rec["seed"] = int(task.task_id.split("-s")[1].split("-")[0])
+        rec["server"] = client.url
         if "error" not in rec:
             rec["score"] = score_run(rec, task.questions)
         out_f.write(json.dumps(rec) + "\n")
         row = {k: rec[k] for k in ("task_id", "channel", "dataset", "k", "seed")}
+        row["wall_s"] = rec.get("wall_s", 0)
         row["error"] = rec.get("error", "")
         row.update({k: v for k, v in rec.get("score", {}).items() if k != "preds"})
         rows.append(row)
@@ -96,9 +105,10 @@ async def run(cfg: dict, run_dir: Path, raw_dir: Path) -> list[dict]:
         if done % 20 == 0 or done == len(jobs):
             print(f"{done}/{len(jobs)} runs", flush=True)
 
-    await asyncio.gather(*(one(t, ch) for t, ch in jobs))
+    await asyncio.gather(*(one(i, t, ch) for i, (t, ch) in enumerate(jobs)))
     out_f.close()
-    await client.aclose()
+    for c in clients:
+        await c.aclose()
     if work.exists():
         with tarfile.open(raw_dir / "workspaces.tar.gz", "w:gz") as tar:
             tar.add(work, arcname="workspaces")

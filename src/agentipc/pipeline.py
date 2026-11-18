@@ -1,4 +1,8 @@
-"""Researcher -> Writer -> Reviewer over one of three channels (A message passing, B files, C files + index)."""
+"""An agent chain (Researcher -> ... -> Reviewer) over one inter-agent channel.
+
+Channels: A1 broadcast (whole history copied), A1zc (A1 ordered so the prefix cache is reused),
+A2 pipe (previous output only), B files, C files + index, D handles (short pushed message + files).
+"""
 from __future__ import annotations
 
 import json
@@ -10,11 +14,12 @@ from .data import Task
 from .llm import ContextOverflow
 from .workspace import Workspace
 
-CHANNELS = ("A", "B", "C")
-ROLES = ("researcher", "writer", "reviewer")
+CHANNELS = ("A1", "A1zc", "A2", "B", "C", "D")
+MESSAGE_CHANNELS = ("A1", "A1zc", "A2")
+FILE_CHANNELS = ("B", "C", "D")
 
-TEAM = ("You are one of three agents (Researcher, Writer, Reviewer) that answer a set of questions "
-        "together, in that order.")
+TEAM = ("You are one agent in a team that answers a set of questions together. The agents work in this "
+        "order: {chain}.")
 
 FORMAT = ("Use exactly this format for every question, in order:\n"
           "Q1: <short answer, a few words>\n"
@@ -28,36 +33,54 @@ ROLE_TEXT = {
                    "linked facts; include the intermediate ones. Do not decide the final answers."),
     "writer": ("You are the Writer. Using the Researcher's facts, write a draft answer for each question: a "
                "short answer and one to three sentences of evidence that cite document titles."),
-    "reviewer": ("You are the Reviewer. Check the Writer's draft against the facts, fix answers that are wrong "
-                 "or unsupported, and produce the final answers."),
+    "checker": ("You are the Fact-checker. Check every answer in the current draft against the Researcher's "
+                "facts and the documents, correct answers that are wrong or unsupported, and produce a "
+                "checked draft."),
+    "reviewer": ("You are the Reviewer. Check the latest draft, fix answers that are wrong or unsupported, "
+                 "and produce the final answers."),
 }
+NAME = {"researcher": "Researcher", "writer": "Writer", "checker": "Fact-checker", "reviewer": "Reviewer"}
 
-OUTPUT_A = {
-    "researcher": "Reply with your notes. Your whole reply is passed to the next agents.",
+OUTPUT_MSG = {
+    "researcher": "Reply with your notes. Your reply is passed on to the next agents.",
     "writer": "Reply with the draft. " + FORMAT,
+    "checker": "Reply with the checked draft. " + FORMAT,
     "reviewer": "Reply with the final answers. " + FORMAT,
 }
 
+# File each role must leave for the next one in the file channels.
+OUT_FILE = {"writer": "draft.md", "checker": "checked.md", "reviewer": "final.md"}
+
 OUTPUT_FILES = {
-    "researcher": ("The other agents cannot see your reply; they see only the shared workspace. Save your "
-                   "notes there with write_file (choose the file names and how to split them). The source "
-                   "documents are also in the workspace under docs/. When your notes are saved, reply DONE."),
-    "writer": ("The Researcher's notes and the source documents are in the shared workspace. Find what you "
-               "need with list_files and read_file; read only what you need. Save the draft to draft.md with "
-               "write_file, then reply DONE. " + FORMAT),
-    "reviewer": ("The draft (draft.md), the Researcher's notes and the source documents are in the shared "
-                 "workspace. Read what you need with read_file. Save the final answers to final.md with "
-                 "write_file, then reply DONE. " + FORMAT),
+    "researcher": ("The documents are in this message, so you do not need to read any file. The other agents "
+                   "cannot see your reply; they see only the shared workspace, where the source documents also "
+                   "are (under docs/). Save your notes there with write_file, in one or a few calls (choose the "
+                   "file names and how to split them)."),
+    "writer": ("The Researcher's notes and the source documents are in the shared workspace. Find the notes "
+               "with list_files and read them with read_file; read a source document only to check a doubtful "
+               "fact. Save the draft to draft.md with write_file. " + FORMAT),
+    "checker": ("The draft (draft.md), the Researcher's notes and the source documents are in the shared "
+                "workspace. Read what you need with read_file. Save the checked draft to checked.md with "
+                "write_file. " + FORMAT),
+    "reviewer": ("The latest draft ({prev_file}), the Researcher's notes and the source documents are in the "
+                 "shared workspace. Read what you need with read_file. Save the final answers to final.md with "
+                 "write_file. " + FORMAT),
 }
+DONE_RULE = "When your file is saved, reply DONE."
 
 INDEX_RULE = {
-    "researcher": ("The workspace has an index file, index.md, that the other agents read first. For every "
-                   "file you write, append one line to index.md (write_file with append=true): "
-                   "`<path> | <which questions> | <what facts it holds>`."),
-    "writer": ("Read index.md first and use it to pick what to read. After saving draft.md, append one line "
-               "for it to index.md (append=true)."),
-    "reviewer": "Read index.md first and use it to pick what to read.",
+    "researcher": ("The workspace keeps an index file, index.md, listing every file with its author and first "
+                   "line; the other agents read it first. Start each notes file with a heading that says which "
+                   "questions it covers."),
+    "other": "Read index.md first (it lists every file with its author and first line) and use it to pick what to read.",
 }
+
+HANDOFF_RULE = ("When your file is saved, reply with a handoff message for the next agents of at most 120 "
+                "words: for each question, the key finding in one line and the workspace path (and line "
+                "numbers, if useful) where the details are. The next agents see this message but not your files "
+                "unless they read them.")
+HANDOFF_READ = ("Handoff messages from earlier agents are below. They say where the details are; read files only "
+                "for details the handoff does not give.")
 
 TOOLS = [
     {"type": "function", "function": {
@@ -77,8 +100,6 @@ TOOLS = [
             "append": {"type": "boolean"}}, "required": ["path", "content"]}}},
 ]
 
-STAGE_FILE = {"writer": "draft.md", "reviewer": "final.md"}
-
 
 def questions_block(task: Task) -> str:
     return "Questions:\n" + "\n".join(f"Q{i + 1}: {q.question}" for i, q in enumerate(task.questions))
@@ -88,11 +109,29 @@ def documents_block(task: Task) -> str:
     return "Documents:\n\n" + "\n\n".join(f"[{d.title}]\n{d.text}" for d in task.docs)
 
 
-def system_prompt(role: str, channel: str) -> str:
-    parts = [TEAM, ROLE_TEXT[role], OUTPUT_A[role] if channel == "A" else OUTPUT_FILES[role]]
-    if channel == "C":
-        parts.append(INDEX_RULE[role])
+def team_text(chain: tuple[str, ...]) -> str:
+    return TEAM.format(chain=" -> ".join(NAME[r] for r in chain))
+
+
+def instruction(role: str, channel: str, chain: tuple[str, ...]) -> str:
+    """Role and channel instructions (everything an agent is told besides its inputs)."""
+    parts = [ROLE_TEXT[role]]
+    if channel in MESSAGE_CHANNELS:
+        parts.append(OUTPUT_MSG[role])
+    else:
+        i = chain.index(role)
+        prev_file = OUT_FILE.get(chain[i - 1], "draft.md") if i > 0 else ""
+        parts.append(OUTPUT_FILES[role].format(prev_file=prev_file))
+        parts.append(HANDOFF_RULE if channel == "D" and role != "reviewer" else DONE_RULE)
+        if channel == "C":
+            parts.append(INDEX_RULE["researcher" if role == "researcher" else "other"])
+        if channel == "D" and role != "researcher":
+            parts.append(HANDOFF_READ)
     return "\n\n".join(parts)
+
+
+def system_prompt(role: str, channel: str, chain: tuple[str, ...] = ("researcher", "writer", "reviewer")) -> str:
+    return team_text(chain) + "\n\n" + instruction(role, channel, chain)
 
 
 @dataclass
@@ -104,43 +143,85 @@ class AgentRun:
     overflow: bool = False
 
 
-async def run_agent(client, ws: Workspace | None, role: str, messages: list[dict], max_turns: int) -> AgentRun:
+WRITE_ONLY = [t for t in TOOLS if t["function"]["name"] == "write_file"]
+FORCE_WRITE = {"type": "function", "function": {"name": "write_file"}}
+
+
+def _missing_output(ws: Workspace, role: str, out_file: str | None) -> bool:
+    return not (ws.root / out_file).is_file() if out_file else not ws.written_by(role)
+
+
+def _do_tool(ws: Workspace, role: str, name: str, raw_args: str | None) -> str:
+    try:
+        args = json.loads(raw_args or "{}")
+    except json.JSONDecodeError:
+        args = None
+    if not isinstance(args, dict):
+        return "ERROR: arguments must be a JSON object"
+    if name == "list_files":
+        return ws.list_files(role)
+    if name == "read_file":
+        return ws.read_file(role, args.get("path", ""), args.get("start_line"), args.get("end_line"))
+    if name == "write_file":
+        return ws.write_file(role, args.get("path", ""), args.get("content", ""), bool(args.get("append")))
+    return f"ERROR: unknown tool {name}"
+
+
+async def _chat(client, run: AgentRun, messages, tools, turn: int, forced: bool):
+    try:
+        r = await client.chat(messages, tools, FORCE_WRITE if forced else None)
+    except ContextOverflow as e:
+        run.overflow = True
+        run.calls.append({"turn": turn, "error": "context_overflow", "detail": str(e)[:200]})
+        return None, None
+    call = {"turn": turn, "prompt_tokens": r.prompt_tokens, "completion_tokens": r.completion_tokens,
+            "cached_tokens": r.cached_tokens, "latency_ms": round(r.latency_ms, 1),
+            "finish_reason": r.finish_reason, "tools": []}
+    if forced:
+        call["forced_write"] = True
+    run.calls.append(call)
+    return r, call
+
+
+async def run_agent(client, ws: Workspace | None, role: str, messages: list[dict], max_turns: int,
+                    out_file: str | None = None) -> AgentRun:
+    """Tool loop. An agent that stops without leaving its output gets one forced write_file turn."""
     run = AgentRun(role)
-    tools = TOOLS if ws is not None else None
-    for turn in range(max_turns):
-        try:
-            r = await client.chat(messages, tools)
-        except ContextOverflow as e:
-            run.overflow = True
-            run.calls.append({"turn": turn, "error": "context_overflow", "detail": str(e)[:200]})
+    tools = None if ws is None else (WRITE_ONLY if role == "researcher" else TOOLS)
+    prev_sig, plain_reply = None, False
+    for turn in range(max_turns if ws is not None else 1):
+        r, call = await _chat(client, run, messages, tools, turn, False)
+        if r is None:
             return run
-        call = {"turn": turn, "prompt_tokens": r.prompt_tokens, "completion_tokens": r.completion_tokens,
-                "cached_tokens": r.cached_tokens, "latency_ms": round(r.latency_ms, 1),
-                "finish_reason": r.finish_reason, "tools": []}
-        run.calls.append(call)
-        if not r.tool_calls or ws is None:
-            run.reply = r.content
-            return run
+        sig = [(tc["function"]["name"], tc["function"].get("arguments")) for tc in r.tool_calls]
+        if ws is None or not r.tool_calls or sig == prev_sig:
+            if r.tool_calls:
+                call["repeat_stop"] = True  # the model repeats its last call verbatim
+            run.reply, plain_reply = r.content, True
+            break
+        prev_sig = sig
         messages.append({"role": "assistant", "content": r.content or None, "tool_calls": r.tool_calls})
         for tc in r.tool_calls:
             name = tc["function"]["name"]
-            try:
-                args = json.loads(tc["function"].get("arguments") or "{}")
-            except json.JSONDecodeError:
-                args = None
-            if not isinstance(args, dict):
-                out = "ERROR: arguments must be a JSON object"
-            elif name == "list_files":
-                out = ws.list_files(role)
-            elif name == "read_file":
-                out = ws.read_file(role, args.get("path", ""), args.get("start_line"), args.get("end_line"))
-            elif name == "write_file":
-                out = ws.write_file(role, args.get("path", ""), args.get("content", ""), bool(args.get("append")))
-            else:
-                out = f"ERROR: unknown tool {name}"
+            out = _do_tool(ws, role, name, tc["function"].get("arguments"))
             call["tools"].append(name)
+            left = max_turns - turn - 1
+            if name == "write_file" and out.startswith("OK"):
+                out += ". If you are finished, reply without calling a tool."
+            if left <= 3:
+                out += f"\n[{left} tool turns left]"
             messages.append({"role": "tool", "tool_call_id": tc.get("id", ""), "content": out})
-    run.hit_turn_limit = True
+    else:
+        run.hit_turn_limit = ws is not None
+    if ws is not None and _missing_output(ws, role, out_file):
+        if plain_reply:
+            messages.append({"role": "assistant", "content": run.reply or ""})
+        messages.append({"role": "user", "content": f"Save your output to {out_file} now." if out_file
+                         else "Save your notes now."})
+        r, call = await _chat(client, run, messages, tools, max_turns, True)
+        for tc in (r.tool_calls if r is not None else []):
+            _do_tool(ws, role, tc["function"]["name"], tc["function"].get("arguments"))
+            call["tools"].append(tc["function"]["name"])
     return run
 
 
@@ -148,55 +229,86 @@ def seed_workspace(ws: Workspace, task: Task, channel: str) -> None:
     for d in task.docs:
         ws.seed(f"docs/{d.doc_id}.txt", f"{d.title}\n{d.text}\n")
     if channel == "C":
-        ws.seed("index.md", "# Index: <path> | <questions> | <contents>\n" +
-                "".join(f"docs/{d.doc_id}.txt | - | source document: {d.title}\n" for d in task.docs))
+        ws.auto_index = True
+        ws.refresh_index()
 
 
-async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: int = 12) -> dict:
-    assert channel in CHANNELS
-    t0 = time.perf_counter()
+def build_messages(role: str, channel: str, chain: tuple[str, ...], task: Task, replies: dict[str, str]) -> list[dict]:
     qs, docs = questions_block(task), documents_block(task)
-    ws = None if channel == "A" else Workspace(Path(workdir) / f"{task.task_id}_{channel}")
+    i = chain.index(role)
+    before = chain[:i]
+    if role == "researcher":
+        # The Researcher's input is the same in every channel: the questions and the documents.
+        if channel == "A1zc":
+            return [{"role": "system", "content": team_text(chain)},
+                    {"role": "user", "content": f"{qs}\n\n{docs}"},
+                    {"role": "user", "content": instruction(role, channel, chain)}]
+        return [{"role": "system", "content": system_prompt(role, channel, chain)},
+                {"role": "user", "content": f"{qs}\n\n{docs}"}]
+    if channel == "A1":
+        msgs = [{"role": "system", "content": system_prompt(role, channel, chain)},
+                {"role": "user", "content": f"{qs}\n\n{docs}"}]
+        msgs += [{"role": "user", "content": f"[{NAME[r]}]\n{replies[r]}"} for r in before]
+        return msgs
+    if channel == "A1zc":
+        # Same content as A1, but the shared history comes first and the role instruction last,
+        # so consecutive agents share a prompt prefix that the serving engine can reuse.
+        msgs = [{"role": "system", "content": team_text(chain)},
+                {"role": "user", "content": f"{qs}\n\n{docs}"}]
+        msgs += [{"role": "user", "content": f"[{NAME[r]}]\n{replies[r]}"} for r in before]
+        msgs.append({"role": "user", "content": instruction(role, channel, chain)})
+        return msgs
+    if channel == "A2":
+        prev = before[-1]
+        return [{"role": "system", "content": system_prompt(role, channel, chain)},
+                {"role": "user", "content": f"{qs}\n\n[{NAME[prev]}]\n{replies[prev]}"}]
+    msgs = [{"role": "system", "content": system_prompt(role, channel, chain)},
+            {"role": "user", "content": qs}]
+    if channel == "D":
+        msgs.append({"role": "user", "content": "\n\n".join(f"[{NAME[r]} handoff]\n{replies[r]}" for r in before)})
+    return msgs
+
+
+async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: int = 12,
+                   chain: tuple[str, ...] = ("researcher", "writer", "reviewer")) -> dict:
+    assert channel in CHANNELS and chain[0] == "researcher" and chain[-1] == "reviewer"
+    t0 = time.perf_counter()
+    files = channel in FILE_CHANNELS
+    ws = Workspace(Path(workdir) / f"{task.task_id}_{channel}_{len(chain)}") if files else None
     if ws is not None:
         seed_workspace(ws, task, channel)
 
     runs: dict[str, AgentRun] = {}
+    replies: dict[str, str] = {}
     stage: dict[str, str] = {}
-    # Researcher input is the same in every channel: the questions and the documents.
-    msgs = [{"role": "system", "content": system_prompt("researcher", channel)},
-            {"role": "user", "content": f"{qs}\n\n{docs}"}]
-    runs["researcher"] = await run_agent(client, ws, "researcher", msgs, 1 if ws is None else max_turns)
-    stage["notes"] = runs["researcher"].reply if ws is None else ws.written_by("researcher")
-
-    for role, prev in (("writer", "researcher"), ("reviewer", "writer")):
-        if channel == "A":
-            # Message passing: every earlier message is copied into this agent's prompt.
-            msgs = [{"role": "system", "content": system_prompt(role, channel)},
-                    {"role": "user", "content": f"{qs}\n\n{docs}"},
-                    {"role": "user", "content": f"[Researcher]\n{runs['researcher'].reply}"}]
-            if role == "reviewer":
-                msgs.append({"role": "user", "content": f"[Writer]\n{runs['writer'].reply}"})
+    for i, role in enumerate(chain):
+        msgs = build_messages(role, channel, chain, task, replies)
+        runs[role] = await run_agent(client, ws, role, msgs, max_turns if files else 1, OUT_FILE.get(role))
+        replies[role] = runs[role].reply
+        if role == "researcher":
+            stage["notes"] = replies[role] if not files else ws.written_by("researcher")
+            if channel == "D":
+                stage["notes"] += "\n" + replies[role]
         else:
-            msgs = [{"role": "system", "content": system_prompt(role, channel)},
-                    {"role": "user", "content": qs}]
-        runs[role] = await run_agent(client, ws, role, msgs, 1 if ws is None else max_turns)
-        if ws is None:
-            stage["draft" if role == "writer" else "final"] = runs[role].reply
-            if role == "writer":
-                stage["writer_input"] = runs["researcher"].reply
-        else:
-            f = ws.root / STAGE_FILE[role]
-            text = f.read_text() if f.is_file() else ""
-            stage["draft" if role == "writer" else "final"] = text
-            if role == "writer":
-                stage["writer_input"] = "\n".join(ws.reads_by.get("writer", []))
-    if ws is not None and not stage["final"]:
-        stage["final"] = runs["reviewer"].reply
+            out = replies[role]
+            if files:
+                f = ws.root / OUT_FILE[role]
+                out = f.read_text() if f.is_file() else ""
+            stage[{"writer": "draft", "reviewer": "final"}.get(role, role)] = out
+        if role == "writer":
+            # What actually reached the Writer from the Researcher.
+            if channel in MESSAGE_CHANNELS:
+                stage["writer_input"] = replies["researcher"]
+            else:
+                pushed = replies["researcher"] if channel == "D" else ""
+                stage["writer_input"] = "\n".join([pushed] + ws.reads_by.get("writer", []))
+    if files and not stage.get("final"):
+        stage["final"] = replies.get("reviewer", "")
         stage["final_from_reply"] = "1"
 
     return {
         "task_id": task.task_id, "channel": channel, "dataset": task.dataset, "k": len(task.questions),
-        "wall_s": round(time.perf_counter() - t0, 2),
+        "chain": list(chain), "wall_s": round(time.perf_counter() - t0, 2),
         "agents": {r: {"calls": a.calls, "hit_turn_limit": a.hit_turn_limit, "overflow": a.overflow,
                        "reply": a.reply} for r, a in runs.items()},
         "io": {r: s.as_dict() for r, s in ws.stats.items()} if ws else {},

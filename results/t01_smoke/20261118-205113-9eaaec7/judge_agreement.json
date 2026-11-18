@@ -1,0 +1,9 @@
+{
+ "n": 200,
+ "agree": 0.875,
+ "kappa": 0.7157798999545247,
+ "lexical_yes": 0.285,
+ "judge_yes": 0.36,
+ "lex_yes_judge_no": 5,
+ "lex_no_judge_yes": 20
+}
