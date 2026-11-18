@@ -136,7 +136,80 @@ def setup(m: Macros) -> None:
     m.add("MaxLen", f"{env['max_model_len']:,}")
 
 
-SECTIONS = [main_run, setup]
+def paired_with_main(run: Path, chans: tuple[str, ...], ref_ch: str | None = None) -> dict:
+    """Mean metrics of a sensitivity run and of the main run on the same (task, channel) pairs."""
+    main = {(r["task_id"], r["channel"]): r for r in load_rows(latest("t07_main"))}
+    out = {}
+    for r in load_rows(run):
+        if r["channel"] not in chans:
+            continue
+        ref = main.get((r["task_id"], ref_ch or r["channel"]))
+        if ref is None:
+            continue
+        d = out.setdefault(r["channel"], {"n": 0, "new": {}, "ref": {}})
+        d["n"] += 1
+        for met in ("acc", "total_tokens", "prefill_tokens", "llm_calls", "file_reads", "turn_limit"):
+            d["new"][met] = d["new"].get(met, 0) + r[met]
+            d["ref"][met] = d["ref"].get(met, 0) + ref[met]
+    for d in out.values():
+        for side in ("new", "ref"):
+            d[side] = {k: v / d["n"] for k, v in d[side].items()}
+    return out
+
+
+def batch_and_budget(m: Macros) -> None:
+    bb = paired_with_main(latest("t08_batch"), ("Bb",), ref_ch="B")["Bb"]
+    m.add("BbN", bb["n"])
+    m.add("BbCalls", f"{bb['new']['llm_calls']:.1f}")
+    m.add("BbCallsB", f"{bb['ref']['llm_calls']:.1f}")
+    m.add("BbTokCut", f"{(1 - bb['new']['total_tokens'] / bb['ref']['total_tokens']) * 100:.0f}")
+    m.add("BbReads", f"{bb['new']['file_reads']:.1f}")
+    m.add("BbReadsB", f"{bb['ref']['file_reads']:.1f}")
+    m.add("BbAcc", pct(bb["new"]["acc"]))
+    m.add("BbAccB", pct(bb["ref"]["acc"]))
+    main = {(r["task_id"], r["channel"]): r for r in load_rows(latest("t07_main"))}
+    pairs = [(r["acc"], main[(r["task_id"], "B")]["acc"]) for r in load_rows(latest("t08_batch"))
+             if (r["task_id"], "B") in main]
+    from .analyze import paired
+    a, b = np.array(pairs, dtype=float).T
+    _, lo, hi = paired(a, b)
+    m.add("BbAccLo", f"{-hi * 100:.0f}")
+    m.add("BbAccHi", f"{-lo * 100:.0f}")
+    docs = tot = nonotes = n = 0
+    for rec in raw_records(latest("t08_batch")):
+        reads = [o["path"] for o in rec["io_ops"] if o["agent"] == "writer" and o["op"] == "read" and "error" not in o]
+        docs += sum(x.startswith("docs/") for x in reads)
+        tot += len(reads)
+        nonotes += not any(not x.startswith("docs/") for x in reads)
+        n += 1
+    m.add("BbDocReads", f"{docs / tot * 100:.0f}")
+    m.add("BbNoNotes", f"{nonotes / n * 100:.0f}")
+    t24 = paired_with_main(latest("t08_turns24"), ("B", "C", "D"))
+    m.add("TwFourN", t24["B"]["n"])
+    up = [d["new"]["total_tokens"] / d["ref"]["total_tokens"] - 1 for ch, d in t24.items() if ch in ("B", "C")]
+    m.add("TwFourTokMin", f"{min(up) * 100:.0f}")
+    m.add("TwFourTokMax", f"{max(up) * 100:.0f}")
+    dacc = [abs(d["new"]["acc"] - d["ref"]["acc"]) for d in t24.values()]
+    m.add("TwFourAccMax", f"{max(dacc) * 100:.0f}")
+    lim = [d["new"]["turn_limit"] for ch, d in t24.items() if ch in ("B", "C")]
+    m.add("TwFourLimitMin", f"{min(lim) * 100:.0f}")
+    m.add("TwFourLimitMax", f"{max(lim) * 100:.0f}")
+    lim12 = [d["ref"]["turn_limit"] for ch, d in t24.items() if ch in ("B", "C")]
+    m.add("TwelveLimitMin", f"{min(lim12) * 100:.0f}")
+    m.add("TwelveLimitMax", f"{max(lim12) * 100:.0f}")
+
+
+def scaling(m: Macros) -> None:
+    rows = json.loads((ROOT / "paper/figs/data/fig4_scaling.json").read_text())["rows"]
+    get = lambda k, ch, key: next(r[key] for r in rows if r["k"] == k and r["channel"] == ch)
+    for k in sorted({r["k"] for r in rows}):
+        kk = {1: "One", 3: "Three", 5: "Five", 8: "Eight", 16: "Sixteen"}[k]
+        for ch in ("A1zc", "A2", "B", "C", "D"):
+            m.add(f"Comp{NAME[ch]}K{kk}", f"{get(k, ch, 'comp_rel'):.2f}")
+            m.add(f"Gap{NAME[ch]}K{kk}", f"{-get(k, ch, 'acc_diff') * 100:.0f}")
+
+
+SECTIONS = [main_run, setup, batch_and_budget, scaling]
 
 
 def main() -> int:

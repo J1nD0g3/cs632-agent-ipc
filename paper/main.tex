@@ -201,8 +201,35 @@ broadcast (\nAccC{}\% vs \nAccAOne{}\%), while B loses \nGapBMin--\nGapBMax poin
 \section{Sensitivity}
 \label{sec:sensitivity}
 
-% TODO(numbers pending): payload k=8 and k=16 (fan-out), cache pressure (1/2/6 concurrent runs),
-% four-agent chain, fan-out at k=3, Qwen3-4B, batched reads (Bb), 24-turn budget, nondeterminism.
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{\figdir/fig_scaling.pdf}
+\caption{Cost and accuracy relative to broadcast as the number of questions per task grows (both datasets
+pooled). $k=16$ uses three parallel Researchers.}
+\label{fig:scaling}
+\end{figure*}
+
+% TODO(numbers pending): k=16 (fan-out), cache pressure (1/2/6 concurrent runs), four-agent chain,
+% fan-out at k=3, Qwen3-4B.
+
+\paragraph{Larger payloads leave the cache behind.} With eight questions per task each prompt holds about 80
+paragraphs, and six concurrent runs no longer fit the server's KV cache together. Zero-copy broadcast then
+computes \nCompAZcKEight{}$\times$ the prefill of broadcast instead of \nCompAZcKThree{}$\times$, and B
+and C compute more than broadcast (\nCompBKEight{}$\times$ and \nCompCKEight{}$\times$): the prefixes they
+resend no longer stay cached between calls (Figure~\ref{fig:scaling}a). The pipe is now the cheap channel that
+loses little (\nGapATwoKEight points).
+
+\paragraph{Cheaper reads make the Writer skip the notes.} A \texttt{read\_files} tool that reads several files
+in one call, the agent's \texttt{readv}, cuts B's calls from \nBbCallsB to \nBbCalls and its tokens by
+\nBbTokCut\%, but costs \nBbAccLo--\nBbAccHi points of accuracy on \nBbN paired tasks (\nBbAcc\% vs
+\nBbAccB\%). Given a cheap bulk read, the Writer reads the source documents itself: \nBbDocReads\% of its reads
+are documents, and in \nBbNoNotes\% of the tasks it never opens the Researcher's notes. Cheap access is not
+enough; the reader also has to know where the result is.
+
+\paragraph{The tool budget does not drive the results.} With 24 tool calls instead of 12, B and C send
+\nTwFourTokMin--\nTwFourTokMax\% more tokens and change accuracy by at most \nTwFourAccMax points on \nTwFourN
+paired tasks per dataset and channel; \nTwFourLimitMin--\nTwFourLimitMax\% of their runs still use the whole
+budget (\nTwelveLimitMin--\nTwelveLimitMax\% at 12). The 12-call limit, if anything, understates their cost.
 
 \paragraph{Run-to-run noise.} Greedy decoding on a batching server is not deterministic: two channels whose
 Researcher receives the identical prompt produce identical output in \nSamePrompt{}\% of tasks. Differences of
