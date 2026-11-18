@@ -122,8 +122,14 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("config")
     ap.add_argument("--n-tasks", type=int, help="override n_tasks (smoke runs)")
+    ap.add_argument("--urls", nargs="*", help="override the config's servers")
+    ap.add_argument("--gpus", nargs="*", type=int, help="GPUs behind --urls (recorded only)")
     a = ap.parse_args()
     cfg = yaml.safe_load(Path(a.config).read_text())
+    if a.urls:
+        cfg["server"]["base_url"], cfg["server"]["base_urls"] = a.urls[0], a.urls
+    if a.gpus:
+        cfg["server"]["gpu"], cfg["server"]["gpus"] = a.gpus[0], a.gpus
     if a.n_tasks:
         cfg["n_tasks"] = a.n_tasks
     run_id = dt.datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + (_sh(["git", "rev-parse", "--short", "HEAD"], ROOT) or "nogit")
