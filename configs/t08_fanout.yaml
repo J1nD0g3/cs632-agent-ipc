@@ -18,5 +18,5 @@ n_tasks: 150
 max_tokens: 2048
 max_turns: 12
 concurrency: 6
-use_tasks: 100
+use_tasks: 50
 researchers: 3
