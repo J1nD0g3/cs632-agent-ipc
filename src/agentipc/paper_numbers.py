@@ -309,6 +309,7 @@ def harness(m: Macros) -> None:
         fr = any(c.get("forced_write") for c in rec["agents"]["reviewer"]["calls"])
         f.setdefault("w_reply", []).append(fw and not rec["agents"]["writer"]["hit_turn_limit"])
         f.setdefault("r_budget", []).append(fr and rec["agents"]["reviewer"]["hit_turn_limit"])
+        f.setdefault("r_limit", []).append(rec["agents"]["reviewer"]["hit_turn_limit"])
         f["writer"].append(fw)
         f["reviewer"].append(fr)
         f["acc"].append(rec["score"]["acc"])
@@ -319,6 +320,8 @@ def harness(m: Macros) -> None:
         m.add(f"Strict{ch}", pct(np.mean(f["acc_strict"])))
         m.add(f"Forced{ch}WriterReply", f"{np.mean(f['w_reply']) * 100:.0f}")
         m.add(f"Forced{ch}ReviewerBudget", f"{np.mean(f['r_budget']) * 100:.0f}")
+        # Tool-budget hits at k=3, the comparison point for the k=16 rate below.
+        m.add(f"KThree{ch}ReviewerLimit", f"{np.mean(f['r_limit']) * 100:.0f}")
     rescued = [np.mean(forced["B"]["writer"]), np.mean(forced["B"]["reviewer"]), np.mean(forced["C"]["reviewer"])]
     m.add("ForcedMin", f"{min(rescued) * 100:.0f}")
     m.add("ForcedMax", f"{max(rescued) * 100:.0f}")

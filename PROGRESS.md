@@ -12,7 +12,7 @@
 | T07 Main experiments: 5 channels x 2 datasets x 3 k | Experiments | Must | Done | 2026-11-19 | results/t07_main/20261118-212337-5d6c70f | 5400 runs, 0 errors, judged |
 | T08 Sensitivity: k = 8, five agents, zero-copy A1, Qwen3-4B | Experiments | Should | In progress | 2026-11-19 | Bb, 24-turn done | k8, chain4, 4B, k16, pressure, fan-out queued |
 | T09 Analysis and figures | Report | Must | In progress | 2026-11-19 | Figs. 1-4 | paper/figs/out |
-| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, round 2: 3/5, 3/5 | AlignScore is the fact measure; scope controls added |
+| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, round 2: 3/5, 3/5; style pass done | AlignScore is the fact measure; scope controls added |
 
 ## Key numbers
 | Key | Metric | Result | Source |
@@ -91,3 +91,6 @@
   scope controls answer it: a pipe that also passes the documents (A2d) gains 6.8 points at 0.96x broadcast's
   compute, while files with the documents in the prompt (Bd) gain 0.5 (n.s.), so files lose through their notes.
   Since 11:49 only GPU 5 is used (GPUs 1, 2, 6 returned to cs506).
+- 2026-11-19 T10: Style pass in the voice of the style guide, with meaning audits after each step (round 3):
+  detector 6/10 -> 4/10 machine-like; body semicolons 35 -> 0; three meaning audits found 8, 6 and 7 issues
+  (dropped scopes and intervals, overclaims), all fixed. Still 6 pages.
