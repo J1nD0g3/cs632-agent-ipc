@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-from .analyze import analyze, load_rows
+from .analyze import analyze, load_rows, paired
 from .stats import ci
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -524,6 +524,32 @@ def pressure(m: Macros) -> None:
         m.add(f"PressN{'One' if c == 1 else 'Two'}", len({r["task_id"] for r in rows}))
 
 
+def scope(m: Macros) -> None:
+    """A2d / Bd: pipe and files with the documents also in the later agents' prompts, against the main run."""
+    main = {(r["task_id"], r["channel"]): r for r in load_rows(latest("t07_main"))}
+    rows = load_rows(latest("t09_scope"))
+    for ch, tag in (("A2d", "ATwoD"), ("Bd", "BD")):
+        rs = [r for r in rows if r["channel"] == ch]
+        ids = [r["task_id"] for r in rs]
+        x = np.array([r["acc"] for r in rs], dtype=float)
+        m.add(f"Scope{tag}N", len(rs))
+        m.add(f"Scope{tag}Acc", pct(x.mean()))
+        for ref, rn in (("A1", "AOne"), ("A2", "ATwo"), ("B", "B")):
+            y = np.array([main[(t, ref)]["acc"] for t in ids], dtype=float)
+            mean, lo, hi = paired(x, y)
+            m.add(f"Scope{tag}Vs{rn}", f"{mean * 100:+.1f}")
+            m.add(f"Scope{tag}Vs{rn}Lo", f"{lo * 100:+.1f}")
+            m.add(f"Scope{tag}Vs{rn}Hi", f"{hi * 100:+.1f}")
+            m.add(f"Scope{tag}Ref{rn}", pct(y.mean()))
+        m.add(f"Scope{tag}Limit", f"{np.mean([r['turn_limit'] for r in rs]) * 100:.0f}")
+    rs = [r for r in rows if r["channel"] == "A2d"]
+    m.add("ScopeATwoDBroke", f"{np.mean([r['q_reviewer_broke'] for r in rs]) * 100:.0f}")
+    m.add("ScopeATwoDCompRatio", f"{np.mean([r['prefill_tokens'] for r in rs]) / np.mean([main[(r['task_id'], 'A1')]['prefill_tokens'] for r in rs]):.2f}")
+    m.add("ScopeATwoBroke", f"{np.mean([main[(r['task_id'], 'A2')]['q_reviewer_broke'] for r in rs]) * 100:.0f}")
+    rs = [r for r in rows if r["channel"] == "Bd"]
+    m.add("ScopeBDSentRatio", f"{np.mean([r['total_tokens'] for r in rs]) / np.mean([main[(r['task_id'], 'B')]['total_tokens'] for r in rs]):.1f}")
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -551,7 +577,7 @@ def judges(m: Macros) -> None:
 
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout, replay, repeat, judges, pressure]
+            fanout, replay, repeat, judges, pressure, scope]
 
 
 def main() -> int:

@@ -26,7 +26,7 @@
 LLM agents that work as a team pass results to each other in one of two ways: they copy the conversation
 into the next agent's prompt, or they share files. This is the message-passing versus shared-memory
 question of operating systems. We replay it on a Researcher--Writer--Reviewer pipeline with Qwen3-8B on
-vLLM, changing only the channel, and count cost both as tokens sent, which an API bills, and as tokens the
+vLLM, changing only the channel and what it carries, and count cost both as tokens sent, which an API bills, and as tokens the
 engine computes after prefix caching. With small payloads, copying is the most accurate channel, and
 ordering the prompt so the prefix cache reuses the shared history, a zero-copy broadcast, keeps its
 accuracy at \nZcRatioMin--\nZcRatioMax{}\% of its compute. Shared files send \nFileSentMin--\nFileSentMax{}$\times$
@@ -71,7 +71,8 @@ that uses tools well.
 
 We make three contributions:
 \begin{itemize}
-\item A testbed that varies only the inter-agent channel and accounts for tokens sent, tokens computed,
+\item A testbed that varies the inter-agent channel, with controls that separate what a channel carries from
+how, and accounts for tokens sent, tokens computed,
 latency, file I/O, and where each supporting fact is lost (\S\ref{sec:method}).
 \item A measurement on two multi-hop QA benchmarks with \nMainTasks paired tasks per condition: copying is
 the most accurate; zero-copy ordering makes it as cheap to compute as a pipe; files cost more tokens and
@@ -197,9 +198,12 @@ APIs that discount cached input.
 
 \paragraph{A pipe is cheap but loses at review.} The pipe sends the fewest tokens (\nSentATwo) but answers
 \nGapATwoMin--\nGapATwoMax points fewer questions than broadcast, significantly in \nGapATwoSig of six
-settings. Its Writer receives everything the Researcher wrote; the losses come at the end, where the Reviewer sees only the draft and changes right answers to wrong ones in up to
+settings. Its losses come at the end, where the Reviewer sees only the draft and changes right answers to wrong ones in up to
 \nPipeBrokeMax{}\% of the questions, against at most \nPipeBrokeAOne{}\% when it also sees the notes and documents
 (Figure~\ref{fig:loss}b).
+What it lacks is the documents: a pipe that also passes them (A2d) answers \nScopeATwoDVsATwo points more
+(\nScopeATwoDVsATwoLo to \nScopeATwoDVsATwoHi, \nScopeATwoDN runs), \nScopeATwoDVsAOne below broadcast, and its Reviewer
+breaks \nScopeATwoDBroke{}\% of answers, not \nScopeATwoBroke{}\%, but it then computes \nScopeATwoDCompRatio{}$\times$ broadcast's tokens.
 
 \paragraph{Files cost more tokens.} B and C send \nSentRatioB{}$\times$ and \nSentRatioC{}$\times$ the tokens of
 broadcast at $k=3$ (\nFileSentMin--\nFileSentMax{}$\times$ across settings), because their pipelines make \nCallsB and \nCallsC model calls instead of three and each call
@@ -229,6 +233,10 @@ never opens the notes. With handles the Writer trusts the handoff and opens even
 (\nDelivDMin--\nDelivDMax{}\% delivered). The index names the notes: C's Writer skips them in \nNoNotesC{}\% of
 the tasks, delivery rises to \nDelivCMin--\nDelivCMax{}\%, and C's accuracy comes within \nPooledGapC points of
 broadcast (\nAccC{}\% vs \nAccAOne{}\%; at most \nGapCMax in one setting), while B loses \nGapBMin--\nGapBMax points (C is significantly above B in \nCoverBSig of six settings).
+
+\paragraph{Missing documents do not explain the file channels.} Putting the documents in the later agents'
+prompts as well (Bd) leaves B's accuracy unchanged (\nScopeBDVsB points, \nScopeBDVsBLo to \nScopeBDVsBHi) at
+\nScopeBDSentRatio{}$\times$ its tokens: files lose through their notes, not through access to the sources.
 
 \paragraph{The tool call, not the file, shortens the notes.} To separate writing from reading we ran A1w:
 the Researcher writes its notes with \texttt{write\_file} exactly as in B, and the Writer and Reviewer
@@ -290,42 +298,37 @@ and B answers \nFanBDiff{} points (\nFanBLo{} to \nFanBHi{}) relative to one Res
 B's own share of the change is \nFanDiD{} points (\nFanDiDLo{} to \nFanDiDHi{}), not significant at this size. D's writers clash as often (\nFanClashD{}\%), but its
 handoffs still carry each Researcher's findings, and D changes by \nFanDDiff{} (\nFanDLo{} to \nFanDHi{}).
 
-\paragraph{A longer pipeline multiplies copies, not cached ones.} Adding a Fact-checker between the Writer and
-the Reviewer adds one more receiver. Broadcast then computes \nChainAOneComp{}\% more, because the history is
-copied once more; zero-copy broadcast computes only \nChainAZcComp{}\% more, because the new agent reuses the
-cached history. The extra check helps the pipe, whose Reviewer was the weak point (\nChainATwoAccRef{}\% to
-\nChainATwoAcc{}\%), and hurts plain files, where one more agent has to find the notes on its own
-(\nChainBAccRef{}\% to \nChainBAcc{}\%); the paired 95\% intervals are \nChainATwoLo{} to \nChainATwoHi{} and \nChainBLo{} to \nChainBHi{} points on
-\nChainN tasks, and the other channels move by at most \nChainOtherMax point.
+\paragraph{A longer pipeline multiplies copies, not cached ones.} A Fact-checker before the Reviewer makes
+broadcast compute \nChainAOneComp{}\% more, zero-copy broadcast only \nChainAZcComp{}\% more, as the new agent
+reuses the cached history. It helps the pipe (\nChainATwoAccRef{}\% to \nChainATwoAcc{}\%, \nChainATwoLo{} to
+\nChainATwoHi{}) and hurts plain files, where one more agent must find the notes (\nChainBAccRef{}\% to
+\nChainBAcc{}\%, \nChainBLo{} to \nChainBHi{}; \nChainN tasks); the others move at most \nChainOtherMax point.
 
 \paragraph{Cheaper reads make the Writer skip the notes.} A \texttt{read\_files} tool that reads several files
 in one call, the agent's \texttt{readv}, cuts B's calls from \nBbCallsB to \nBbCalls and its tokens by
 \nBbTokCut{}\%, but costs \nBbAccLo--\nBbAccHi points of accuracy on \nBbN paired tasks (\nBbAcc{}\% vs
-\nBbAccB{}\%). Given a cheap bulk read, the Writer reads the source documents itself: \nBbDocReads{}\% of its reads
-are documents, and in \nBbNoNotes{}\% of the tasks it never opens the Researcher's notes. Cheap access is not
-enough; the reader also has to know where the result is.
+\nBbAccB{}\%). Given a cheap bulk read, the Writer reads the sources itself (\nBbDocReads{}\% of reads) and in
+\nBbNoNotes{}\% of the tasks never opens the notes: the reader also has to know where the result is.
 
 \paragraph{A smaller model needs simpler channels.} With Qwen3-4B, whose smaller weights leave a larger cache
 (\nSmallKv tokens vs \nBigKv), the file channels fall far behind broadcast at three and five questions: B by
-\nSmallBGapMinThreeFive--\nSmallBGapMaxThreeFive points and C by \nSmallCGapMinThreeFive--\nSmallCGapMaxThreeFive. The index helps less: C uses up its tool budget in \nSmallCLimitMin--\nSmallCLimitMax{}\% of those runs (B in
-\nSmallBLimitMin--\nSmallBLimitMax{}\%). Handles lose
+\nSmallBGapMinThreeFive--\nSmallBGapMaxThreeFive points and C by \nSmallCGapMinThreeFive--\nSmallCGapMaxThreeFive. C uses up its tool budget in
+\nSmallCLimitMin--\nSmallCLimitMax{}\% of those runs. Handles lose
 \nSmallDGapMinThreeFive--\nSmallDGapMaxThreeFive points and the pipe at most \nSmallATwoGapMaxThreeFive (but up to
 \nSmallATwoGapMax at one question). Zero-copy ordering, free for Qwen3-8B, costs the smaller model \nSmallAZcGapMinThreeFive--\nSmallAZcGapMaxThreeFive
 points there (significant in \nSmallAZcSigThreeFive of four settings); a plausible cause, which we have not
 tested, is that it reads its instruction last, after thousands of tokens of documents.
 
 \paragraph{The tool budget does not drive the results.} With 24 tool calls instead of 12, B and C send
-\nTwFourTokMin--\nTwFourTokMax{}\% more tokens and change accuracy by at most \nTwFourAccMax points on \nTwFourN
-paired tasks per channel ($k=3$, both datasets); \nTwFourLimitMin--\nTwFourLimitMax{}\% of their runs still use the whole
-budget (\nTwelveLimitMin--\nTwelveLimitMax{}\% at 12). At $k=3$ the 12-call limit, if anything, understates their cost; at $k=16$ it binds harder (B's Writer in
+\nTwFourTokMin--\nTwFourTokMax{}\% more tokens and change accuracy by at most \nTwFourAccMax points (\nTwFourN paired
+tasks per channel, $k=3$). At $k=16$ the budget binds harder (B's Writer in
 \nLargeBWriterLimit{}\% of runs, its Reviewer in \nLargeBReviewerLimit{}\%), so the large-payload collapse is that
 of B under this budget.
 
 \paragraph{Run-to-run noise.} Greedy decoding on a batching server is not deterministic: two channels whose
 Researcher receives the identical prompt produce identical output in \nSamePrompt{}\% of tasks. Rerunning A1 and B on
-\nAAN of the main tasks (an A/A control) gives the same accuracy within \nAAWorst points at 95\% (\nAAAOneDiff{} and
-\nAABDiff{} points), the same score on \nAABSame--\nAAAOneSame{}\% of tasks, and the same B--A1 gap (\nAAGapRepeat
-vs \nAAGapMain points); the effects we report are larger than this noise.
+\nAAN of the main tasks gives the same accuracy within \nAAWorst points at 95\%, the same score on
+\nAABSame--\nAAAOneSame{}\% of tasks, and the same B--A1 gap (\nAAGapRepeat vs \nAAGapMain points).
 
 \section{Related Work}
 
@@ -345,7 +348,7 @@ engine change, only a prompt order that makes the shared prefix exact, and we us
 channel costs once such reuse is in place. TOAP compares passing a reference, a summary, or a KV cache
 between agents~\cite{toap}; we compare full channels, including tool-mediated file access.
 
-\paragraph{IPC.} Lauer and Needham argued that message passing and shared memory are duals whose costs
+\paragraph{IPC\@.} Lauer and Needham argued that message passing and shared memory are duals whose costs
 depend on the system~\cite{lauer-needham}; L4 made messages cheap by cutting copies~\cite{liedtke-ipc}. The
 agent analogues are the same: the prefix cache plays zero-copy, and the index plays the directory.
 
@@ -353,17 +356,16 @@ agent analogues are the same: the prefix cache plays zero-copy, and the index pl
 \label{sec:conclusion}
 
 Which channel a pipeline of LLM agents should use depends on what it pays for, how large its payloads are
-next to the KV cache, and how well its model uses tools. Our measurements give four rules. When the shared
-history fits the cache, copy it and order prompts so the cache reuses it: zero-copy broadcast matched the most
-accurate channel, broadcast, and computed about as little as a pipe. When it does not fit, the pipe is the cheap choice
-and loses little; at three questions a checking stage helped it more than any other channel. Let agents write long results as plain replies
-and have the system store them, since writing through a tool call shortened the notes. Share files only
-with a naming discipline, such as an index, when several agents write, and only with a model that handles
-tools: plain files, as our B implements them, cost more tokens and
-lost accuracy in every setting, and cheaper bulk reads made it worse. Count the cost the deployment pays: files send \nFileSentMin--\nFileSentMax{}$\times$ the tokens of
-copying, but with up to five questions per task they compute \nFileCompMin--\nFileCompMax{}$\times$ as much. Our results come from one model
-family, linear pipelines, and multi-hop QA; artifacts larger than a context window, such as code bases,
-are where files should be indispensable, and we have not measured them.
+next to the KV cache, and how well its model uses tools. When the shared history fits the cache, copy it and
+order prompts so the cache reuses it: zero-copy broadcast matched broadcast, the most accurate channel, and
+computed about as little as a pipe. When it does not fit, the pipe is the cheap choice, but its savings come
+from dropping the documents, which costs the Reviewer. Let agents write long results as plain replies and have
+the system store them, since writing through a tool call shortened the notes. Share files only with a naming
+discipline, such as an index, and a model that handles tools: plain files cost more tokens and lost accuracy in
+every setting, and cheaper bulk reads made it worse. Count the cost the deployment pays: files send
+\nFileSentMin--\nFileSentMax{}$\times$ the tokens of copying but compute \nFileCompMin--\nFileCompMax{}$\times$ as much at up to five
+questions. Our results come from one model family, linear pipelines, and multi-hop QA; artifacts larger than a
+context window, such as code bases, are where files should be indispensable, and we have not measured them.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}
