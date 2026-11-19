@@ -290,6 +290,8 @@ def kv_tokens(model: str) -> int:
     import re
     for log in sorted((ROOT / "logs").glob("vllm_gpu*_*.log"), reverse=True):
         text = log.read_text(errors="replace")
+        if "RTX PRO 6000" in text:  # the RTX 3090 servers' capacity only; PRO 6000 runs set KV explicitly
+            continue
         if f"models--Qwen--{model}" in text or f"'{'Qwen/' + model}'" in text:
             hit = re.search(r"GPU KV cache size: ([0-9,]+) tokens", text)
             if hit:
@@ -579,6 +581,65 @@ def scope(m: Macros) -> None:
     m.add("ScopeBDSentRatio", f"{np.mean([r['total_tokens'] for r in rs]) / np.mean([main[(r['task_id'], 'B')]['total_tokens'] for r in rs]):.1f}")
 
 
+def pro6000(m: Macros) -> None:
+    """PRO 6000: P1 varies only the KV cache (Qwen3-8B, k=8), P2 only the model (KV 100k, k=3), p03 the corner."""
+    from .rescue import rescored
+    kv = {"ThirtyFive": "p01_cache_35k", "Hundred": "p01_cache_100k", "FourHundred": "p01_cache_400k"}
+    accs = {}
+    for tag, exp in kv.items():
+        rows = load_rows(latest(exp))
+        a1 = {r["task_id"]: r for r in rows if r["channel"] == "A1"}
+        base = np.mean([r["prefill_tokens"] for r in a1.values()])
+        for ch in ("A1", "A1zc", "A2", "B", "C", "D"):
+            rs = [r for r in rows if r["channel"] == ch]
+            accs.setdefault(ch, []).append(np.mean([r["acc"] for r in rs]))
+            if ch != "A1":
+                m.add(f"PKv{tag}Comp{NAME[ch]}", f"{np.mean([r['prefill_tokens'] for r in rs]) / base:.2f}")
+        m.add(f"PKv{tag}N", len(a1))
+    m.add("PKvAccShiftMax", f"{max(max(v) - min(v) for v in accs.values()) * 100:.1f}")
+    sizes = {"Four": "p02_size_4b", "Eight": "p02_size_8b", "Fourteen": "p02_size_14b", "ThirtyTwo": "p02_size_32b"}
+    for tag, exp in sizes.items():
+        rows = load_rows(latest(exp))
+        a1 = {r["task_id"]: r for r in rows if r["channel"] == "A1"}
+        m.add(f"PSize{tag}AccAOne", pct(np.mean([r["acc"] for r in a1.values()])))
+        m.add(f"PSize{tag}N", len(a1))
+        for ch in ("A1zc", "A2", "B", "C", "D"):
+            rs = [r for r in rows if r["channel"] == ch]
+            x = np.array([r["acc"] for r in rs], dtype=float)
+            y = np.array([a1[r["task_id"]]["acc"] for r in rs], dtype=float)
+            mean, lo, hi = paired(x, y)
+            n = f"PSize{tag}Gap{NAME[ch]}"
+            m.add(n, f"{-mean * 100:.0f}")
+            m.add(f"{n}Lo", f"{-hi * 100:.0f}")
+            m.add(f"{n}Hi", f"{-lo * 100:.0f}")
+            m.add(f"PSize{tag}Acc{NAME[ch]}", pct(x.mean()))
+    for tag, exp in (("ThirtyTwo", "p02_size_32b"), ("Corner", "p03_corner_32b_35k")):
+        res = rescored(latest(exp))
+        for ch in ("B", "C", "D"):
+            m.add(f"PRescue{tag}{NAME[ch]}", pct(res[ch]["rescued"]))
+            m.add(f"PRescue{tag}{NAME[ch]}Moved", res[ch]["moved"])
+            m.add(f"PRescue{tag}{NAME[ch]}Measured", pct(res[ch]["measured"]))
+        m.add(f"PRescue{tag}Runs", res["B"]["runs"])
+    # Prefixed-path writes by the agents whose output the harness reads by name (Writer, Reviewer).
+    slips = {"B": 0, "C": 0, "D": 0}
+    for rec in raw_records(latest("p02_size_32b")):
+        if rec["channel"] in slips and "error" not in rec:
+            slips[rec["channel"]] += any(o["op"] == "write" and o["agent"] in ("writer", "reviewer")
+                                         and o["path"].startswith("workspace/") and "error" not in o
+                                         for o in rec["io_ops"])
+    for ch, v in slips.items():
+        m.add(f"PSlipThirtyTwo{ch}", v)
+    m.add("PSlipThirtyTwoCResearcher", sum(
+        any(o["op"] == "write" and o["agent"].startswith("researcher") and o["path"].startswith("workspace/")
+            and "error" not in o for o in rec["io_ops"])
+        for rec in raw_records(latest("p02_size_32b")) if rec["channel"] == "C" and "error" not in rec))
+    rows = load_rows(latest("p03_corner_32b_35k"))
+    a1 = np.mean([r["prefill_tokens"] for r in rows if r["channel"] == "A1"])
+    for ch in ("A1zc", "B", "C", "D"):
+        m.add(f"PCornerComp{NAME[ch]}", f"{np.mean([r['prefill_tokens'] for r in rows if r['channel'] == ch]) / a1:.2f}")
+    m.add("PCornerAccAOne", pct(np.mean([r["acc"] for r in rows if r["channel"] == "A1"])))
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -606,7 +667,7 @@ def judges(m: Macros) -> None:
 
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout, replay, repeat, judges, pressure, scope]
+            fanout, replay, repeat, judges, pressure, scope, pro6000]
 
 
 def main() -> int:

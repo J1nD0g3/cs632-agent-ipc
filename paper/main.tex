@@ -140,7 +140,8 @@ Every channel runs the same tasks, so comparisons are paired.
 v0.33.0 with prefix caching, one RTX 3090 per server (\nMaxLen-token context). Tool calls use vLLM's
 function-calling parser. Each server runs six tasks at a time, interleaved across channels, and its KV cache
 holds \nBigKv tokens. Each run gets its own cache namespace (\texttt{cache\_salt}), so a run reuses only its
-own prefixes and channels never share cached KV.
+own prefixes and channels never share cached KV. The cache and model-size runs of \S\ref{sec:sensitivity} use
+one RTX PRO 6000 per server with a fixed KV size.
 
 \paragraph{Metrics.} \emph{Accuracy} is the share of questions whose final answer matches the gold answer
 (exact match, F1 $\ge 0.8$, or the gold answer inside a short prediction). \emph{Tokens sent} is the sum of
@@ -284,11 +285,15 @@ broadcast's accuracy within \nGapATwoKSixteen point at \nCompATwoKSixteen{}$\tim
 files collapse, with B answering \nGapBKSixteen points fewer questions than broadcast, while C loses
 \nGapCKSixteen and D \nGapDKSixteen (Figure~\ref{fig:scaling}b).
 
-Cache sharing among concurrent runs explains the lost savings but not the accuracy collapse. We reran
-\nPressNTwo of the sixteen-question tasks with two runs per server instead of six. Measured as a share of each
-channel's own tokens sent, unlike the other ratios in this paper, B then computes \nPressBCTwo, down from
-\nPressBCSix, and zero-copy broadcast \nPressAZcCTwo, down from \nPressAZcCSix. C behaves like B. Accuracy
-changes by at most \nPressAccMax points. A single long prompt does not remove the savings.
+Cache sharing among concurrent runs explains the lost savings but not the accuracy collapse. With two runs
+per server instead of six (\nPressNTwo sixteen-question tasks), B computes \nPressBCTwo of its own tokens sent
+instead of \nPressBCSix, zero-copy broadcast \nPressAZcCTwo instead of \nPressAZcCSix, and accuracy changes
+by at most \nPressAccMax points. A larger cache has the same effect. On an RTX PRO 6000 we reran
+\nPKvThirtyFiveN of the eight-question tasks changing only the KV cache. At 35k tokens, as on the
+RTX 3090 servers, zero-copy broadcast computes \nPKvThirtyFiveCompAZc{}$\times$ broadcast's prefill and B and C
+\nPKvThirtyFiveCompB{}$\times$ and \nPKvThirtyFiveCompC{}$\times$. At 100k tokens these fall to
+\nPKvHundredCompAZc{}$\times$, \nPKvHundredCompB{}$\times$, and \nPKvHundredCompC{}$\times$, and 400k changes nothing
+further. Accuracy moves by at most \nPKvAccShiftMax points across the three sizes.
 
 \paragraph{Parallel writers race on shared files.} Part of B's collapse at sixteen questions happens before
 anyone reads. Three Researchers writing to one workspace at the same time pick the same file name. In
@@ -318,19 +323,24 @@ files in one call, the agent's \texttt{readv}, cuts B's calls from \nBbCallsB to
 $-$\nBbAccLo). Given a cheap bulk read, the Writer reads the sources itself
 (\nBbDocReads{}\% of reads) and in \nBbNoNotes{}\% of the tasks never opens the notes.
 
-\paragraph{A smaller model.} On Qwen3-4B, the file channels fall far behind broadcast at three and five
-questions, B by \nSmallBGapMinThreeFive--\nSmallBGapMaxThreeFive points and C by
-\nSmallCGapMinThreeFive--\nSmallCGapMaxThreeFive. The smaller weights leave a larger KV cache (\nSmallKv
-tokens vs \nBigKv), so these runs do not face more cache pressure than Qwen3-8B's. C uses up its tool budget
-in \nSmallCLimitMin--\nSmallCLimitMax{}\% of those runs. Handles lose
-\nSmallDGapMinThreeFive--\nSmallDGapMaxThreeFive points and the pipe at most \nSmallATwoGapMaxThreeFive.
-Zero-copy ordering, free for Qwen3-8B, costs the smaller model
-\nSmallAZcGapMinThreeFive--\nSmallAZcGapMaxThreeFive points in the same settings, significantly in
-\nSmallAZcSigThreeFiveWord of four.
+\paragraph{Model size.} On the PRO 6000, with the cache fixed at 100k tokens, we varied the Qwen3 model
+from 4B to 32B on \nPSizeEightN three-question tasks. Files trail broadcast at every size, B by
+\nPSizeFourteenGapB--\nPSizeThirtyTwoGapB points and C by \nPSizeEightGapC--\nPSizeFourGapC. Zero-copy ordering
+costs only the 4B model (\nPSizeFourGapAZc points, \nPSizeFourGapAZcLo to \nPSizeFourGapAZcHi). The pipe loses
+only with Qwen3-8B (\nPSizeEightGapATwo points, \nPSizeEightGapATwoLo to \nPSizeEightGapATwoHi) and stays
+within \nPSizeFourGapATwo points at the other sizes, so at three questions its loss at review in
+\S\ref{sec:results} is specific to that model. In B and D, Qwen3-32B's Writer or Reviewer writes to a prefixed path such
+as \texttt{workspace/final.md}, and in \nPRescueThirtyTwoBMoved and \nPRescueThirtyTwoDMoved of \nPSizeThirtyTwoN runs
+the harness then finds no answer, so B and D trail broadcast by \nPSizeThirtyTwoGapB and \nPSizeThirtyTwoGapD
+points. Reading those files gives \nPRescueThirtyTwoB{}\% and \nPRescueThirtyTwoD{}\% against
+\nPSizeThirtyTwoAccAOne{}\%. In C the Researchers also prefixed paths (\nPSlipThirtyTwoCResearcher runs), but with the index
+no Writer or Reviewer did.
+On the RTX 3090 servers Qwen3-4B (\nSmallKv-token cache) loses up to
+\nSmallCGapMaxThreeFive points with indexed files and \nSmallAZcGapMaxThreeFive with zero-copy ordering at three and
+five questions.
 
-\paragraph{Tool budget.} Doubling the tool budget to 24 calls makes B and C send
-\nTwFourTokMin--\nTwFourTokMax{}\% more tokens and change accuracy by at most \nTwFourAccMax points
-(\nTwFourN paired tasks per channel, $k=3$). At $k=16$ the 12-call budget binds harder (B's Reviewer hits
+\paragraph{Tool budget.} With 24 tool calls instead of 12, B and C change accuracy by at most
+\nTwFourAccMax points (\nTwFourN paired tasks per channel, $k=3$). At $k=16$ the 12-call budget binds harder (B's Reviewer hits
 it in \nLargeBReviewerLimit{}\% of runs, up from \nKThreeBReviewerLimit{}\% at $k=3$), so B's collapse
 there is a result for this budget.
 
@@ -352,10 +362,8 @@ measures one of them, ignored input.
 prefix~\cite{vllm,sglang}, and Prompt Cache reuses attention states of prompt modules~\cite{promptcache}.
 Parrot and KVFlow schedule multi-agent workflows so shared prefixes stay cached~\cite{parrot,kvflow}, and
 KVCOMM and TokenDance reuse KV across agents whose prefixes differ by changing the
-engine~\cite{kvcomm,tokendance}. Zero-copy broadcast is the simplest KV reuse across agents. It makes the shared prefix
-exact by prompt order alone, and we use it to measure what the channel costs once reuse is in place. TOAP
-compares passing a reference, a summary, or a KV cache between agents~\cite{toap}. We compare full
-channels, including tool-mediated file access.
+engine~\cite{kvcomm,tokendance}. Zero-copy broadcast is the simplest KV reuse across agents, by prompt order alone. TOAP
+compares passing a reference, a summary, or a KV cache~\cite{toap}, not channels with tool-mediated files.
 
 \paragraph{IPC\@.} Lauer and Needham argued that message passing and shared memory are duals whose costs
 depend on the system~\cite{lauer-needham}. L4 made messages cheap by cutting copies~\cite{liedtke-ipc}. In
@@ -364,20 +372,18 @@ agents, the prefix cache plays the role of zero-copy and the index that of the d
 \section{Conclusion}
 \label{sec:conclusion}
 
-Which channel a pipeline of LLM agents should use depends on what it pays for, how large its payloads are
-next to the KV cache, and how well its model uses tools. When the shared history fits the cache, copy it and
+The right channel depends on what the deployment pays for, on payload size next to the KV cache, and on
+the model. When the shared history fits the cache, copy it and
 order prompts so the cache reuses it. For Qwen3-8B, zero-copy broadcast matched broadcast, the most accurate
 channel, and computed \nZcCut{}\% less at $k=3$. When the history does not fit, the pipe is the cheap
-choice, but its savings come from dropping the documents, which at $k=3$ costs the Reviewer. Long results
+choice, but its savings come from dropping the documents, which at $k=3$ cost Qwen3-8B's Reviewer. Long results
 are better written as plain replies that the system stores, since writing through a tool call shortened the
 notes. Files need a naming discipline, such as an index, and a model that handles tools. Plain files lost
 accuracy and cost more tokens in every setting. Finally, a deployment should count the cost it pays, because
 plain and indexed files sent more tokens than copying but computed \nFileCompMin--\nFileCompMax{}$\times$ as
-much at up to five questions. Our results come from one model family, linear pipelines, and multi-hop QA, and
-we have not measured artifacts larger than a context window, such as code bases, where files may be the only
-option. Nor have we tested why a tool call shortens notes, why a Fact-checker helps the pipe, whether one or
-both of C's two differences prevent the clash, or our guess that the 4B model loses with zero-copy order because it
-reads its instruction last, after thousands of tokens of documents.
+much at up to five questions. Our results come from one model family, linear pipelines, and multi-hop QA, not
+from artifacts larger than a context window, such as code bases, where files may be the only option. Nor have we tested why a tool call shortens notes, why a Fact-checker helps the pipe, whether one or
+both of C's two differences prevent the clash, or why the 4B model loses with zero-copy order.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}
