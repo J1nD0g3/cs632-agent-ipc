@@ -26,7 +26,8 @@ from .run import datasets
 ROOT = Path(__file__).resolve().parents[2]
 
 
-async def run(run_dir: Path, n: int, qwen: list[str], other: list[str], other_name: str, max_chars: int, seed: int) -> dict:
+def sample_units(run_dir: Path, n: int, max_chars: int, seed: int) -> list[tuple]:
+    """(channel, stage, question, text) units, evenly across channels; deterministic for a seed."""
     cfg = yaml.safe_load((run_dir / "config.yaml").read_text())
     raw = ROOT / "results_raw" / cfg["exp"] / run_dir.name
     by_task = {}
@@ -49,7 +50,13 @@ async def run(run_dir: Path, n: int, qwen: list[str], other: list[str], other_na
                 units.setdefault(rec["channel"], []).append((rec["channel"], stage, q, text))
     rng = random.Random(seed)
     per = max(1, n // len(units))
-    sample = [u for ch in sorted(units) for u in rng.sample(units[ch], min(per, len(units[ch])))]
+    return [u for ch in sorted(units) for u in rng.sample(units[ch], min(per, len(units[ch])))]
+
+
+async def run(run_dir: Path, n: int, qwen: list[str], other: list[str], other_name: str, max_chars: int, seed: int) -> dict:
+    sample = sample_units(run_dir, n, max_chars, seed)
+    cfg = yaml.safe_load((run_dir / "config.yaml").read_text())
+    raw = ROOT / "results_raw" / cfg["exp"] / run_dir.name
 
     async def judge_all_units(urls: list[str], name: str) -> list[list[bool | None]]:
         clients = [ChatClient(u, name, max_tokens=64) for u in urls]

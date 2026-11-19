@@ -1,0 +1,24 @@
+{
+ "n": 450,
+ "qwen3-8b": {
+  "present": 1.0,
+  "dropped": 0.78,
+  "swapped": 0.4067,
+  "all": 0.7289,
+  "unparsed": 0
+ },
+ "llama3-8b": {
+  "present": 0.9533,
+  "dropped": 0.7267,
+  "swapped": 0.3733,
+  "all": 0.6844,
+  "unparsed": 0
+ },
+ "lexical": {
+  "present": 1.0,
+  "dropped": 0.7533,
+  "swapped": 0.0067,
+  "all": 0.5867,
+  "unparsed": 0
+ }
+}
