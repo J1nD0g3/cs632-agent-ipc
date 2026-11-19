@@ -69,8 +69,6 @@
   \bibinfo{booktitle}{\emph{Advances in Neural Information Processing Systems
   (NeurIPS)}}.
 \newblock
-\newblock
-\shownote{arXiv:2503.13657}.
 
 
 \bibitem[Chen et~al\mbox{.}(2025)]%
@@ -81,8 +79,6 @@
   {LLM}-Based Multi-Agent System}. In \bibinfo{booktitle}{\emph{Findings of the
   Association for Computational Linguistics (ACL)}}.
 \newblock
-\newblock
-\shownote{arXiv:2410.08115}.
 
 
 \bibitem[Gim et~al\mbox{.}(2024)]%
@@ -262,8 +258,6 @@
   Multi-Agent Conversation}. In \bibinfo{booktitle}{\emph{Conference on
   Language Modeling (COLM)}}.
 \newblock
-\newblock
-\shownote{arXiv:2308.08155}.
 
 
 \bibitem[Yang et~al\mbox{.}(2025)]%

@@ -36,6 +36,13 @@ def latest(exp: str) -> Path | None:
     return runs[-1] if runs else None
 
 
+WORDS = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten")
+
+
+def word(n: int) -> str:
+    return WORDS[n] if 0 <= n < len(WORDS) else str(n)
+
+
 def pct(x: float) -> str:
     return f"{x * 100:.1f}"
 
@@ -68,6 +75,9 @@ def main_run(m: Macros) -> None:
     for ch in ("A1zc", "A2", "B", "C", "D"):
         m.add(f"Wall{NAME[ch]}", f"{pool(ch, 3, 'wall_s') / pool('A1', 3, 'wall_s'):.1f}")
     m.add("WallAOne", f"{pool('A1', 3, 'wall_s'):.0f}")
+    walls = [pool(ch, 3, "wall_s") / pool("A1", 3, "wall_s") for ch in ("B", "C", "D")]
+    m.add("WallFileMin", f"{min(walls):.1f}")
+    m.add("WallFileMax", f"{max(walls):.1f}")
     a1c, zc = pool("A1", 3, "prefill_tokens"), pool("A1zc", 3, "prefill_tokens")
     m.add("ZcCut", f"{(1 - zc / a1c) * 100:.0f}")
     m.add("PooledGapC", f"{(pool('A1', 3, 'acc') - pool('C', 3, 'acc')) * 100:.1f}")
@@ -84,8 +94,11 @@ def main_run(m: Macros) -> None:
         m.add(f"Gap{NAME[ch]}Min", f"{-max(diffs) * 100:.0f}")
         m.add(f"Gap{NAME[ch]}Max", f"{-min(diffs) * 100:.0f}")
         m.add(f"Gap{NAME[ch]}Sig", n_sig)
+        m.add(f"Gap{NAME[ch]}SigWord", word(n_sig))
     vs_b = analyze(rows, "B")
-    m.add("CoverBSig", sum(1 for key, g in vs_b.items() if key.endswith("|C") and g.get("acc_diff", (0, 0, 0))[1] > 0))
+    cover = sum(1 for key, g in vs_b.items() if key.endswith("|C") and g.get("acc_diff", (0, 0, 0))[1] > 0)
+    m.add("CoverBSig", cover)
+    m.add("CoverBSigWord", word(cover))
     right = [r for r in rows if r["channel"] == "A1" and r["k"] == 3 and "aq_right_notes_miss" in r]
     m.add("RightMissAOne", f"{sum(r['aq_right_notes_miss'] for r in right) / sum(r['acc'] for r in right) * 100:.0f}")
     zc_ratio = [g["prefill_tokens"] / res[key.replace("A1zc", "A1")]["prefill_tokens"]
@@ -257,6 +270,7 @@ def qwen4b(m: Macros) -> None:
         sig = sum(1 for key, g in res.items() if key.endswith(f"|{ch}") and "acc_diff" in g and g["acc_diff"][2] < 0
                   and ("|k3|" in key or "|k5|" in key))
         m.add(f"Small{NAME[ch]}SigThreeFive", sig)
+        m.add(f"Small{NAME[ch]}SigThreeFiveWord", word(sig))
     pool = lambda rs, ch, k: np.mean([r["acc"] for r in rs if r["channel"] == ch and r["k"] == k])
     m.add("SmallAccAOneK", pct(np.mean([r["acc"] for r in rows if r["channel"] == "A1"])))
     m.add("SmallAccBK", pct(np.mean([r["acc"] for r in rows if r["channel"] == "B"])))
@@ -305,6 +319,12 @@ def harness(m: Macros) -> None:
         m.add(f"Strict{ch}", pct(np.mean(f["acc_strict"])))
         m.add(f"Forced{ch}WriterReply", f"{np.mean(f['w_reply']) * 100:.0f}")
         m.add(f"Forced{ch}ReviewerBudget", f"{np.mean(f['r_budget']) * 100:.0f}")
+    rescued = [np.mean(forced["B"]["writer"]), np.mean(forced["B"]["reviewer"]), np.mean(forced["C"]["reviewer"])]
+    m.add("ForcedMin", f"{min(rescued) * 100:.0f}")
+    m.add("ForcedMax", f"{max(rescued) * 100:.0f}")
+    strict = [np.mean(forced[ch]["acc_strict"]) for ch in ("B", "C", "D")]
+    m.add("StrictMin", pct(min(strict)))
+    m.add("StrictMax", pct(max(strict)))
     # Zero-copy under exact match, per cell, to qualify "within the noise".
     res = analyze_metric(load_rows(run), "em")
     gaps = [-g[0] for key, g in res.items() if key.endswith("|A1zc")]
@@ -398,9 +418,9 @@ def a1w(m: Macros) -> None:
         m.add(f"WGap{n}Lo", f"{-hi * 100:.0f}")
         m.add(f"WGap{n}Hi", f"{-lo * 100:.0f}")
         m.add(f"WNotes{n}", f"{np.mean([main[(r['task_id'], ref)]['as_recall_notes'] for r in rows]) * 100:.0f}")
-        m.add(f"WOver{n}", f"{mean * 100:.0f}")
-        m.add(f"WOver{n}Lo", f"{lo * 100:.0f}")
-        m.add(f"WOver{n}Hi", f"{hi * 100:.0f}")
+        m.add(f"WOver{n}", f"{mean * 100:.1f}")
+        m.add(f"WOver{n}Lo", f"{lo * 100:.1f}")
+        m.add(f"WOver{n}Hi", f"{hi * 100:.1f}")
     m.add("WAcc", pct(np.mean([r["acc"] for r in rows])))
     m.add("WNotes", f"{np.mean([r['as_recall_notes'] for r in rows]) * 100:.0f}")
     lens = {"w": [], "A1": [], "B": []}
@@ -431,6 +451,7 @@ def fanout(m: Macros) -> None:
         m.add(f"Fan{n}Diff", f"{mean * 100:+.0f}")
         m.add(f"Fan{n}Lo", f"{lo * 100:+.0f}")
         m.add(f"Fan{n}Hi", f"{hi * 100:+.0f}")
+        m.add(f"Fan{n}DiffAbs", f"{abs(mean) * 100:.0f}")
     # Difference in differences: B's change with three Researchers minus broadcast's change.
     by = {(r["task_id"], r["channel"]): r["acc"] for r in rows}
     ids = sorted({r["task_id"] for r in rows})
@@ -522,6 +543,10 @@ def pressure(m: Macros) -> None:
                 m.add(f"Press{NAME[ch]}AccTwo", pct(np.mean([r["acc"] for r in rs])))
                 m.add(f"Press{NAME[ch]}AccSix", pct(np.mean([x["acc"] for x in ref])))
         m.add(f"PressN{'One' if c == 1 else 'Two'}", len({r["task_id"] for r in rows}))
+        if c == 2:
+            moves = [abs(np.mean([r["acc"] for r in rows if r["channel"] == ch]) -
+                         np.mean([six[(r["task_id"], ch)]["acc"] for r in rows if r["channel"] == ch])) for ch in ("B", "C")]
+            m.add("PressAccMax", pct(max(moves)))
 
 
 def scope(m: Macros) -> None:
@@ -541,6 +566,7 @@ def scope(m: Macros) -> None:
             m.add(f"Scope{tag}Vs{rn}Lo", f"{lo * 100:+.1f}")
             m.add(f"Scope{tag}Vs{rn}Hi", f"{hi * 100:+.1f}")
             m.add(f"Scope{tag}Ref{rn}", pct(y.mean()))
+            m.add(f"Scope{tag}Vs{rn}Abs", f"{abs(mean) * 100:.1f}")
         m.add(f"Scope{tag}Limit", f"{np.mean([r['turn_limit'] for r in rs]) * 100:.0f}")
     rs = [r for r in rows if r["channel"] == "A2d"]
     m.add("ScopeATwoDBroke", f"{np.mean([r['q_reviewer_broke'] for r in rs]) * 100:.0f}")
