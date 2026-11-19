@@ -243,8 +243,9 @@ handles hold D to \nGapDKSixteen (Figure~\ref{fig:scaling}b).
 writing to one workspace at the same time pick the same file name: in \nClashB{}\% of B's tasks (\nClashD{}\% of
 D's) at least two of them write the same path, and the later write replaces the earlier notes, so B's notes
 state only \nLargeNotesB{}\% of the supporting facts against \nLargeNotesC{}\% in C. In C no two Researchers ever
-wrote the same path (\nClashC{}\%): the instruction to head each file with its questions, and an index that
-lists who wrote what, act as the naming discipline that shared memory needs. Message channels cannot race,
+wrote the same path (\nClashC{}\%). C differs in two ways that can prevent the clash, an instruction to head
+each file with its questions and an index that lists who wrote what; we have not separated them, but either
+is the kind of naming discipline that shared memory needs. Message channels cannot race,
 because each agent's output is its own message.
 
 \paragraph{A longer pipeline multiplies copies, not cached ones.} Adding a Fact-checker between the Writer and
