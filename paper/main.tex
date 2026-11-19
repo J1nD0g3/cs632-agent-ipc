@@ -260,10 +260,12 @@ zero-copy broadcast saves nothing (\nCompAZcKSixteen{}$\times$), the pipe matche
 \nGapBKSixteen points fewer questions than broadcast, while the index holds C to \nGapCKSixteen points and
 handles hold D to \nGapDKSixteen (Figure~\ref{fig:scaling}b).
 
-\paragraph{Parallel writers race on shared files.} The collapse is not a reading failure. Three Researchers
-writing to one workspace at the same time pick the same file name: in \nClashB{}\% of B's tasks (\nClashD{}\% of
-D's) at least two of them write the same path, and the later write replaces the earlier notes, so B's notes
-state only \nLargeNotesB{}\% of the supporting facts against \nLargeNotesC{}\% in C. In C no two Researchers ever
+\paragraph{Parallel writers race on shared files.} Part of the collapse happens before anyone reads. Three
+Researchers writing to one workspace at the same time pick the same file name: in \nClashB{}\% of B's tasks
+(\nClashD{}\% of D's) at least two of them write the same path, and the later write replaces the earlier notes.
+B's notes keep \nLargeClashNotes{}\% of the supporting facts in the \nLargeClashN tasks with a clash and
+\nLargeNoClashNotes{}\% in the \nLargeNoClashN without one. The race is not the whole loss, though: B answers
+\nLargeClashAcc{}\% and \nLargeNoClashAcc{}\% of those tasks' questions, as its Reviewer also runs out of budget. In C no two Researchers ever
 wrote the same path (\nClashC{}\%). C differs in two ways that can prevent the clash, an instruction to head
 each file with its questions and an index that lists who wrote what; we have not separated them, but either
 is the kind of naming discipline that shared memory needs. Message channels cannot race,

@@ -327,7 +327,21 @@ def harness(m: Macros) -> None:
         m.add(f"Clash{NAME.get(ch, ch)}", f"{clash[ch] / runs[ch] * 100:.0f}")
     big_rows = load_rows(big)
     for ch in ("B", "C", "D"):
-        m.add(f"LargeNotes{ch}", f"{np.mean([r['judge_recall_notes'] for r in big_rows if r['channel'] == ch]) * 100:.0f}")
+        m.add(f"LargeNotes{ch}", f"{np.mean([r['as_recall_notes'] for r in big_rows if r['channel'] == ch]) * 100:.0f}")
+    # Split B's k=16 tasks by whether two Researchers wrote the same path.
+    clashed = {}
+    for rec in raw_records(big):
+        if rec["channel"] == "B" and "error" not in rec:
+            by_path = {}
+            for o in rec["io_ops"]:
+                if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o:
+                    by_path.setdefault(o["path"], set()).add(o["agent"])
+            clashed[rec["task_id"]] = any(len(v) > 1 for v in by_path.values())
+    for flag, tag in ((True, "Clash"), (False, "NoClash")):
+        rs = [r for r in big_rows if r["channel"] == "B" and clashed.get(r["task_id"]) is flag]
+        m.add(f"Large{tag}N", len(rs))
+        m.add(f"Large{tag}Notes", f"{np.mean([r['as_recall_notes'] for r in rs]) * 100:.0f}")
+        m.add(f"Large{tag}Acc", f"{np.mean([r['acc'] for r in rs]) * 100:.0f}")
     m.add("LargeBWriterLimit", f"{np.mean(hits['writer']) * 100:.0f}")
     m.add("LargeBReviewerLimit", f"{np.mean(hits['reviewer']) * 100:.0f}")
 
