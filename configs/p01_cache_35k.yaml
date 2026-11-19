@@ -1,0 +1,29 @@
+exp: p01_cache_35k
+datasets:
+  hotpotqa: data/raw/hotpot_distractor_validation.parquet
+  2wiki: data/raw/2wiki_dev.json
+model: Qwen/Qwen3-8B
+server:
+  base_url: http://localhost:8200
+  base_urls:
+  - http://localhost:8200
+  served_name: qwen3-8b
+  gpu: 0
+  vllm_src: ''
+  flags: see scripts/queue_pro6000.sh
+channels:
+- A1
+- A1zc
+- A2
+- B
+- C
+- D
+k:
+- 8
+seeds:
+- 3
+n_tasks: 100
+max_tokens: 2048
+max_turns: 12
+concurrency: 6
+use_tasks: 50
