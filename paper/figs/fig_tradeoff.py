@@ -5,7 +5,9 @@ tokens sent (a), broadcast costs a third of the file channels and keeps the best
 tokens actually computed (b), zero-copy broadcast keeps broadcast's accuracy at the cost of a pipe.
 Form: two scatter panels with a shared accuracy axis; message channels are circles (navy family, the
 pipe gray), file channels squares (teal family), zero-copy broadcast the one gold star; vertical bars
-are 95% bootstrap CIs; an arrow in (b) carries the zero-copy saving.
+are 95% bootstrap CIs; an arrow in (b) carries the zero-copy saving, and each label in (b) gives the share of
+the tokens sent that the engine reused from its prefix cache (file channels resend their conversation on
+every tool call, and the cache absorbs most of it).
 Data: figs/data/fig2_tradeoff.json (agentipc.figdata from the main run).
 """
 import json
@@ -27,8 +29,8 @@ STYLE = {  # marker, fill, name
 LABEL = {
     "sent": {"A1": (5, -5, "start"), "A1zc": (5, 5, "start"), "A2": (5, 0, "start"),
              "B": (-5, 4, "end"), "C": (-5, -4, "end"), "D": (5, 0, "start")},
-    "comp": {"A1": (-5, -6, "end"), "A1zc": (-6, 0, "end"), "A2": (5, 5, "start"),
-             "B": (5, 4, "start"), "C": (5, -4, "start"), "D": (5, 0, "start")},
+    "comp": {"A1": (-5, -13, "end"), "A1zc": (-6, 0, "end"), "A2": (5, 5, "start"),
+             "B": (5, 4, "start"), "C": (5, -4, "start"), "D": (-5, -12, "end")},
 }
 
 fig = Figure("text")
@@ -52,6 +54,10 @@ for rect, metric, key, xr, title in panels:
         dx, dy, anchor = LABEL[key][ch]
         px, py = ax.px(x, y)
         fig.text(px + dx, py + dy, name, size=6.5, anchor=anchor, weight=700 if ch == "A1zc" else 500)
+        if key == "comp":  # share of the sent tokens the engine served from its prefix cache
+            reused = 1 - c["prefill_tokens"] / c["total_tokens"]
+            fig.text(px + dx, py + dy + 6.8, f"{reused * 100:.0f}% cached", size=6, anchor=anchor,
+                     color="gray5")
     if key == "comp":
         (ax_, ay), (bx, by) = ax.px(CH["A1"][metric], CH["A1"]["acc"]), ax.px(CH["A1zc"][metric], CH["A1zc"]["acc"])
         cut = 1 - CH["A1zc"][metric] / CH["A1"][metric]

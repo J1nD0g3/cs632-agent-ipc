@@ -89,11 +89,10 @@ We propose no new protocol or engine change. Zero-copy broadcast needs only a pr
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{\figdir/fig_channels.pdf}
-\caption{The Writer's prompt, call by call, on one task with three questions (to scale). Dark segments are
-computed; pale hatched ones are reused from the prefix cache. Copying sends one large prompt; file channels
-make several smaller calls that resend a growing conversation, most of it cached. Right: tokens the Writer
-sent and computed over all its calls.}
+\includegraphics[width=\textwidth]{\figdir/fig_mechanism.pdf}
+\caption{How results reach the next agent. Top: message channels copy content into the next prompt (bars).
+Zero-copy broadcast puts the shared part first, so the engine reuses it from the cache (hatched). Bottom:
+file channels leave results in a shared workspace that later agents read through tool calls.}
 \label{fig:channels}
 \end{figure*}
 
@@ -187,7 +186,8 @@ difference is that interval. Each task runs once per channel.
 \includegraphics[width=\textwidth]{\figdir/fig_tradeoff.pdf}
 \caption{Accuracy against cost per task, $k=3$, both datasets pooled (300 tasks per channel; bars are 95\%
 intervals). Counted by tokens sent (a), copying the history is the accurate choice and files are the
-expensive one; counted by tokens computed (b), zero-copy broadcast keeps that accuracy at a pipe's cost.}
+expensive one. Counted by tokens computed (b), zero-copy broadcast keeps that accuracy at a pipe's cost.
+Labels in (b) give the share of the tokens sent that the engine served from its prefix cache.}
 \label{fig:tradeoff}
 \end{figure*}
 
@@ -213,7 +213,7 @@ broadcast's tokens.
 \paragraph{Files cost more tokens.} B and C send \nSentRatioB{}$\times$ and \nSentRatioC{}$\times$ the
 tokens of broadcast at $k=3$, and \nFileSentMin--\nFileSentMax{}$\times$ across settings. Their pipelines
 make \nCallsB and \nCallsC model calls to broadcast's three, and each call resends the conversation. The
-cache absorbs most of it, so B and C compute \nCompRatioB{}$\times$ the tokens of broadcast. D's handoffs
+cache absorbs most of it (Figure~\ref{fig:tradeoff}b), so B and C compute \nCompRatioB{}$\times$ the tokens of broadcast. D's handoffs
 replace most reads, so it sends only \nSentRatioD{}$\times$ and computes \nCompRatioD{}$\times$. Because
 the calls are sequential, file channels are also slower, taking \nWallFileMin--\nWallFileMax{}$\times$
 broadcast's \nWallAOne\,s per task.
