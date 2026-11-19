@@ -70,6 +70,7 @@ def main_run(m: Macros) -> None:
     m.add("WallAOne", f"{pool('A1', 3, 'wall_s'):.0f}")
     a1c, zc = pool("A1", 3, "prefill_tokens"), pool("A1zc", 3, "prefill_tokens")
     m.add("ZcCut", f"{(1 - zc / a1c) * 100:.0f}")
+    m.add("PooledGapC", f"{(pool('A1', 3, 'acc') - pool('C', 3, 'acc')) * 100:.1f}")
     for ch in ("B", "C", "D", "A2"):
         m.add(f"SentRatio{NAME[ch]}", f"{pool(ch, 3, 'total_tokens') / pool('A1', 3, 'total_tokens'):.1f}")
         m.add(f"CompRatio{NAME[ch]}", f"{pool(ch, 3, 'prefill_tokens') / pool('A1', 3, 'prefill_tokens'):.2f}")
@@ -426,6 +427,15 @@ def fanout(m: Macros) -> None:
         m.add(f"Fan{n}Diff", f"{mean * 100:+.0f}")
         m.add(f"Fan{n}Lo", f"{lo * 100:+.0f}")
         m.add(f"Fan{n}Hi", f"{hi * 100:+.0f}")
+    # Difference in differences: B's change with three Researchers minus broadcast's change.
+    by = {(r["task_id"], r["channel"]): r["acc"] for r in rows}
+    ids = sorted({r["task_id"] for r in rows})
+    did = np.array([(by[(t, "B")] - main[(t, "B")]["acc"]) - (by[(t, "A1")] - main[(t, "A1")]["acc"]) for t in ids])
+    from .stats import ci as _ci
+    mean, lo, hi = _ci(did)
+    m.add("FanDiD", f"{mean * 100:+.0f}")
+    m.add("FanDiDLo", f"{lo * 100:+.0f}")
+    m.add("FanDiDHi", f"{hi * 100:+.0f}")
     clash, runs = {}, {}
     for rec in raw_records(run):
         if "error" in rec or rec["channel"] not in ("B", "C", "D"):
@@ -493,6 +503,23 @@ def repeat(m: Macros) -> None:
     m.add("AAGapMain", f"{-gap(lambda t, c: main[(t, c)]['acc']) * 100:.1f}")
 
 
+def pressure(m: Macros) -> None:
+    """Same k=16 tasks at 1, 2 and 6 concurrent runs per server: computed / sent tokens per channel."""
+    six = {(r["task_id"], r["channel"]): r for r in load_rows(latest("t08_large"))}
+    for c in (1, 2):
+        rows = load_rows(latest(f"t08_pressure_c{c}"))
+        for ch in ("A1zc", "B", "C"):
+            rs = [r for r in rows if r["channel"] == ch]
+            ratio = np.mean([r["prefill_tokens"] for r in rs]) / np.mean([r["total_tokens"] for r in rs])
+            m.add(f"Press{NAME[ch]}C{'One' if c == 1 else 'Two'}", f"{ratio:.2f}")
+            if c == 2:
+                ref = [six[(r["task_id"], ch)] for r in rs]
+                m.add(f"Press{NAME[ch]}CSix", f"{np.mean([x['prefill_tokens'] for x in ref]) / np.mean([x['total_tokens'] for x in ref]):.2f}")
+                m.add(f"Press{NAME[ch]}AccTwo", pct(np.mean([r["acc"] for r in rs])))
+                m.add(f"Press{NAME[ch]}AccSix", pct(np.mean([x["acc"] for x in ref])))
+        m.add(f"PressN{'One' if c == 1 else 'Two'}", len({r["task_id"] for r in rows}))
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -503,6 +530,10 @@ def judges(m: Macros) -> None:
     for kind in ("present", "dropped", "swapped"):
         m.add(f"SynA{kind.capitalize()}", f"{av['synthetic'][kind] * 100:.0f}")
     m.add("SynAAuc", f"{av['synthetic']['auc']:.3f}")
+    m.add("SynQAcceptDropped", f"{(1 - syn['qwen3-8b']['dropped']) * 100:.0f}")
+    m.add("SynQAcceptSwapped", f"{(1 - syn['qwen3-8b']['swapped']) * 100:.0f}")
+    m.add("AsQKappa", f"{av['real']['qwen3-8b']['kappa']:.2f}")
+    m.add("AsLexKappa", f"{av['real']['lexical']['kappa']:.2f}")
     ent = json.loads((latest("t07_main") / "entities.json").read_text())["pooled"]
     for ch in CH:
         m.add(f"Ent{NAME[ch]}Notes", f"{ent[f'k3|{ch}']['ent_recall_notes'] * 100:.0f}")
@@ -516,7 +547,7 @@ def judges(m: Macros) -> None:
 
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout, replay, repeat, judges]
+            fanout, replay, repeat, judges, pressure]
 
 
 def main() -> int:
