@@ -1,0 +1,122 @@
+{
+ "threshold": 0.5,
+ "scored": "/mnt/sda/heojin/cs632-store/factcheck/p05_a1r_4b_as.jsonl",
+ "groups": {
+  "2wiki|3|A1r": {
+   "n": 100,
+   "aq_delivery_miss": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_no_answer": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_ok": {
+    "mean": 0.6033,
+    "lo": 0.53,
+    "hi": 0.6767
+   },
+   "aq_overflow": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_research_miss": {
+    "mean": 0.25,
+    "lo": 0.1967,
+    "hi": 0.3033
+   },
+   "aq_reviewer_broke": {
+    "mean": 0.0033,
+    "lo": 0.0,
+    "hi": 0.01
+   },
+   "aq_reviewer_fixed": {
+    "mean": 0.1133,
+    "lo": 0.0633,
+    "hi": 0.1667
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.6233,
+    "lo": 0.5632,
+    "hi": 0.6867
+   },
+   "aq_writer_wrong": {
+    "mean": 0.03,
+    "lo": 0.0133,
+    "hi": 0.05
+   },
+   "as_kept_writer_input": {
+    "mean": 1.0,
+    "lo": 1.0,
+    "hi": 1.0
+   },
+   "as_recall_notes": {
+    "mean": 0.3241,
+    "lo": 0.2822,
+    "hi": 0.3692
+   }
+  },
+  "hotpotqa|3|A1r": {
+   "n": 100,
+   "aq_delivery_miss": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_no_answer": {
+    "mean": 0.0033,
+    "lo": 0.0,
+    "hi": 0.01
+   },
+   "aq_ok": {
+    "mean": 0.5167,
+    "lo": 0.4467,
+    "hi": 0.5867
+   },
+   "aq_overflow": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_research_miss": {
+    "mean": 0.2067,
+    "lo": 0.16,
+    "hi": 0.2567
+   },
+   "aq_reviewer_broke": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_reviewer_fixed": {
+    "mean": 0.1367,
+    "lo": 0.08,
+    "hi": 0.2001
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.38,
+    "lo": 0.3167,
+    "hi": 0.4433
+   },
+   "aq_writer_wrong": {
+    "mean": 0.1367,
+    "lo": 0.0933,
+    "hi": 0.18
+   },
+   "as_kept_writer_input": {
+    "mean": 1.0,
+    "lo": 1.0,
+    "hi": 1.0
+   },
+   "as_recall_notes": {
+    "mean": 0.6249,
+    "lo": 0.5715,
+    "hi": 0.6749
+   }
+  }
+ }
+}

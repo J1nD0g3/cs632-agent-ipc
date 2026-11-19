@@ -41,7 +41,7 @@ def fig2(rows: list[dict], src: Path, k: int = 3) -> None:
     table = []
     for ch in CHANNELS:
         row = {"channel": ch, "k": k}
-        for m in ("acc", "total_tokens", "prefill_tokens"):
+        for m in ("acc", "total_tokens", "prefill_tokens", "prompt_tokens"):
             mean, lo, hi = pooled(rows, ch, k, m)
             row.update({m: round(mean, 4), f"{m}_lo": round(lo, 4), f"{m}_hi": round(hi, 4)})
         table.append(row)

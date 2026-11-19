@@ -1,0 +1,29 @@
+exp: p08_norm_32b
+datasets:
+  hotpotqa: data/raw/hotpot_distractor_validation.parquet
+  2wiki: data/raw/2wiki_dev.json
+model: Qwen/Qwen3-32B
+server:
+  base_url: http://localhost:8201
+  base_urls:
+  - http://localhost:8201
+  served_name: qwen3-32b
+  gpu: 1
+  vllm_src: ''
+  flags: see scripts/queue_pro6000.sh
+  gpus:
+  - 1
+channels:
+- B
+- C
+- D
+k:
+- 3
+seeds:
+- 2
+n_tasks: 150
+max_tokens: 2048
+max_turns: 12
+concurrency: 6
+use_tasks: 100
+normalize_paths: true

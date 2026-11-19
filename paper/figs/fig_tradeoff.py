@@ -6,7 +6,7 @@ tokens actually computed (b), zero-copy broadcast keeps broadcast's accuracy at 
 Form: two scatter panels with a shared accuracy axis; message channels are circles (navy family, the
 pipe gray), file channels squares (teal family), zero-copy broadcast the one gold star; vertical bars
 are 95% bootstrap CIs; an arrow in (b) carries the zero-copy saving, and each label in (b) gives the share of
-the tokens sent that the engine reused from its prefix cache (file channels resend their conversation on
+the prompt tokens that the engine reused from its prefix cache (file channels resend their conversation on
 every tool call, and the cache absorbs most of it).
 Data: figs/data/fig2_tradeoff.json (agentipc.figdata from the main run).
 """
@@ -55,7 +55,7 @@ for rect, metric, key, xr, title in panels:
         px, py = ax.px(x, y)
         fig.text(px + dx, py + dy, name, size=6.5, anchor=anchor, weight=700 if ch == "A1zc" else 500)
         if key == "comp":  # share of the sent tokens the engine served from its prefix cache
-            reused = 1 - c["prefill_tokens"] / c["total_tokens"]
+            reused = 1 - c["prefill_tokens"] / c["prompt_tokens"]  # prompt tokens served from the cache
             fig.text(px + dx, py + dy + 6.8, f"{reused * 100:.0f}% cached", size=6, anchor=anchor,
                      color="gray5")
     if key == "comp":

@@ -1,0 +1,26 @@
+{
+ "hotpotqa_k16_s4": {
+  "tasks": 30,
+  "questions": 480,
+  "docs_mean": 159.7,
+  "doc_chars_mean": 87871.5,
+  "support_facts_mean": 38.7,
+  "types": {
+   "bridge": 416,
+   "comparison": 64
+  }
+ },
+ "2wiki_k16_s4": {
+  "tasks": 30,
+  "questions": 480,
+  "docs_mean": 146.3,
+  "doc_chars_mean": 55296.7,
+  "support_facts_mean": 38.5,
+  "types": {
+   "inference": 68,
+   "bridge_comparison": 97,
+   "compositional": 206,
+   "comparison": 109
+  }
+ }
+}

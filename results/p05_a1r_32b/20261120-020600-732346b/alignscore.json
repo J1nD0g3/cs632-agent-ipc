@@ -1,0 +1,122 @@
+{
+ "threshold": 0.5,
+ "scored": "/mnt/sda/heojin/cs632-store/factcheck/p05_a1r_32b_as.jsonl",
+ "groups": {
+  "2wiki|3|A1r": {
+   "n": 100,
+   "aq_delivery_miss": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_no_answer": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_ok": {
+    "mean": 0.76,
+    "lo": 0.71,
+    "hi": 0.81
+   },
+   "aq_overflow": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_research_miss": {
+    "mean": 0.1767,
+    "lo": 0.13,
+    "hi": 0.2234
+   },
+   "aq_reviewer_broke": {
+    "mean": 0.0067,
+    "lo": 0.0,
+    "hi": 0.0167
+   },
+   "aq_reviewer_fixed": {
+    "mean": 0.0133,
+    "lo": 0.0033,
+    "hi": 0.0267
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.6433,
+    "lo": 0.5867,
+    "hi": 0.7
+   },
+   "aq_writer_wrong": {
+    "mean": 0.0433,
+    "lo": 0.02,
+    "hi": 0.07
+   },
+   "as_kept_writer_input": {
+    "mean": 1.0,
+    "lo": 1.0,
+    "hi": 1.0
+   },
+   "as_recall_notes": {
+    "mean": 0.3871,
+    "lo": 0.3393,
+    "hi": 0.4343
+   }
+  },
+  "hotpotqa|3|A1r": {
+   "n": 100,
+   "aq_delivery_miss": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_no_answer": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_ok": {
+    "mean": 0.7333,
+    "lo": 0.6833,
+    "hi": 0.7867
+   },
+   "aq_overflow": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_research_miss": {
+    "mean": 0.17,
+    "lo": 0.13,
+    "hi": 0.21
+   },
+   "aq_reviewer_broke": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_reviewer_fixed": {
+    "mean": 0.0033,
+    "lo": 0.0,
+    "hi": 0.01
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.4767,
+    "lo": 0.4167,
+    "hi": 0.54
+   },
+   "aq_writer_wrong": {
+    "mean": 0.0933,
+    "lo": 0.06,
+    "hi": 0.1267
+   },
+   "as_kept_writer_input": {
+    "mean": 1.0,
+    "lo": 1.0,
+    "hi": 1.0
+   },
+   "as_recall_notes": {
+    "mean": 0.6041,
+    "lo": 0.558,
+    "hi": 0.6501
+   }
+  }
+ }
+}

@@ -1,0 +1,380 @@
+{
+ "2wiki|k3|B": {
+  "n": 50,
+  "errors": 0,
+  "acc": {
+   "mean": 0.6067,
+   "lo": 0.5133,
+   "hi": 0.7
+  },
+  "all_correct": {
+   "mean": 0.32,
+   "lo": 0.18,
+   "hi": 0.46
+  },
+  "em": {
+   "mean": 0.5333,
+   "lo": 0.4333,
+   "hi": 0.6267
+  },
+  "f1": {
+   "mean": 0.6277,
+   "lo": 0.5436,
+   "hi": 0.7107
+  },
+  "answered": {
+   "mean": 1.0,
+   "lo": 1.0,
+   "hi": 1.0
+  },
+  "total_tokens": {
+   "mean": 42476.06,
+   "lo": 38703.6565,
+   "hi": 46434.289
+  },
+  "prompt_tokens": {
+   "mean": 40624.0,
+   "lo": 36972.6955,
+   "hi": 44440.4545
+  },
+  "completion_tokens": {
+   "mean": 1852.06,
+   "lo": 1549.395,
+   "hi": 2218.5095
+  },
+  "prefill_tokens": {
+   "mean": 9550.4,
+   "lo": 9083.0085,
+   "hi": 10024.35
+  },
+  "llm_calls": {
+   "mean": 19.06,
+   "lo": 17.74,
+   "hi": 20.4
+  },
+  "tokens_researcher": {
+   "mean": 7983.58,
+   "lo": 7447.306,
+   "hi": 8597.6795
+  },
+  "tokens_writer": {
+   "mean": 13618.68,
+   "lo": 11565.756,
+   "hi": 15823.1025
+  },
+  "tokens_reviewer": {
+   "mean": 20873.8,
+   "lo": 18270.394,
+   "hi": 23662.6935
+  },
+  "file_io": {
+   "mean": 16.46,
+   "lo": 15.08,
+   "hi": 17.88
+  },
+  "file_reads": {
+   "mean": 11.5,
+   "lo": 10.08,
+   "hi": 12.94
+  },
+  "file_writes": {
+   "mean": 2.96,
+   "lo": 2.86,
+   "hi": 3.06
+  },
+  "file_lists": {
+   "mean": 2.0,
+   "lo": 2.0,
+   "hi": 2.0
+  },
+  "read_chars": {
+   "mean": 7386.78,
+   "lo": 6371.2845,
+   "hi": 8445.152
+  },
+  "write_chars": {
+   "mean": 2401.96,
+   "lo": 2072.0105,
+   "hi": 2799.7025
+  },
+  "fact_recall_notes": {
+   "mean": 0.2962,
+   "lo": 0.2295,
+   "hi": 0.369
+  },
+  "fact_kept_writer_input": {
+   "mean": 0.662,
+   "lo": 0.5433,
+   "hi": 0.777
+  },
+  "fact_kept_draft": {
+   "mean": 0.4466,
+   "lo": 0.3363,
+   "hi": 0.5562
+  },
+  "fact_kept_final": {
+   "mean": 0.5389,
+   "lo": 0.4217,
+   "hi": 0.6503
+  },
+  "info_loss": {
+   "mean": 0.4611,
+   "lo": 0.3497,
+   "hi": 0.5783
+  },
+  "fact_recall_final": {
+   "mean": 0.2152,
+   "lo": 0.1737,
+   "hi": 0.2595
+  },
+  "triple_recall_notes": {
+   "mean": 0.6778,
+   "lo": 0.6032,
+   "hi": 0.7527
+  },
+  "triple_recall_final": {
+   "mean": 0.6533,
+   "lo": 0.5961,
+   "hi": 0.7063
+  },
+  "overflow": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "turn_limit": {
+   "mean": 0.48,
+   "lo": 0.34,
+   "hi": 0.62
+  },
+  "wall_s": {
+   "mean": 28.0768,
+   "lo": 23.7584,
+   "hi": 33.2614
+  },
+  "q_ok": {
+   "mean": 0.4933,
+   "lo": 0.3933,
+   "hi": 0.5935
+  },
+  "q_reviewer_fixed": {
+   "mean": 0.1133,
+   "lo": 0.0667,
+   "hi": 0.1733
+  },
+  "q_overflow": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "q_no_answer": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "q_research_miss": {
+   "mean": 0.3133,
+   "lo": 0.2333,
+   "hi": 0.3933
+  },
+  "q_delivery_miss": {
+   "mean": 0.0067,
+   "lo": 0.0,
+   "hi": 0.02
+  },
+  "q_writer_wrong": {
+   "mean": 0.04,
+   "lo": 0.0067,
+   "hi": 0.08
+  },
+  "q_reviewer_broke": {
+   "mean": 0.0333,
+   "lo": 0.0067,
+   "hi": 0.0733
+  }
+ },
+ "hotpotqa|k3|B": {
+  "n": 50,
+  "errors": 0,
+  "acc": {
+   "mean": 0.66,
+   "lo": 0.58,
+   "hi": 0.74
+  },
+  "all_correct": {
+   "mean": 0.3,
+   "lo": 0.18,
+   "hi": 0.42
+  },
+  "em": {
+   "mean": 0.5867,
+   "lo": 0.5,
+   "hi": 0.6667
+  },
+  "f1": {
+   "mean": 0.7116,
+   "lo": 0.6405,
+   "hi": 0.7802
+  },
+  "answered": {
+   "mean": 1.0,
+   "lo": 1.0,
+   "hi": 1.0
+  },
+  "total_tokens": {
+   "mean": 34255.22,
+   "lo": 31125.256,
+   "hi": 37529.7765
+  },
+  "prompt_tokens": {
+   "mean": 32595.2,
+   "lo": 29640.9025,
+   "hi": 35650.1305
+  },
+  "completion_tokens": {
+   "mean": 1660.02,
+   "lo": 1330.363,
+   "hi": 2057.334
+  },
+  "prefill_tokens": {
+   "mean": 9881.6,
+   "lo": 9541.6785,
+   "hi": 10238.4435
+  },
+  "llm_calls": {
+   "mean": 15.4,
+   "lo": 14.2195,
+   "hi": 16.64
+  },
+  "tokens_researcher": {
+   "mean": 10438.48,
+   "lo": 9886.9805,
+   "hi": 11033.7815
+  },
+  "tokens_writer": {
+   "mean": 10510.5,
+   "lo": 8739.8025,
+   "hi": 12499.815
+  },
+  "tokens_reviewer": {
+   "mean": 13306.24,
+   "lo": 11160.9255,
+   "hi": 15418.1645
+  },
+  "file_io": {
+   "mean": 12.42,
+   "lo": 11.18,
+   "hi": 13.7005
+  },
+  "file_reads": {
+   "mean": 7.44,
+   "lo": 6.1995,
+   "hi": 8.74
+  },
+  "file_writes": {
+   "mean": 2.98,
+   "lo": 2.84,
+   "hi": 3.14
+  },
+  "file_lists": {
+   "mean": 2.0,
+   "lo": 2.0,
+   "hi": 2.0
+  },
+  "read_chars": {
+   "mean": 5052.4,
+   "lo": 4465.468,
+   "hi": 5652.759
+  },
+  "write_chars": {
+   "mean": 2699.94,
+   "lo": 2476.281,
+   "hi": 2952.6535
+  },
+  "fact_recall_notes": {
+   "mean": 0.4262,
+   "lo": 0.3483,
+   "hi": 0.5074
+  },
+  "fact_kept_writer_input": {
+   "mean": 0.821,
+   "lo": 0.7183,
+   "hi": 0.912
+  },
+  "fact_kept_draft": {
+   "mean": 0.5449,
+   "lo": 0.4354,
+   "hi": 0.6514
+  },
+  "fact_kept_final": {
+   "mean": 0.5891,
+   "lo": 0.4769,
+   "hi": 0.6947
+  },
+  "info_loss": {
+   "mean": 0.4109,
+   "lo": 0.3053,
+   "hi": 0.5231
+  },
+  "fact_recall_final": {
+   "mean": 0.297,
+   "lo": 0.24,
+   "hi": 0.3532
+  },
+  "overflow": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "turn_limit": {
+   "mean": 0.16,
+   "lo": 0.06,
+   "hi": 0.2605
+  },
+  "wall_s": {
+   "mean": 25.554,
+   "lo": 20.6809,
+   "hi": 31.4718
+  },
+  "q_ok": {
+   "mean": 0.5533,
+   "lo": 0.4667,
+   "hi": 0.64
+  },
+  "q_reviewer_fixed": {
+   "mean": 0.1067,
+   "lo": 0.0467,
+   "hi": 0.1733
+  },
+  "q_overflow": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "q_no_answer": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  },
+  "q_research_miss": {
+   "mean": 0.2933,
+   "lo": 0.2133,
+   "hi": 0.3733
+  },
+  "q_delivery_miss": {
+   "mean": 0.0133,
+   "lo": 0.0,
+   "hi": 0.04
+  },
+  "q_writer_wrong": {
+   "mean": 0.0333,
+   "lo": 0.0067,
+   "hi": 0.0667
+  },
+  "q_reviewer_broke": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0
+  }
+ }
+}
