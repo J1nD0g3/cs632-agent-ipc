@@ -467,8 +467,17 @@ def repeat(m: Macros) -> None:
     m.add("AAGapMain", f"{-gap(lambda t, c: main[(t, c)]['acc']) * 100:.1f}")
 
 
+def judges(m: Macros) -> None:
+    d = json.loads((latest("t07_main") / "judge_cross.json").read_text())
+    m.add("JxFacts", d["facts"])
+    m.add("JxAgree", f"{d['qwen_vs_other']['agree'] * 100:.0f}")
+    m.add("JxKappa", f"{d['qwen_vs_other']['kappa']:.2f}")
+    m.add("JxLexAgree", f"{d['qwen_vs_lexical']['agree'] * 100:.0f}")
+    m.add("JxLexKappa", f"{d['qwen_vs_lexical']['kappa']:.2f}")
+
+
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout, replay, repeat]
+            fanout, replay, repeat, judges]
 
 
 def main() -> int:

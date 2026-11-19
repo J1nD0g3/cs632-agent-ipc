@@ -149,8 +149,12 @@ which supporting sentences a text states. We judge the Researcher's output and w
 the copied notes in message channels (so delivery is complete by construction), or the text of the files
 it read in file channels, source documents included. We attribute each wrong answer to a stage: the
 Reviewer if the draft answer was right; otherwise the Researcher if its output misses a supporting fact,
-delivery if the Writer did not receive one, and the Writer if it had them all. \emph{Latency} is wall time
-per task under the shared load.
+delivery if the Writer did not receive one, and the Writer if it had them all. The judge is noisy: on
+\nJxFacts sampled facts, Llama-3-8B-Instruct given the same prompt agrees with it on \nJxAgree\% ($\kappa$ =
+\nJxKappa), and lexical matching on \nJxLexAgree\% ($\kappa$ = \nJxLexKappa). We therefore read fact-level numbers as
+estimates and back each conclusion with a measure that needs no judge: accuracy, note length, which files
+an agent opened, and which files two agents both wrote. \emph{Latency} is wall time per task under the
+shared load.
 
 \paragraph{Harness.} An agent may make up to 12 tool calls. If it stops without leaving its output file, it
 gets one call that must write it, as frameworks take an agent's last message as its output. At $k=3$ this
