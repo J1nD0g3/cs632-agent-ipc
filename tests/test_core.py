@@ -180,3 +180,27 @@ def test_parallel_researchers(questions, tmp_path):
                         [("write_file", {"path": "final.md", "content": _final(3)})], "DONE"])
     rec = asyncio.run(run_task(task, "B", files, tmp_path, researchers=3))
     assert sorted(rec["io"]) == ["researcher1", "researcher2", "researcher3", "reviewer", "writer"]
+
+
+def test_a1w_writes_then_copies(questions, tmp_path):
+    task = make_tasks(questions, 1, 1, seed=0)[0]
+    client = MockClient([[("write_file", {"path": "notes.md", "content": "FILE NOTES"})], "DONE", "DRAFT", _final(1)])
+    rec = asyncio.run(run_task(task, "A1w", client, tmp_path))
+    assert [t["function"]["name"] for t in client.calls[0]["tools"]] == ["write_file"]
+    assert client.calls[2]["tools"] is None
+    writer = " ".join(m["content"] for m in client.calls[2]["messages"])
+    assert "FILE NOTES" in writer and "Documents:" in writer
+    assert rec["stage"]["notes"] == "FILE NOTES" and rec["stage"]["writer_input"] == "FILE NOTES"
+
+
+def test_replay_skips_researcher(questions, tmp_path):
+    task = make_tasks(questions, 1, 1, seed=0)[0]
+    a = MockClient(["DRAFT", _final(1)])
+    rec = asyncio.run(run_task(task, "A2", a, tmp_path, fixed_notes="SAME NOTES"))
+    assert len(a.calls) == 2 and "SAME NOTES" in a.calls[0]["messages"][1]["content"]
+    c = MockClient([[("read_file", {"path": "index.md"})], [("read_file", {"path": "notes.md"})],
+                    [("write_file", {"path": "draft.md", "content": _final(1)})], "DONE",
+                    [("write_file", {"path": "final.md", "content": _final(1)})], "DONE"])
+    rec = asyncio.run(run_task(task, "C", c, tmp_path, fixed_notes="SAME NOTES"))
+    assert "notes.md | by researcher" in rec["stage"]["writer_input"] and "SAME NOTES" in rec["stage"]["writer_input"]
+    assert "researcher" not in rec["agents"] and rec["stage"]["notes"] == "SAME NOTES"

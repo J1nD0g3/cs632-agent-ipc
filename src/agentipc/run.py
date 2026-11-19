@@ -78,6 +78,16 @@ async def run(cfg: dict, run_dir: Path, raw_dir: Path) -> list[dict]:
     random.Random(cfg.get("order_seed", 0)).shuffle(jobs)
     (run_dir / "task_stats.json").write_text(json.dumps(tstats, indent=1))
     sems = [asyncio.Semaphore(cfg.get("concurrency", 8)) for _ in clients]
+    replay = {}
+    if cfg.get("replay_from"):
+        # Replay one channel's Researcher output from an earlier run into every channel (reading-side test).
+        src_exp, src_ch = cfg["replay_from"], cfg.get("replay_channel", "A1")
+        src = sorted(p.parent for p in (ROOT / "results" / src_exp).glob("2*/summary.json"))[-1]
+        for line in gzip.open(ROOT / "results_raw" / src_exp / src.name / "records.jsonl.gz", "rt"):
+            rec = json.loads(line)
+            if rec["channel"] == src_ch and "error" not in rec:
+                replay[rec["task_id"]] = rec["agents"]["researcher"]["reply"]
+        (run_dir / "replay_source.txt").write_text(f"results/{src_exp}/{src.name} channel {src_ch}\n")
     work = raw_dir / "workspaces"
     out_f = gzip.open(raw_dir / "records.jsonl.gz", "wt")
     rows, done = [], 0
@@ -89,7 +99,7 @@ async def run(cfg: dict, run_dir: Path, raw_dir: Path) -> list[dict]:
             try:
                 rec = await run_task(task, ch, client, work, cfg.get("max_turns", 12),
                                      tuple(cfg.get("chain", ["researcher", "writer", "reviewer"])),
-                                     cfg.get("researchers", 1))
+                                     cfg.get("researchers", 1), replay.get(task.task_id) if replay else None)
             except Exception as e:  # keep going; a failed run is recorded, not dropped
                 rec = {"task_id": task.task_id, "channel": ch, "dataset": task.dataset, "k": len(task.questions),
                        "error": f"{type(e).__name__}: {e}"[:500], "agents": {}, "stage": {}}

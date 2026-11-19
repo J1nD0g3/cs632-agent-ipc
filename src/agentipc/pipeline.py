@@ -15,8 +15,8 @@ from .data import Task
 from .llm import ContextOverflow, SaltedClient
 from .workspace import Workspace
 
-CHANNELS = ("A1", "A1zc", "A2", "B", "Bb", "C", "D")
-MESSAGE_CHANNELS = ("A1", "A1zc", "A2")
+CHANNELS = ("A1", "A1zc", "A1w", "A2", "B", "Bb", "C", "D")
+MESSAGE_CHANNELS = ("A1", "A1zc", "A1w", "A2")
 FILE_CHANNELS = ("B", "Bb", "C", "D")
 
 TEAM = ("You are one agent in a team that answers a set of questions together. The agents work in this "
@@ -267,17 +267,19 @@ def build_messages(role: str, channel: str, chain: tuple[str, ...], task: Task, 
         # A Researcher's input is the same in every channel: its questions and their documents.
         if rtask is not None:
             qs, docs = rtask_block(rtask), documents_block(rtask)
+        if channel == "A1w":
+            channel = "B"
         if channel == "A1zc":
             return [{"role": "system", "content": team_text(chain)},
                     {"role": "user", "content": f"{qs}\n\n{docs}"},
                     {"role": "user", "content": instruction(role, channel, chain)}]
         return [{"role": "system", "content": system_prompt(role, channel, chain)},
                 {"role": "user", "content": f"{qs}\n\n{docs}"}]
-    if channel in ("A1", "A1zc"):
+    if channel in ("A1", "A1zc", "A1w"):
         # A1 copies everything said so far: the task (all questions and documents) and every earlier output.
         history = [{"role": "user", "content": f"{qs}\n\n{docs}"}]
         history += [{"role": "user", "content": f"[{display(r)}]\n{replies[r]}"} for r in before]
-        if channel == "A1":
+        if channel in ("A1", "A1w"):
             return [{"role": "system", "content": system_prompt(role, channel, chain)}] + history
         # A1zc: same content, shared history first and the role instruction last, so consecutive agents
         # share a prompt prefix that the serving engine can reuse.
@@ -321,14 +323,17 @@ def split_task(task: Task, n: int) -> list[Task]:
 
 
 async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: int = 12,
-                   chain: tuple[str, ...] = ("researcher", "writer", "reviewer"), researchers: int = 1) -> dict:
+                   chain: tuple[str, ...] = ("researcher", "writer", "reviewer"), researchers: int = 1,
+                   fixed_notes: str | None = None) -> dict:
+    """fixed_notes replays a given Researcher output instead of running the Researcher (reading-side test)."""
     assert channel in CHANNELS and chain[0] == "researcher" and chain[-1] == "reviewer"
     t0 = time.perf_counter()
     client = SaltedClient(client, f"{task.task_id}.{channel}.{len(chain)}.{researchers}.{time.time_ns()}"
                           if researchers > 1 else f"{task.task_id}.{channel}.{len(chain)}.{time.time_ns()}")
     files = channel in FILE_CHANNELS
     tag = f"{len(chain)}" if researchers == 1 else f"{len(chain)}r{researchers}"
-    ws = Workspace(Path(workdir) / f"{task.task_id}_{channel}_{tag}") if files else None
+    tag += "_replay" if fixed_notes is not None else ""
+    ws = Workspace(Path(workdir) / f"{task.task_id}_{channel}_{tag}") if files or channel == "A1w" else None
     if ws is not None:
         seed_workspace(ws, task, channel)
     tools = TOOLS_BATCH if channel == "Bb" else TOOLS
@@ -346,20 +351,35 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
     replies: dict[str, str] = {}
     stage: dict[str, str] = {}
     # Parallel Researchers run concurrently, as in an orchestrator-worker fan-out.
-    res = await asyncio.gather(*(run_agent(client, ws, r, build_messages(r, channel, shown, task, replies, flat, sub),
-                                           turns, None, tools) for r, sub in zip(rroles, parts)))
-    for r, run in zip(rroles, res):
-        runs[r], replies[r] = run, run.reply
-    if files:
+    if fixed_notes is not None:
+        assert researchers == 1 and channel != "D", "replay needs one Researcher and no handoff"
+        replies["researcher"] = fixed_notes
+        if files:
+            ws.seed("notes.md", "# Researcher notes for all questions\n" + fixed_notes + "\n")
+            ws.authors["notes.md"] = "researcher"
+            if ws.auto_index:
+                ws.refresh_index()
+        stage["notes"] = fixed_notes
+    else:
+        res = await asyncio.gather(*(run_agent(client, ws, r, build_messages(r, channel, shown, task, replies, flat, sub),
+                                               max_turns if ws is not None else 1, None, tools)
+                                     for r, sub in zip(rroles, parts)))
+        for r, run in zip(rroles, res):
+            runs[r], replies[r] = run, run.reply
+        if channel == "A1w":
+            # The notes the Researcher wrote to its file are what A1w copies forward.
+            for r in rroles:
+                replies[r] = ws.written_by(r)
+    if fixed_notes is None and files:
         stage["notes"] = "\n".join(ws.written_by(r) for r in rroles)
         if channel == "D":
             stage["notes"] += "\n" + "\n".join(replies[r] for r in rroles)
-    else:
+    elif fixed_notes is None:
         stage["notes"] = "\n".join(replies[r] for r in rroles)
 
     for role in chain[1:]:
         msgs = build_messages(role, channel, shown, task, replies, flat)
-        runs[role] = await run_agent(client, ws, role, msgs, turns, OUT_FILE.get(role), tools)
+        runs[role] = await run_agent(client, ws if files else None, role, msgs, turns, OUT_FILE.get(role), tools)
         replies[role] = runs[role].reply
         out = replies[role]
         if files:
@@ -379,7 +399,8 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
 
     return {
         "task_id": task.task_id, "channel": channel, "dataset": task.dataset, "k": len(task.questions),
-        "chain": list(chain), "researchers": researchers, "wall_s": round(time.perf_counter() - t0, 2),
+        "chain": list(chain), "researchers": researchers, "replay": fixed_notes is not None,
+        "wall_s": round(time.perf_counter() - t0, 2),
         "agents": {r: {"calls": a.calls, "hit_turn_limit": a.hit_turn_limit, "overflow": a.overflow,
                        "reply": a.reply} for r, a in runs.items()},
         "io": {r: s.as_dict() for r, s in ws.stats.items()} if ws else {},
