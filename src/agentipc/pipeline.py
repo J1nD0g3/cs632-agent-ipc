@@ -15,9 +15,9 @@ from .data import Task
 from .llm import ContextOverflow, SaltedClient
 from .workspace import Workspace
 
-CHANNELS = ("A1", "A1zc", "A1w", "A2", "B", "Bb", "C", "D")
-MESSAGE_CHANNELS = ("A1", "A1zc", "A1w", "A2")
-FILE_CHANNELS = ("B", "Bb", "C", "D")
+CHANNELS = ("A1", "A1zc", "A1w", "A2", "A2d", "B", "Bb", "Bd", "C", "D")
+MESSAGE_CHANNELS = ("A1", "A1zc", "A1w", "A2", "A2d")
+FILE_CHANNELS = ("B", "Bb", "Bd", "C", "D")
 
 TEAM = ("You are one agent in a team that answers a set of questions together. The agents work in this "
         "order: {chain}.")
@@ -269,6 +269,8 @@ def build_messages(role: str, channel: str, chain: tuple[str, ...], task: Task, 
             qs, docs = rtask_block(rtask), documents_block(rtask)
         if channel == "A1w":
             channel = "B"
+        if channel in ("A2d", "Bd"):
+            channel = {"A2d": "A2", "Bd": "B"}[channel]
         if channel == "A1zc":
             return [{"role": "system", "content": team_text(chain)},
                     {"role": "user", "content": f"{qs}\n\n{docs}"},
@@ -285,15 +287,16 @@ def build_messages(role: str, channel: str, chain: tuple[str, ...], task: Task, 
         # share a prompt prefix that the serving engine can reuse.
         return ([{"role": "system", "content": team_text(chain)}] + history +
                 [{"role": "user", "content": instruction(role, channel, chain)}])
-    if channel == "A2":
+    if channel in ("A2", "A2d"):
         # A pipe carries only the previous stage's output (all parallel Researchers, if that stage had several).
         prev = [r for r in before if base_role(r) == base_role(before[-1])] if base_role(before[-1]) == "researcher" \
             else [before[-1]]
         body = "\n\n".join(f"[{display(r)}]\n{replies[r]}" for r in prev)
+        given = f"{qs}\n\n{docs}" if channel == "A2d" else qs
         return [{"role": "system", "content": system_prompt(role, channel, chain)},
-                {"role": "user", "content": f"{qs}\n\n{body}"}]
+                {"role": "user", "content": f"{given}\n\n{body}"}]
     msgs = [{"role": "system", "content": system_prompt(role, channel, chain)},
-            {"role": "user", "content": qs}]
+            {"role": "user", "content": f"{qs}\n\n{docs}" if channel == "Bd" else qs}]
     if channel == "D":
         msgs.append({"role": "user", "content": "\n\n".join(f"[{display(r)} handoff]\n{replies[r]}" for r in before)})
     return msgs
