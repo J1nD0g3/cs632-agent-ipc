@@ -144,22 +144,19 @@ own prefixes and channels never share cached KV.
 \paragraph{Metrics.} \emph{Accuracy} is the share of questions whose final answer matches the gold answer
 (exact match, F1 $\ge 0.8$, or the gold answer inside a short prediction). \emph{Tokens sent} is the sum of
 prompt and completion tokens over all calls, the quantity an API bills; \emph{tokens computed} subtracts the
-prompt tokens the engine served from its cache. \emph{Fact delivery} uses Qwen3-8B as a judge to decide
-which supporting sentences a text states. We judge the Researcher's output and what the Writer received:
-the copied notes in message channels (so delivery is complete by construction), or the text of the files
-it read in file channels, source documents included. We attribute each wrong answer to a stage: the
-Reviewer if the draft answer was right; otherwise the Researcher if its output misses a supporting fact,
-delivery if the Writer did not receive one, and the Writer if it had them all. The judge is lenient. On
-\nSynN pairs built from the task documents with labels known by construction, it accepts every present
-sentence (\nSynQPresent{}\%) but rejects only \nSynQDropped{}\% of removed ones and \nSynQSwapped{}\% of sentences whose key
-entity we replaced (Llama-3-8B-Instruct: \nSynLPresent, \nSynLDropped, \nSynLSwapped{}\%); on \nJxFacts real facts the two
-judges agree on \nJxAgree{}\% ($\kappa$ = \nJxKappa). We therefore read judge numbers as upper-bound estimates and back
-each conclusion with measures that need no judge: accuracy; the entities of each question's gold chain
-(the subjects and objects of 2Wiki's evidence triples, the titles of HotpotQA's supporting paragraphs) found
-by exact string match, as answer-string recall is used for retrieval~\cite{dpr}; note length; which files
-an agent opened; and which files two agents both wrote. By entity match the Researcher's output keeps
-\nEntAOneNotes{}\% of the chain entities in A1, \nEntCNotes{}\% in C, \nEntDNotes{}\% in D, and \nEntBNotes{}\% in B, and the Writer
-receives \nEntBDeliv{}\% of them in B, \nEntDDeliv{}\% in D, and \nEntCDeliv{}\% in C: the same order as the judge. \emph{Latency} is wall time per task under the
+prompt tokens the engine served from its cache. \emph{Fact delivery} asks which supporting sentences a text states, scored with AlignScore~\cite{alignscore}, a
+RoBERTa-large alignment model, at its 0.5 threshold. We score the Researcher's output and what the Writer
+received: the copied notes in message channels (so delivery is complete by construction), or the text of
+the files it read in file channels, source documents included. We attribute each wrong answer to a stage:
+the Reviewer if the draft answer was right; otherwise the Researcher if its output misses a supporting fact,
+delivery if the Writer did not receive one, and the Writer if it had them all. We checked the measures on
+\nSynN pairs built from the task documents, with labels known by construction: a supporting sentence kept,
+removed, or with its key entity replaced. AlignScore labels them correctly \nSynAPresent, \nSynADropped, and
+\nSynASwapped{}\% of the time (AUC \nSynAAuc); Qwen3-8B used as a judge accepts nearly everything
+(\nSynQPresent, \nSynQDropped, \nSynQSwapped{}\%), as does Llama-3-8B-Instruct. As a check that needs no model, we
+also match the entities of each question's gold chain (the subjects and objects of 2Wiki's evidence
+triples, the titles of HotpotQA's supporting paragraphs) by exact string, as answer-string recall is used in
+retrieval~\cite{dpr}; it ranks the channels the same way. \emph{Latency} is wall time per task under the
 shared load.
 
 \paragraph{Harness.} An agent may make up to 12 tool calls. If it stops without leaving its output file, it
@@ -209,7 +206,7 @@ broadcast's \nWallAOne\,s under our shared load, and the pipe \nWallATwo{}$\time
 \centering
 \includegraphics[width=\textwidth]{\figdir/fig_loss.pdf}
 \caption{Where information is lost, $k=3$, both datasets pooled. (a) Share of supporting facts in the
-Researcher's output and share that reached the Writer (LLM judge). (b) Wrong answers by the first stage at
+Researcher's output and share that reached the Writer (AlignScore). (b) Wrong answers by the first stage at
 fault.}
 \label{fig:loss}
 \end{figure*}
@@ -217,7 +214,7 @@ fault.}
 \paragraph{Files lose information on both sides; an index helps the reader find it.} Writing to a file
 changes the writer: given the same questions and documents, the Researcher writes
 \nNotesShorter{}\% shorter notes when they go to files through a tool call (\nNotesCharsFile vs \nNotesCharsMsg characters at $k=3$), and in B its notes state \nNotesB{}\% of the
-supporting facts instead of \nNotesAOne{}\% (Figure~\ref{fig:loss}a). On the reading side, the files B's Writer reads state only \nDelivBMin--\nDelivBMax{}\% of the facts in its
+supporting facts instead of \nNotesAOne{}\% (Figure~\ref{fig:loss}a; AlignScore). On the reading side, the files B's Writer reads state only \nDelivBMin--\nDelivBMax{}\% of the facts in its
 notes. The file list does not say which file
 holds the notes, so \nDocReadsB{}\% of B's Writer reads go to source documents and in \nNoNotesB{}\% of the tasks it
 never opens the notes. With handles the Writer trusts the handoff and opens even less

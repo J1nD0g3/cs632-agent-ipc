@@ -49,14 +49,14 @@ def fig2(rows: list[dict], src: Path, k: int = 3) -> None:
                             "channels": table}, table)
 
 
-FAIL = ("q_research_miss", "q_delivery_miss", "q_writer_wrong", "q_reviewer_broke", "q_no_answer")
+FAIL = ("aq_research_miss", "aq_delivery_miss", "aq_writer_wrong", "aq_reviewer_broke", "aq_no_answer")
 
 
 def fig3(rows: list[dict], src: Path, k: int = 3) -> None:
     table = []
     for ch in CHANNELS:
         row = {"channel": ch, "k": k}
-        for m in ("judge_recall_notes", "judge_kept_writer_input", "acc") + FAIL:
+        for m in ("as_recall_notes", "as_kept_writer_input", "acc") + FAIL:
             mean, lo, hi = pooled(rows, ch, k, m)
             row.update({m: round(mean, 4), f"{m}_lo": round(lo, 4), f"{m}_hi": round(hi, 4)})
         table.append(row)

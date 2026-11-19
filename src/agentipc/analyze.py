@@ -19,7 +19,8 @@ METRICS = ("acc", "total_tokens", "prefill_tokens", "completion_tokens", "llm_ca
            "turn_limit", "judge_recall_notes", "judge_kept_writer_input", "judge_kept_final", "judge_info_loss",
            "q_research_miss", "q_delivery_miss", "q_writer_wrong", "q_reviewer_broke", "q_reviewer_fixed",
            "q_no_answer", "jq_research_miss", "jq_delivery_miss", "jq_writer_wrong", "jq_reviewer_broke",
-           "jq_reviewer_fixed", "jq_no_answer", "jq_overflow")
+           "jq_reviewer_fixed", "jq_no_answer", "jq_overflow", "as_recall_notes", "as_kept_writer_input",
+           "aq_research_miss", "aq_delivery_miss", "aq_writer_wrong", "aq_reviewer_broke", "aq_no_answer")
 
 
 def load_rows(run_dir: Path) -> list[dict]:
@@ -32,6 +33,12 @@ def load_rows(run_dir: Path) -> list[dict]:
             r = rows.get((j["task_id"], j["channel"]))
             if r is not None:
                 r.update({k: v for k, v in j.items() if k.startswith(("judge_", "jq_"))})
+    aligned = raw / "alignscore_rows.jsonl.gz"
+    if aligned.exists():
+        for j in map(json.loads, gzip.open(aligned, "rt")):
+            r = rows.get((j["task_id"], j["channel"]))
+            if r is not None:
+                r.update({k: v for k, v in j.items() if k.startswith(("as_", "aq_"))})
     return [r for r in rows.values() if not r.get("error")]
 
 

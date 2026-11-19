@@ -1,0 +1,26 @@
+{
+ "threshold": 0.5,
+ "synthetic": {
+  "present": 0.9933,
+  "dropped": 0.9467,
+  "swapped": 0.92,
+  "auc": 0.9957,
+  "n": 450
+ },
+ "real": {
+  "qwen3-8b": {
+   "agree": 0.6215,
+   "kappa": 0.2934
+  },
+  "llama3-8b": {
+   "agree": 0.5949,
+   "kappa": 0.2228
+  },
+  "lexical": {
+   "agree": 0.7731,
+   "kappa": 0.5361
+  },
+  "n": 864,
+  "yes_rate": 0.3947
+ }
+}

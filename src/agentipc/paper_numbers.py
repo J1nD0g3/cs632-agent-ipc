@@ -61,8 +61,9 @@ def main_run(m: Macros) -> None:
         m.add(f"Acc{n}", pct(pool(ch, 3, "acc")))
         m.add(f"Sent{n}", ktok(pool(ch, 3, "total_tokens")))
         m.add(f"Comp{n}", ktok(pool(ch, 3, "prefill_tokens")))
-        m.add(f"Notes{n}", f"{pool(ch, 3, 'judge_recall_notes') * 100:.0f}")
-        m.add(f"Deliv{n}", f"{pool(ch, 3, 'judge_kept_writer_input') * 100:.0f}")
+        m.add(f"Notes{n}", f"{pool(ch, 3, 'as_recall_notes') * 100:.0f}")
+        m.add(f"Deliv{n}", f"{pool(ch, 3, 'as_kept_writer_input') * 100:.0f}")
+        m.add(f"JNotes{n}", f"{pool(ch, 3, 'judge_recall_notes') * 100:.0f}")
         m.add(f"Calls{n}", f"{pool(ch, 3, 'llm_calls'):.1f}")
     for ch in ("A1zc", "A2", "B", "C", "D"):
         m.add(f"Wall{NAME[ch]}", f"{pool(ch, 3, 'wall_s') / pool('A1', 3, 'wall_s'):.1f}")
@@ -93,7 +94,8 @@ def main_run(m: Macros) -> None:
     broke = {key: g["q_reviewer_broke"] for key, g in res.items() if key.endswith("|A2")}
     m.add("PipeBrokeMax", f"{max(broke.values()) * 100:.0f}")
     m.add("PipeBrokeAOne", f"{max(g['q_reviewer_broke'] for key, g in res.items() if key.endswith('|A1')) * 100:.0f}")
-    deliv = {ch: [g["judge_kept_writer_input"] for key, g in res.items() if key.endswith(f"|{ch}")] for ch in ("B", "C", "D")}
+    deliv = {ch: [g["as_kept_writer_input"] for key, g in res.items() if key.endswith(f"|{ch}") and "as_kept_writer_input" in g]
+             for ch in ("B", "C", "D")}
     for ch, v in deliv.items():
         m.add(f"Deliv{NAME[ch]}Min", f"{min(v) * 100:.0f}")
         m.add(f"Deliv{NAME[ch]}Max", f"{max(v) * 100:.0f}")
@@ -473,6 +475,10 @@ def judges(m: Macros) -> None:
         for kind in ("present", "dropped", "swapped"):
             m.add(f"Syn{n}{kind.capitalize()}", f"{syn[key][kind] * 100:.0f}")
     m.add("SynN", syn["n"])
+    av = json.loads((latest("t07_main") / "alignscore_validation.json").read_text())
+    for kind in ("present", "dropped", "swapped"):
+        m.add(f"SynA{kind.capitalize()}", f"{av['synthetic'][kind] * 100:.0f}")
+    m.add("SynAAuc", f"{av['synthetic']['auc']:.3f}")
     ent = json.loads((latest("t07_main") / "entities.json").read_text())["pooled"]
     for ch in CH:
         m.add(f"Ent{NAME[ch]}Notes", f"{ent[f'k3|{ch}']['ent_recall_notes'] * 100:.0f}")
