@@ -12,7 +12,7 @@
 | T07 Main experiments: 5 channels x 2 datasets x 3 k | Experiments | Must | Done | 2026-11-19 | results/t07_main/20261118-212337-5d6c70f | 5400 runs, 0 errors, judged |
 | T08 Sensitivity: k = 8, five agents, zero-copy A1, Qwen3-4B | Experiments | Should | In progress | 2026-11-19 | Bb, 24-turn done | k8, chain4, 4B, k16, pressure, fan-out queued |
 | T09 Analysis and figures | Report | Must | In progress | 2026-11-19 | Figs. 1-4 | paper/figs/out |
-| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, round 2: 3/5, 3/5; style pass done | AlignScore is the fact measure; scope controls added |
+| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, round 4: 3/5, 3/5; E1-E5 added | AlignScore is the fact measure; scope controls added |
 
 ## Key numbers
 | Key | Metric | Result | Source |
@@ -94,3 +94,8 @@
 - 2026-11-19 T10: Style pass in the voice of the style guide, with meaning audits after each step (round 3):
   detector 6/10 -> 4/10 machine-like; body semicolons 35 -> 0; three meaning audits found 8, 6 and 7 issues
   (dropped scopes and intervals, overclaims), all fixed. Still 6 pages.
+- 2026-11-20 T10: Round 4. Reviews (3/5, 3/5) asked for causal controls; ran 4,020 runs on the PRO 6000 (KV 100k):
+  writing control at 4 sizes (the tool call, not the wording, shortens notes and costs accuracy at 4B/8B/32B; not at
+  14B), 32B with normalized paths (files still 8-17 points behind), serving time per channel (zero-copy saves no
+  time; files 1.3-2.0x), k=16 with a 100k cache and 24 calls (neither closes B's 34-point gap), zero-copy with fixed
+  notes (4B loss is from prompt order). Paper revised; meaning audit found 12 issues, all fixed. Still 6 pages.

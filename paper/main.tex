@@ -23,18 +23,19 @@
 \begin{abstract}
 LLM agents that work as a team pass results to each other in one of two ways: they copy the conversation
 into the next agent's prompt, or they share files. This is the message-passing versus shared-memory
-question of operating systems. We test it on a Researcher--Writer--Reviewer pipeline with Qwen3-8B on
-vLLM, changing only the channel and what it carries. We count cost both as tokens sent, which an API bills,
-and as tokens the engine computes after prefix caching. With small payloads, copying is the most accurate
-channel. Zero-copy broadcast, which orders the prompt so the prefix cache reuses the shared history, keeps
-copying's accuracy while computing \nZcRatioMin--\nZcRatioMax{}\% as many tokens. Shared files send
+question of operating systems. We test it on a Researcher--Writer--Reviewer pipeline with Qwen3 models on
+vLLM, changing only the channel and what it carries. We count cost as tokens sent, as prefill the engine
+computes after prefix caching, and as serving time. With small payloads and Qwen3-8B, copying is the most
+accurate channel. Zero-copy broadcast, which orders the prompt so the prefix cache reuses the shared
+history, keeps copying's accuracy while computing \nZcRatioMin--\nZcRatioMax{}\% as much prefill, but
+with each channel served alone, six tasks at a time, it saves no time. Shared files send
 \nFileSentMin--\nFileSentMax{}$\times$ the tokens, because every access is a model call that resends the
-conversation. They also lose information on both sides. Notes written through a tool call are
-\nNotesShorter{}\% shorter, and readers without an index skip them. Once the prompts of concurrent runs
-outgrow the KV cache, zero-copy's savings shrink, and at sixteen questions they vanish. When three parallel
-Researchers split sixteen questions, plain files lose \nGapBKSixteen points and files with an index
-\nGapCKSixteen. A 4B model loses \nPSizeFourGapC points with files even when they have an index, and
-\nPSizeFourGapAZc with zero-copy ordering.
+conversation. Served alone, they take up to \nRFourTimeB{}$\times$ the time and generate up to
+\nRFourGenB{}$\times$ the tokens. They also lose information on both sides. With the instruction's wording
+matched, writing notes through a tool call costs facts and accuracy at \nRFourWSigWord of \nRFourSizesWord model sizes, and readers
+without an index skip the notes. When three parallel Researchers split sixteen questions, plain files lose
+\nGapBKSixteen points, and neither a larger KV cache nor twice the tool budget closes the gap. A 4B model
+loses \nPSizeFourGapAZc points with zero-copy ordering.
 \end{abstract}
 
 \maketitle
@@ -60,27 +61,27 @@ because its prefix cache reuses the KV of a repeated prefix~\cite{vllm,sglang}.
 This paper presents a controlled comparison of inter-agent channels. We keep the task, the model, the
 roles, and their order fixed, and change only how the Researcher's and Writer's results reach the next
 agent, over five channels (\S\ref{sec:channels}). Our key observation is that \emph{cost has to be counted
-two ways}, because the channels trade one cost for another. Specifically, at three questions per task
-shared files send \nSentRatioB{}$\times$ the tokens that copying the history does, the cost an API bills.
-Yet the engine computes only \nCompRatioB{}$\times$ as much prefill, the cost a self-hosted deployment pays.
-Copying the history with the shared part first (zero-copy broadcast) cuts the tokens computed by
-\nZcCut{}\% at copying's accuracy. Our second observation is that these savings depend on the cache
-and the model as well as on the channel. They shrink or vanish when the agents' prompts no longer fit the
-KV cache, and the file channels need a model that uses tools well.
+three ways}, because the channels trade one cost for another. Specifically, at three questions per task
+shared files send \nSentRatioB{}$\times$ the tokens that copying the history does, which is what an API
+bills when it does not discount cached input. Yet the engine computes only \nCompRatioB{}$\times$ as much
+prefill. Serving time, measured with each channel served alone on one GPU at six tasks at a time, ranks
+the channels as tokens sent does. Plain files take \nRFourTimeB{}$\times$ broadcast's time, and their
+agents generate \nRFourGenB{}$\times$ the tokens. Copying the history with the shared part
+first (zero-copy broadcast) cuts prefill by \nZcCut{}\% at copying's accuracy but takes
+\nRFourTimeAZc{}$\times$ the time. Our second observation is that these results depend on the cache and the
+model as well as on the channel. Prefill savings shrink when the agents' prompts no longer fit the KV cache,
+and the file channels need a model that uses tools well.
 
 The challenge is that changing the channel also changes what reaches the next agent. We therefore add
 controls that change one without the other, for example by replaying the same notes into every channel.
 We make three contributions:
 \begin{itemize}
-\item We build a testbed that varies the inter-agent channel, with controls that separate what a channel
-carries from how it carries it (\S\ref{sec:method}).
+\item We build a testbed that varies the inter-agent channel, with such controls (\S\ref{sec:method}).
 \item We measure five channels on two multi-hop QA benchmarks with \nMainTasks paired tasks per condition,
-and find where each one loses information (\S\ref{sec:results}).
+in tokens, prefill, and serving time, and find where each one loses information (\S\ref{sec:results}).
 \item We vary payload size, pipeline length, tool budget, batched reads, and model size
-(\S\ref{sec:sensitivity}), and turn the comparison into rules for when each channel is the right choice
-(\S\ref{sec:conclusion}).
+(\S\ref{sec:sensitivity}), and derive rules for choosing a channel (\S\ref{sec:conclusion}).
 \end{itemize}
-We propose no new protocol or engine change. Zero-copy broadcast needs only a prompt order.
 
 \section{Five Channels}
 \label{sec:channels}
@@ -98,17 +99,19 @@ The pipeline has three agents. The \emph{Researcher} reads the task's documents 
 each question needs. The \emph{Writer} drafts a short answer and evidence per question. The \emph{Reviewer}
 checks the draft and produces the final answers. Every Researcher receives the same user message, which
 holds the questions and all documents. Its instructions differ in where its notes go (a reply, or files
-written with a \texttt{write\_file} tool) and in what each channel asks of it. The channels differ in
+written with a \texttt{write\_file} tool) and in what each channel asks of it, and
+\S\ref{sec:results} separates the two for B. The channels differ in
 what the Writer and the Reviewer receive (Figure~\ref{fig:channels}). Zero-copy broadcast is broadcast with
 a different prompt order, so we count it as a variant of broadcast.
 
 \paragraph{A1, broadcast.} Every earlier message is copied into the next prompt: the task with its documents,
 the Researcher's notes, and, for the Reviewer, the draft. This is AutoGen's group chat~\cite{autogen}.
 
-\paragraph{A1-zc, zero-copy broadcast.} The same content as A1, but the prompt starts with the shared history
-and ends with the role's instruction, so consecutive agents share a prefix and the engine reuses its KV
-instead of computing it again. Only the order changes. It avoids recomputing the shared history, but every
-token is still sent.
+\paragraph{A1-zc, zero-copy broadcast.} The same messages as A1, but each prompt starts with the shared
+history and ends with the role's instruction, which moves out of the system prompt. Consecutive agents then
+share a prefix, and the engine reuses its KV instead of computing it again. Every token is still sent. The
+new order also changes what agents write. At $k=3$ the Researcher's notes grow from \nNotesCharsAOne to
+\nNotesCharsAZc characters.
 
 \paragraph{A2, pipe.} Each agent receives only the previous agent's output: the Writer gets the notes, the
 Reviewer gets the draft. ChatDev's chat chain works this way~\cite{chatdev}.
@@ -132,50 +135,49 @@ what the handoff lacks.
 2WikiMultihopQA~\cite{2wiki}, the benchmarks prior agent-communication studies use~\cite{optima,pact}. Each
 question comes with ten paragraphs and the sentences that support its answer. A task bundles $k$ questions
 so the amount passed between agents grows with $k$. Its documents are the union of their paragraphs (about
-30 at $k=3$). We drop yes/no questions and questions with fewer than two supporting sentences, leaving
-\nHotpotUsable and \nWikiUsable dev questions, and draw \nMainTasks tasks per dataset and $k \in \{1,3,5\}$.
+30 at $k=3$). We drop yes/no questions and questions with fewer than two supporting sentences and draw \nMainTasks tasks per dataset and $k \in \{1,3,5\}$.
 Every channel runs the same tasks, so comparisons are paired.
 
 \paragraph{Model and serving.} Qwen3-8B~\cite{qwen3} with thinking disabled, greedy decoding, on vLLM
 v0.33.0 with prefix caching, one RTX 3090 per server (\nMaxLen-token context). Tool calls use vLLM's
 function-calling parser. Each server runs six tasks at a time, interleaved across channels, and its KV cache
-holds \nBigKv tokens. Each run gets its own cache namespace (\texttt{cache\_salt}), so a run reuses only its
-own prefixes and channels never share cached KV. The cache and model-size runs of \S\ref{sec:sensitivity} use
-one RTX PRO 6000 per server with a fixed KV size.
+holds \nBigKv tokens. Each run gets its own cache namespace (\texttt{cache\_salt}), so channels never share
+cached KV. The timing, cache, and model-size runs use one RTX PRO 6000 per server
+and a 100k-token KV cache unless stated.
 
 \paragraph{Metrics.} \emph{Accuracy} is the share of questions whose final answer matches the gold answer
 (exact match, F1 $\ge 0.8$, or the gold answer inside a short prediction). \emph{Tokens sent} is the sum of
-prompt and completion tokens over all calls, the quantity an API bills. \emph{Tokens computed} counts
-prefill only, the prompt tokens the engine did not serve from its cache. \emph{Fact delivery} asks which
-supporting sentences a text states, scored with AlignScore~\cite{alignscore}, a RoBERTa-large alignment
-model, at its 0.5 threshold. We score the Researcher's output and what the Writer received, and call the
+prompt and completion tokens over all calls. It is what an API bills without caching and an upper bound
+when the API discounts cached input. \emph{Tokens computed} counts prefill only, the prompt tokens the engine
+did not serve from its cache. \emph{Serving time} is the wall time of a run that serves one channel alone
+on one GPU, six tasks at a time. \emph{Fact delivery} asks which
+supporting sentences a text states, scored with AlignScore~\cite{alignscore} at its 0.5
+threshold. We score the Researcher's output and what the Writer received, and call the
 share of the output's facts that the Writer received \emph{delivery}. In message channels the Writer
 receives the copied notes, so delivery is complete by construction. In file channels it receives the text
 of the files it read, source documents included. We attribute each wrong answer to one stage. If the
 draft answer was right, we charge the Reviewer. Otherwise we charge the Researcher if its output misses a
 supporting fact, delivery if the Writer did not receive one, and the Writer if it had them all. The split is
 coarse, since \nRightMissAOne{}\% of broadcast's correct answers also come from notes that miss a supporting
-fact. \emph{Latency} is wall time per task under the shared load of six tasks per server.
+fact.
 
-\paragraph{Validating fact delivery.} We checked the measures on \nSynN pairs built from the task documents,
-with labels known by construction: a supporting sentence kept, removed, or with its key entity replaced.
-AlignScore separates them with an AUC of \nSynAAuc, while Qwen3-8B used as a judge accepts
-\nSynQAcceptDropped{}\% of the removed sentences. These synthetic pairs hold the sentence verbatim, and real
-notes paraphrase. On real outputs AlignScore is stricter than the judge and agrees with it only moderately
-($\kappa$ = \nAsQKappa). We therefore report AlignScore and treat fact-level numbers as approximate. As a
-check that needs no model, we also match the entities of each question's gold chain (the subjects and objects of 2Wiki's evidence
-triples, the titles of HotpotQA's supporting paragraphs) by exact string, like answer-string recall in
-retrieval~\cite{dpr}. This check agrees that the Researcher's output keeps fewer of them in file channels.
-It credits D's handoffs, which name the entities without stating the facts, with
-\nEntDDeliv{}\% delivery where AlignScore finds about half.
+\paragraph{Validating fact delivery.} On \nSynN pairs built from the task documents, with a supporting
+sentence kept, removed, or with its key entity replaced, AlignScore separates the labels with an AUC of
+\nSynAAuc, while Qwen3-8B used as a judge accepts \nSynQAcceptDropped{}\% of the removed sentences. Real
+notes paraphrase, and on them AlignScore agrees only moderately with the judge ($\kappa$ = \nAsQKappa), so
+we treat fact-level numbers as approximate. An exact match of each question's gold-chain entities, like
+answer-string recall in retrieval~\cite{dpr}, agrees that notes in file channels keep fewer of the gold
+entities. It
+credits D's handoffs, which name the entities without stating the facts, with \nEntDDeliv{}\% delivery
+where AlignScore finds about half.
 
 \paragraph{Harness.} An agent may make up to 12 tool calls. If it stops without leaving its output file, it
 gets one call that must write it, since frameworks take an agent's last message as its output. At $k=3$
 this rescue is used in \nForcedMin--\nForcedMax{}\% of the runs of B's Writer and of the Reviewers of B
 and C. Counting every rescued run as wrong would leave B, C, and D at \nStrictMin--\nStrictMax{}\%
 accuracy. The Researcher writes but does not read, since its documents are already in its prompt. We report
-95\% bootstrap intervals over tasks and paired differences against A1 unless the text names another reference. A range in parentheses after a
-difference is that interval. Each task runs once per channel.
+95\% bootstrap intervals over tasks and paired differences against A1 unless stated. A range in parentheses after a difference is that interval, and counts of significant settings
+are not corrected for multiple comparisons. Each task runs once per channel.
 
 \section{Results}
 \label{sec:results}
@@ -185,8 +187,8 @@ difference is that interval. Each task runs once per channel.
 \includegraphics[width=\textwidth]{\figdir/fig_tradeoff.pdf}
 \caption{Accuracy against cost per task, $k=3$, both datasets pooled (300 tasks per channel; bars are 95\%
 intervals). Counted by tokens sent (a), copying the history is the accurate choice and files are the
-expensive one. Counted by tokens computed (b), zero-copy broadcast keeps that accuracy at a pipe's cost.
-Labels in (b) give the share of the tokens sent that the engine served from its prefix cache.}
+expensive one. Counted by tokens computed (b), zero-copy broadcast keeps that accuracy at a pipe's prefill.
+Labels in (b) give the share of prompt tokens that the engine served from its prefix cache.}
 \label{fig:tradeoff}
 \end{figure*}
 
@@ -195,41 +197,45 @@ the questions, more than any other channel (Figure~\ref{fig:tradeoff}). Zero-cop
 broadcast in every dataset and $k$, and no difference is significant. Under exact match it is up to
 \nZcEmGapMax points lower on 2Wiki. It computes \nCompAZc tokens per task to broadcast's \nCompAOne, close
 to the pipe's \nCompATwo, because the Writer and the Reviewer reuse the documents the Researcher
-already prefilled. Its tokens sent stay those of broadcast (\nSentAZc), so the gain is for self-hosted
-serving or APIs that discount cached input.
+already prefilled. Its tokens sent stay those of broadcast (\nSentAZc), so the gain is in prefill alone.
 
 \paragraph{A pipe is cheap but loses at review.} The pipe sends the fewest tokens (\nSentATwo) but answers
 \nGapATwoMin--\nGapATwoMax points fewer questions than broadcast, significantly in \nGapATwoSigWord of six
-settings. Its losses come at the end. The Reviewer sees only the draft and changes right answers to wrong
+settings. The Reviewer sees only the draft and changes right answers to wrong
 ones in up to \nPipeBrokeMax{}\% of the questions. In broadcast, where it also sees the notes and
-documents, it does so in at most \nPipeBrokeAOne{}\% (Figure~\ref{fig:loss}b). One input the pipe lacks is
-the documents. On \nScopeATwoDN tasks, a pipe that also passes them cuts the answers its Reviewer breaks
-from \nScopeATwoBroke{}\% to \nScopeATwoDBroke{}\% and answers \nScopeATwoDVsATwoAbs points more than the
-pipe (\nScopeATwoDVsATwoLo to \nScopeATwoDVsATwoHi). It still trails broadcast (\nScopeATwoDVsAOne
-points, \nScopeATwoDVsAOneLo to \nScopeATwoDVsAOneHi), yet computes \nScopeATwoDCompRatio{}$\times$
-broadcast's tokens.
+documents, it does so in at most \nPipeBrokeAOne{}\% (Figure~\ref{fig:loss}b). On \nScopeATwoDN tasks, a pipe that
+also passes the documents answers \nScopeATwoDVsATwoAbs points more than the pipe (\nScopeATwoDVsATwoLo to
+\nScopeATwoDVsATwoHi). It still trails broadcast (\nScopeATwoDVsAOne points, \nScopeATwoDVsAOneLo to
+\nScopeATwoDVsAOneHi) at \nScopeATwoDCompRatio{}$\times$ broadcast's prefill.
 
 \paragraph{Files cost more tokens.} B and C send \nSentRatioB{}$\times$ and \nSentRatioC{}$\times$ the
 tokens of broadcast at $k=3$, and \nFileSentMin--\nFileSentMax{}$\times$ across settings. Their pipelines
 make \nCallsB and \nCallsC model calls to broadcast's three, and each call resends the conversation. The
 cache absorbs most of it (Figure~\ref{fig:tradeoff}b), so B and C compute \nCompRatioB{}$\times$ the tokens of broadcast. D's handoffs
-replace most reads, so it sends only \nSentRatioD{}$\times$ and computes \nCompRatioD{}$\times$. Because
-the calls are sequential, file channels are also slower, taking \nWallFileMin--\nWallFileMax{}$\times$
-broadcast's \nWallAOne\,s per task.
+replace most reads, so it sends only \nSentRatioD{}$\times$ and computes \nCompRatioD{}$\times$.
+
+\paragraph{Prefill savings buy no serving time.} We served each channel alone on one GPU with Qwen3-8B,
+six tasks at a time. Broadcast takes \nRFourTimeAOne\,s for all \nRFourAloneN three-question tasks.
+Zero-copy broadcast takes \nRFourTimeAZc{}$\times$ as long, and its agents generate \nRFourGenAZc{}$\times$
+the completion tokens. B, C, and D take \nRFourTimeB{}$\times$, \nRFourTimeC{}$\times$, and
+\nRFourTimeD{}$\times$ the time and generate \nRFourGenB{}$\times$, \nRFourGenC{}$\times$, and
+\nRFourGenD{}$\times$ the tokens. They also make more model calls, in the same order, so for files we cannot separate generation from sequential
+calls. Only the pipe is faster (\nRFourTimeATwo{}$\times$, with \nRFourGenATwo{}$\times$ the tokens). At
+this load the channels rank by time as by tokens sent.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{\figdir/fig_loss.pdf}
 \caption{Where information is lost, $k=3$, both datasets pooled. (a) Shares of all supporting facts that
 the Researcher's output states and that reached the Writer (AlignScore). The second bar is the first times
-delivery, the share of the output's facts that reached the Writer, which \S\ref{sec:results} reports.
+delivery, the share of the output's facts that reached the Writer.
 (b) Wrong answers by stage at fault; an answer is
 charged to the Researcher whenever its output misses any supporting fact, which favors that stage.}
 \label{fig:loss}
 \end{figure*}
 
 \paragraph{Files lose information when written and when read.} Given the same questions and documents,
-the Researcher writes \nNotesShorter{}\% shorter notes at $k=3$ when they go to files through a tool call.
+the Researcher writes \nNotesShorter{}\% shorter notes at $k=3$ when they go to files.
 In B its notes state \nNotesB{}\% of the supporting facts, where broadcast's state \nNotesAOne{}\%
 (Figure~\ref{fig:loss}a). On the reading side, the files B's Writer reads state only
 \nDelivBMin--\nDelivBMax{}\% of the facts in the Researcher's notes. The file list does not say which file
@@ -237,30 +243,36 @@ holds the notes, so \nDocReadsB{}\% of B's Writer reads go to source documents, 
 tasks it never opens the notes. In D the Writer trusts the handoff, opens even fewer files, and receives
 \nDelivDMin--\nDelivDMax{}\% of the notes' facts. The index names the notes. C's Writer skips them in
 \nNoNotesC{}\% of the tasks, and delivery rises to \nDelivCMin--\nDelivCMax{}\%. In accuracy, C comes
-within \nPooledGapC points of broadcast at $k=3$ with both datasets pooled, and within \nGapCMax in any one
+within \nPooledGapC points of broadcast at $k=3$ pooled, and within \nGapCMax in any one
 setting, while B trails it by \nGapBMin--\nGapBMax points in each of the six settings. C is significantly above B in \nCoverBSigWord of
 six settings.
 
-\paragraph{Giving files the documents.} Putting the documents in the prompts of B's later agents as well
+\paragraph{Giving files the documents.} Putting the documents in the prompts of B's later agents too
 leaves B's accuracy unchanged on \nScopeBDN tasks (\nScopeBDVsB points, \nScopeBDVsBLo to \nScopeBDVsBHi)
-at \nScopeBDSentRatio{}$\times$ its tokens. Missing sources therefore do not explain the file channels'
-loss, which lies in their notes.
+at \nScopeBDSentRatio{}$\times$ its tokens. Missing sources therefore do not explain the
+loss.
 
-\paragraph{The tool call, not the file, shortens the notes.} In A1w the Researcher writes its notes with
-\texttt{write\_file} exactly as in B, and the Writer and Reviewer receive them copied, as in A1, with the
-documents. On a subset of \nWN paired tasks, its notes are as short as B's (\nWChars vs \nWCharsB
-characters) and state \nWNotes{}\% of the supporting facts, where B's state \nWNotesB{}\% and A1's
-\nWNotesAOne{}\%. A1w answers \nWAcc{}\%, \nWGapAOne points below broadcast (\nWGapAOneLo to
-\nWGapAOneHi). Writing the result as a tool-call argument therefore costs accuracy by itself. This cost is
-a large part of B's loss but, by a small margin, not all of it, since A1w stays \nWOverB points above B
-(\nWOverBLo to \nWOverBHi).
+\paragraph{Writing through a tool call loses facts.} B's Researcher instruction differs from A1's in wording
+as well as in the tool. Two controls on the \nRFourEightWMinusRN tasks of the model-size runs
+(\S\ref{sec:sensitivity}) separate the two. In A1r the Researcher gets B's instruction with only its
+destination sentences changed to a reply, and in A1w it gets B's instruction and writes with
+\texttt{write\_file}. Both copy the notes forward as in broadcast.
+A1r's notes state as many supporting facts as A1's at every size (\nRFourEightNotesR{}\% vs
+\nRFourEightNotesAOne{}\% at 8B), and A1r is as accurate as A1 except at 4B, where it answers
+\nRFourFourRMinusAOne points more. The wording thus costs no accuracy. A1w's notes state about as many facts as
+B's (\nRFourEightNotesW{}\% vs \nRFourEightNotesB{}\% at 8B). At 4B, 8B, and 32B that is fewer than A1r's,
+and A1w changes accuracy relative to A1r by \nRFourFourWMinusR points (\nRFourFourWMinusRLo to
+\nRFourFourWMinusRHi), \nRFourEightWMinusR (\nRFourEightWMinusRLo to \nRFourEightWMinusRHi), and
+\nRFourThirtyTwoWMinusR (\nRFourThirtyTwoWMinusRLo to \nRFourThirtyTwoWMinusRHi). At 14B the tool call
+keeps the facts (\nRFourFourteenNotesW{}\% vs \nRFourFourteenNotesR{}\%) and A1w matches A1r
+(\nRFourFourteenWMinusR, \nRFourFourteenWMinusRLo to \nRFourFourteenWMinusRHi). Writing through a tool
+call, not the wording, costs accuracy whenever it drops facts from the notes.
 
 \paragraph{Reading the same notes.} To measure reading alone we replayed broadcast's Researcher output,
 unchanged, into every channel, as one file \texttt{notes.md} for B and C. Given the same notes, B and C
 both answer \nRepBGap points fewer questions than broadcast on \nRepN tasks (\nRepBGapLo to \nRepBGapHi),
 and the pipe \nRepATwoGap fewer. When the notes are a single, clearly named file, the index does not help.
-C's Writer reads the index, which also lists thirty source documents, in \nRepIndexC{}\% of the tasks. It
-opens the notes less often than B's Writer (\nRepOpenC{}\% vs \nRepOpenB{}\% of tasks) and receives fewer
+C's Writer, whose index also lists thirty source documents, opens the notes less often than B's (\nRepOpenC{}\% vs \nRepOpenB{}\% of tasks) and receives fewer
 of their facts (\nRepCDeliv{}\% vs \nRepBDeliv{}\%).
 
 \section{Sensitivity}
@@ -275,74 +287,76 @@ pooled). $k=16$ uses three parallel Researchers.}
 \end{figure*}
 
 \paragraph{Larger payloads.} At eight questions per task each prompt holds about 80 paragraphs, so six
-concurrent runs no longer fit the server's \nBigKv-token KV cache together. Zero-copy broadcast then computes
-\nCompAZcKEight{}$\times$ the prefill of broadcast, up from \nCompAZcKThree{}$\times$ at three questions.
-B and C compute more than broadcast (\nCompBKEight{}$\times$ and \nCompCKEight{}$\times$), because the
-prefixes they resend no longer stay cached between calls (Figure~\ref{fig:scaling}a). The pipe is now the
-cheap channel that loses little (\nGapATwoKEight points). At sixteen questions, which we split among three
-parallel Researchers, zero-copy broadcast saves nothing (\nCompAZcKSixteen{}$\times$). The pipe matches
-broadcast's accuracy within \nGapATwoKSixteen point at \nCompATwoKSixteen{}$\times$ its compute. Plain
-files collapse, with B answering \nGapBKSixteen points fewer questions than broadcast, while C loses
-\nGapCKSixteen and D \nGapDKSixteen (Figure~\ref{fig:scaling}b).
+concurrent runs no longer fit the RTX 3090 servers' \nBigKv-token KV cache together. Zero-copy broadcast then
+computes \nCompAZcKEight{}$\times$ broadcast's prefill, up from \nCompAZcKThree{}$\times$ at three
+questions. B and C compute more than broadcast (\nCompBKEight{}$\times$ and \nCompCKEight{}$\times$),
+because the prefixes they resend no longer stay cached between calls (Figure~\ref{fig:scaling}a). The pipe,
+still cheap, now loses little (\nGapATwoKEight points). At sixteen questions, with three
+parallel Researchers, zero-copy broadcast saves nothing (\nCompAZcKSixteen{}$\times$). The pipe
+matches broadcast's accuracy within \nGapATwoKSixteen point at \nCompATwoKSixteen{}$\times$ its compute.
+Plain files collapse. B answers \nGapBKSixteen points fewer questions than broadcast, C
+\nGapCKSixteen fewer, and D \nGapDKSixteen (Figure~\ref{fig:scaling}b).
 
-Cache sharing among concurrent runs explains the lost savings but not the accuracy collapse. With two runs
-per server instead of six (\nPressNTwo sixteen-question tasks), B computes \nPressBCTwo of its own tokens sent
-instead of \nPressBCSix, zero-copy broadcast \nPressAZcCTwo instead of \nPressAZcCSix, and accuracy changes
-by at most \nPressAccMax points. A larger cache has the same effect. On an RTX PRO 6000 we reran
-\nPKvThirtyFiveN of the eight-question tasks changing only the KV cache. At 35k tokens, as on the
-RTX 3090 servers, zero-copy broadcast computes \nPKvThirtyFiveCompAZc{}$\times$ broadcast's prefill and B and C
-\nPKvThirtyFiveCompB{}$\times$ and \nPKvThirtyFiveCompC{}$\times$. At 100k tokens these fall to
-\nPKvHundredCompAZc{}$\times$, \nPKvHundredCompB{}$\times$, and \nPKvHundredCompC{}$\times$, and 400k changes nothing
-further. Accuracy moves by at most \nPKvAccShiftMax points across the three sizes.
+\paragraph{The cache does not explain the collapse.} A larger cache brings the savings back, fully at
+eight questions and partly at sixteen.
+At eight questions, changing only the KV cache on \nPKvThirtyFiveN tasks, zero-copy broadcast computes
+\nPKvThirtyFiveCompAZc{}$\times$ broadcast's prefill at 35k tokens and \nPKvHundredCompAZc{}$\times$ at
+100k, while accuracy moves by at
+most \nPKvAccShiftMax points. At sixteen questions with a 100k-token cache (\nRFourKSixteenGapBN tasks),
+zero-copy broadcast computes \nRFourKSixteenCompAZc{}$\times$ broadcast's prefill and B
+\nRFourKSixteenCompB{}$\times$, against \nCompAZcKSixteen{}$\times$ and \nCompBKSixteen{}$\times$ on the same tasks with the RTX 3090
+servers' \nBigKv-token cache. The accuracy gaps stay. B trails
+broadcast by \nRFourKSixteenGapB points (\nRFourKSixteenGapBLo to \nRFourKSixteenGapBHi), D by
+\nRFourKSixteenGapD (\nRFourKSixteenGapDLo to \nRFourKSixteenGapDHi), and C by \nRFourKSixteenGapC
+(\nRFourKSixteenGapCLo to \nRFourKSixteenGapCHi), while the pipe stays within \nRFourKSixteenGapATwo
+points (\nRFourKSixteenGapATwoLo to \nRFourKSixteenGapATwoHi).
 
-\paragraph{Parallel writers race on shared files.} Part of B's collapse at sixteen questions happens before
-anyone reads. Three Researchers writing to one workspace at the same time pick the same file name. In
-\nClashB{}\% of B's tasks at least two of them write the same path, and the later write replaces the earlier
-notes. B's notes keep \nLargeClashNotes{}\% of the supporting facts in the \nLargeClashN tasks with a clash
-and \nLargeNoClashNotes{}\% in the \nLargeNoClashN without one. The race is not the whole loss. B
-answers \nLargeClashAcc{}\% of those tasks' questions with a clash and \nLargeNoClashAcc{}\% without one, and its
-Reviewer also runs out of budget. In C no two Researchers ever wrote the same path. C differs in two ways
-that can prevent the clash, an instruction to head each file with its questions and an index that lists
-who wrote what. Message channels cannot race, because each agent's output is its own message. To isolate
-the parallel writers, we ran three Researchers on \nFanN three-question tasks. B's writers clash in
-\nFanClashB{}\% of them, and B loses \nFanBDiffAbs points relative to one Researcher. Broadcast also loses
-\nFanAOneDiffAbs with three Researchers, so B's own share of the change is \nFanDiD{} points
-(\nFanDiDLo{} to \nFanDiDHi{}), not significant at this size. D's writers clash about as often, but its
-handoffs still carry each Researcher's findings, and D changes by \nFanDDiff{} points (\nFanDLo{} to \nFanDHi{}).
+\paragraph{A larger tool budget does not close the gap.} At $k=16$ B's Reviewer hits the 12-call budget in
+\nLargeBReviewerLimit{}\% of runs, up from
+\nKThreeBReviewerLimit{}\% at $k=3$. Yet in the separate 100k-cache runs, 24 calls change B's accuracy by only
+\nRFourBTwentyFour points (\nRFourBTwentyFourLo to \nRFourBTwentyFourHi, \nRFourBTwentyFourN tasks), and
+B's Reviewer still uses all 24 in \nRFourBTwentyFourRevLimit{}\% of runs (\nRFourBTwelveRevLimit{}\% with
+12).
 
-\paragraph{A fourth agent.} A Fact-checker before the Reviewer makes broadcast compute \nChainAOneComp{}\%
-more, but zero-copy broadcast only \nChainAZcComp{}\% more, as the new agent reuses the cached history. On
+\paragraph{Parallel writers race on shared files.} What remains is specific to files at sixteen questions,
+where three Researchers write in parallel and later agents search a larger workspace. Writing at the
+same time, the Researchers pick the same file name. In \nClashB{}\% of B's tasks at least two write the same path, and the later write replaces
+the earlier notes. B's notes keep \nLargeClashNotes{}\% of the supporting facts in the \nLargeClashN tasks
+with a clash and \nLargeNoClashNotes{}\% in the \nLargeNoClashN without one. The race we see is not the
+whole loss, since B answers \nLargeClashAcc{}\% of the questions with a clash and \nLargeNoClashAcc{}\%
+without one. In C, whose Researchers head each file with its questions and see an index, no two wrote the
+same path. With three Researchers on \nFanN
+three-question tasks, B's writers clash in \nFanClashB{}\%, but B's accuracy change from one to three
+Researchers, less broadcast's, is \nFanDiD{} points (\nFanDiDLo{} to \nFanDiDHi{}).
+
+\paragraph{A fourth agent.} A Fact-checker before review adds \nChainAOneComp{}\% to broadcast's
+prefill but \nChainAZcComp{}\% to zero-copy broadcast's, which it reuses. On
 \nChainN tasks it raises the pipe from \nChainATwoAccRef{}\% to \nChainATwoAcc{}\% (\nChainATwoLo{} to
-\nChainATwoHi{}), although in the pipe the Fact-checker also sees only the draft. It lowers plain files
-from \nChainBAccRef{}\% to \nChainBAcc{}\% (\nChainBLo{} to \nChainBHi{}). The others move at most \nChainOtherMax point.
+\nChainATwoHi{}) and lowers B from \nChainBAccRef{}\% to \nChainBAcc{}\% (\nChainBLo{} to
+\nChainBHi{}).
 
 \paragraph{Cheaper reads make the Writer skip the notes.} A \texttt{read\_files} tool that reads several
-files in one call, the agent's \texttt{readv}, cuts B's calls from \nBbCallsB to \nBbCalls and its tokens by
-\nBbTokCut{}\%. But on \nBbN paired tasks it lowers accuracy from \nBbAccB{}\% to \nBbAcc{}\% ($-$\nBbAccHi to
-$-$\nBbAccLo). Given a cheap bulk read, the Writer reads the sources itself
-(\nBbDocReads{}\% of reads) and in \nBbNoNotes{}\% of the tasks never opens the notes.
+files in one call, the agent's \texttt{readv}, cuts B's calls from \nBbCallsB to \nBbCalls. But on \nBbN
+paired tasks it lowers accuracy from \nBbAccB{}\% to \nBbAcc{}\% ($-$\nBbAccHi to $-$\nBbAccLo). Given a
+cheap bulk read, the Writer reads the sources (\nBbDocReads{}\% of reads) and in \nBbNoNotes{}\% of
+the tasks never opens the notes.
 
-\paragraph{Model size.} On the PRO 6000, with the cache fixed at 100k tokens, we varied the Qwen3 model
-from 4B to 32B on \nPSizeEightN three-question tasks. Files trail broadcast at every size, B by
-\nPSizeFourteenGapB--\nPSizeThirtyTwoGapB points and C by \nPSizeEightGapC--\nPSizeFourGapC. Zero-copy ordering
-costs only the 4B model (\nPSizeFourGapAZc points, \nPSizeFourGapAZcLo to \nPSizeFourGapAZcHi). The pipe loses
-only with Qwen3-8B (\nPSizeEightGapATwo points, \nPSizeEightGapATwoLo to \nPSizeEightGapATwoHi) and stays
-within \nPSizeFourGapATwo points at the other sizes, so at three questions its loss at review in
-\S\ref{sec:results} is specific to that model. In B and D, Qwen3-32B's Writer or Reviewer writes to a prefixed path such
-as \texttt{workspace/final.md}, and in \nPRescueThirtyTwoBMoved and \nPRescueThirtyTwoDMoved of \nPSizeThirtyTwoN runs
-the harness then finds no answer, so B and D trail broadcast by \nPSizeThirtyTwoGapB and \nPSizeThirtyTwoGapD
-points. Reading those files gives \nPRescueThirtyTwoB{}\% and \nPRescueThirtyTwoD{}\% against
-\nPSizeThirtyTwoAccAOne{}\%. In C the Researchers also prefixed paths (\nPSlipThirtyTwoCResearcher runs), but with the index
-no Writer or Reviewer did.
-Shorter notes are not universal. At 4B, 8B, and 32B file channels' notes state
-\nPSizeFileNotesMin--\nPSizeFileNotesMax\% of the supporting facts against \nPSizeAOneNotesMin--\nPSizeAOneNotesMax\% in
-broadcast, but at 14B B's notes state \nPSizeFourteenNotesB\% against \nPSizeFourteenNotesAOne\%, yet B
-trails by \nPSizeFourteenGapB.
-
-\paragraph{Tool budget.} With 24 tool calls instead of 12, B and C change accuracy by at most
-\nTwFourAccMax points (\nTwFourN paired tasks per channel, $k=3$). At $k=16$ the 12-call budget binds harder (B's Reviewer hits
-it in \nLargeBReviewerLimit{}\% of runs, up from \nKThreeBReviewerLimit{}\% at $k=3$), so B's collapse
-there is a result for this budget.
+\paragraph{Model size.} With the cache at 100k tokens, we varied the Qwen3 model from 4B to 32B on
+\nPSizeEightN three-question tasks. Files trail broadcast at every size, B by
+\nPSizeFourteenGapB--\nPSizeFourGapB points and C by \nPSizeEightGapC--\nPSizeFourGapC, counting Qwen3-32B
+with the path fix below. Qwen3-32B often writes to paths such as
+\texttt{workspace/final.md}, so we reran it with a leading \texttt{workspace/} treated as the root. B, C,
+and D then trail the first run's broadcast by \nRFourNormBGap (\nRFourNormBGapLo to \nRFourNormBGapHi), \nRFourNormCGap
+(\nRFourNormCGapLo to \nRFourNormCGapHi), and \nRFourNormDGap points (\nRFourNormDGapLo to
+\nRFourNormDGapHi), close to a rescore of the \nPRescueThirtyTwoBMoved B and \nPRescueThirtyTwoDMoved D runs
+(of \nPSizeThirtyTwoN) whose answer the first harness missed. The pipe loses only with Qwen3-8B (\nPSizeEightGapATwo points,
+\nPSizeEightGapATwoLo to \nPSizeEightGapATwoHi) and stays within \nPSizeFourGapATwo points at the other
+sizes, so its loss at review is specific to that model. Zero-copy ordering costs only
+the 4B model (\nPSizeFourGapAZc points, \nPSizeFourGapAZcLo to \nPSizeFourGapAZcHi). The loss is not the
+longer notes. With broadcast's notes replayed into both channels, zero-copy still loses
+\nRFourZcReplayFour points at 4B (\nRFourZcReplayFourLo to \nRFourZcReplayFourHi) and
+\nRFourZcReplayEight at 8B (\nRFourZcReplayEightLo to \nRFourZcReplayEightHi). At 4B it comes from the
+prompt order the Writer and Reviewer see.
 
 \paragraph{Run-to-run noise.} Greedy decoding on a batching server is not deterministic. Two channels whose
 Researcher receives the identical prompt produce identical output in \nSamePrompt{}\% of tasks. Rerunning A1
@@ -353,8 +367,7 @@ $\pm$\nAAWorst points, and the same B--A1 gap (\nAAGapRepeat vs \nAAGapMain poin
 
 \paragraph{Agent communication.} AgentPrune, G-Designer, and AgentDropout prune the communication graph, and
 Optima trains agents to send shorter messages~\cite{agentprune,gdesigner,agentdropout,optima}. PACT compares
-what a message should contain~\cite{pact}. They change who talks or what is said over a fixed channel. We
-change the channel and count what the engine computes. Blackboard designs give agents a shared
+what a message should contain~\cite{pact}. They keep the channel fixed, and we change it. Blackboard designs give agents a shared
 state~\cite{lbmas,blackboard-ds}. MAST catalogs inter-agent failures~\cite{mast}, and our stage attribution
 measures one of them, ignored input.
 
@@ -362,28 +375,32 @@ measures one of them, ignored input.
 prefix~\cite{vllm,sglang}, and Prompt Cache reuses attention states of prompt modules~\cite{promptcache}.
 Parrot and KVFlow schedule multi-agent workflows so shared prefixes stay cached~\cite{parrot,kvflow}, and
 KVCOMM and TokenDance reuse KV across agents whose prefixes differ by changing the
-engine~\cite{kvcomm,tokendance}. Zero-copy broadcast is the simplest KV reuse across agents, by prompt order alone. TOAP
-compares passing a reference, a summary, or a KV cache~\cite{toap}, not channels with tool-mediated files.
+engine~\cite{kvcomm,tokendance}. Zero-copy broadcast applies the common practice of putting shared content first, so our contribution is
+the measurement. TOAP
+compares passing a reference, a summary, or a KV cache~\cite{toap}, not tool-mediated files.
 
 \paragraph{IPC\@.} Lauer and Needham argued that message passing and shared memory are duals whose costs
 depend on the system~\cite{lauer-needham}. L4 made messages cheap by cutting copies~\cite{liedtke-ipc}. In
-agents, the prefix cache plays the role of zero-copy and the index that of the directory.
+agents, the prefix cache plays the role of shared pages, since every token is still sent, and the index
+that of the directory.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-The right channel depends on what the deployment pays for, on payload size next to the KV cache, and on
-the model. When the shared history fits the cache, copy it and
-order prompts so the cache reuses it. For Qwen3-8B, zero-copy broadcast matched broadcast, the most accurate
-channel, and computed \nZcCut{}\% less at $k=3$. When the history does not fit, the pipe is the cheap
-choice, but its savings come from dropping the documents, which at $k=3$ cost Qwen3-8B's Reviewer. Long results
-are better written as plain replies that the system stores, since writing through a tool call shortened
-Qwen3-8B's notes. Files need a naming discipline, such as an index, and a model that handles tools. Plain files lost
-accuracy and cost more tokens in every setting. Finally, a deployment should count the cost it pays, because
-plain and indexed files sent more tokens than copying but computed \nFileCompMin--\nFileCompMax{}$\times$ as
-much at up to five questions. Our results come from one model family, linear pipelines, and multi-hop QA, not
-from artifacts larger than a context window, such as code bases, where files may be the only option. Nor have we tested why a tool call shortens notes, why a Fact-checker helps the pipe, whether one or
-both of C's two differences prevent the clash, or why the 4B model loses with zero-copy order.
+The right channel depends on which cost the deployment pays, on payload size next to the KV cache, and
+on the model. When the shared history fits the cache, copying it in an order the cache reuses kept Qwen3-8B
+at broadcast's accuracy and computed \nZcCut{}\% less prefill at $k=3$. It saved no serving
+time with each channel served alone at six tasks at a time, and it cost the 4B model accuracy. The pipe is
+the cheapest channel by all three counts, but its savings come from dropping the documents, which at $k=3$ cost
+Qwen3-8B's Reviewer. Long results are better written as plain replies that the system stores, since
+writing them through a tool call lost facts and accuracy at \nRFourWSigWord of \nRFourSizesWord model sizes. Files need a model
+that handles tools. An index helped Qwen3-8B find the notes among many files, most at sixteen questions,
+but not Qwen3-14B and not when the notes were one named file. Plain files lost accuracy in every setting,
+sent more tokens than copying, and took longer when served alone, though they computed
+\nFileCompBMin--\nFileCompBMax{}$\times$ as much prefill at up to five questions. Our results come from one model family, linear pipelines, and multi-hop QA, not from
+artifacts larger than a context window, such as code bases, where files may be the only option. We have not
+tested why a tool call drops facts, why order matters at 4B, or what in file access at sixteen questions
+causes the collapse.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}

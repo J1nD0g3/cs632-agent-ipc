@@ -143,6 +143,8 @@ def main_run(m: Macros) -> None:
     m.add("NotesCharsMsg", f"{msg:,.0f}")
     m.add("NotesCharsFile", f"{files:,.0f}")
     m.add("NotesShorter", f"{(1 - files / msg) * 100:.0f}")
+    m.add("NotesCharsAOne", f"{np.mean(notes['A1']):,.0f}")
+    m.add("NotesCharsAZc", f"{np.mean(notes['A1zc']):,.0f}")
     m.add("SamePrompt", f"{same / pairs * 100:.0f}")
     for ch in ("B", "C"):
         m.add(f"DocReads{ch}", f"{doc_reads[ch] / all_reads[ch] * 100:.0f}")
@@ -237,6 +239,9 @@ def file_compute_range(m: Macros) -> None:
     v = [r["comp_rel"] for r in rows if r["channel"] in ("B", "C") and r["k"] <= 5]
     m.add("FileCompMin", f"{min(v):.1f}")
     m.add("FileCompMax", f"{max(v):.1f}")
+    vb = [r["comp_rel"] for r in rows if r["channel"] == "B" and r["k"] <= 5]
+    m.add("FileCompBMin", f"{min(vb):.1f}")
+    m.add("FileCompBMax", f"{max(vb):.1f}")
 
 
 def chain4(m: Macros) -> None:
@@ -654,6 +659,76 @@ def pro6000(m: Macros) -> None:
     m.add("PCornerAccAOne", pct(np.mean([r["acc"] for r in rows if r["channel"] == "A1"])))
 
 
+def round4(m: Macros) -> None:
+    """Round-4 PRO 6000 runs (KV 100k): writing control, normalized 32B paths, serving time, k=16, zero-copy replay."""
+    def rows(exp):
+        return load_rows(latest(exp))
+
+    def by(rs, ch):
+        return {r["task_id"]: r for r in rs if r["channel"] == ch}
+
+    def gap(name, x, y, metric="acc", sign=1):
+        ids = sorted(set(x) & set(y))
+        mean, lo, hi = paired(np.array([x[i][metric] for i in ids], float), np.array([y[i][metric] for i in ids], float))
+        vals = sorted((sign * mean, sign * lo, sign * hi))
+        m.add(name, f"{sign * mean * 100:.1f}")
+        m.add(f"{name}Lo", f"{min(sign * lo, sign * hi) * 100:.1f}")
+        m.add(f"{name}Hi", f"{max(sign * lo, sign * hi) * 100:.1f}")
+        m.add(f"{name}N", len(ids))
+        return sign * mean, min(sign * lo, sign * hi), max(sign * lo, sign * hi)
+
+    def mean(d, metric):
+        return np.mean([v[metric] for v in d.values() if metric in v])
+
+    sizes = {"Four": "4b", "Eight": "8b", "Fourteen": "14b", "ThirtyTwo": "32b"}
+    w_sig = 0
+    for tag, s in sizes.items():
+        p2 = rows(f"p02_size_{s}")
+        a1, b = by(p2, "A1"), by(p2, "B")
+        r, w = by(rows(f"p05_a1r_{s}"), "A1r"), by(rows(f"p05_a1w_{s}"), "A1w")
+        for lab, d in (("AOne", a1), ("R", r), ("W", w), ("B", b)):
+            m.add(f"RFour{tag}Acc{lab}", pct(mean(d, "acc")))
+            m.add(f"RFour{tag}Notes{lab}", f"{mean(d, 'as_recall_notes') * 100:.0f}")
+        w_sig += gap(f"RFour{tag}WMinusR", w, r)[2] < 0
+        gap(f"RFour{tag}RMinusAOne", r, a1)
+    m.add("RFourWSigWord", word(w_sig))
+    m.add("RFourSizesWord", word(len(sizes)))
+    n32 = rows("p08_norm_32b")
+    a1 = by(rows("p02_size_32b"), "A1")
+    for ch in ("B", "C", "D"):
+        m.add(f"RFourNorm{ch}Acc", pct(mean(by(n32, ch), "acc")))
+        gap(f"RFourNorm{ch}Gap", by(n32, ch), a1, sign=-1)
+    times, comp, calls = {}, {}, {}
+    for ch in ("A1", "A1zc", "A2", "B", "C", "D"):
+        run = latest(f"p06_alone_{ch}")
+        times[ch] = json.loads((run / "run_time.json").read_text())["elapsed_s"]
+        comp[ch] = np.mean([r["completion_tokens"] for r in load_rows(run)])
+        calls[ch] = np.mean([r["llm_calls"] for r in load_rows(run)])
+    for ch in ("B", "C", "D"):
+        m.add(f"RFourCalls{ch}", f"{calls[ch]:.1f}")
+    m.add("RFourAloneN", len(load_rows(latest("p06_alone_A1"))))
+    for ch in ("A1zc", "A2", "B", "C", "D"):
+        m.add(f"RFourTime{NAME[ch]}", f"{times[ch] / times['A1']:.2f}")
+        m.add(f"RFourGen{NAME[ch]}", f"{comp[ch] / comp['A1']:.1f}")
+    m.add("RFourTimeAOne", f"{times['A1']:.0f}")
+    k16 = rows("p07_k16_kv100k")
+    a1 = by(k16, "A1")
+    base = mean(a1, "prefill_tokens")
+    for ch in ("A1zc", "A2", "B", "C", "D"):
+        m.add(f"RFourKSixteenComp{NAME[ch]}", f"{mean(by(k16, ch), 'prefill_tokens') / base:.2f}")
+        gap(f"RFourKSixteenGap{NAME[ch]}", by(k16, ch), a1, sign=-1)
+    b24 = by(rows("p07_k16_b24"), "B")
+    gap("RFourBTwentyFour", b24, by(k16, "B"))
+    # B's Reviewer exhausting its tool budget at k=16 with 100k KV, with 24 calls and with 12.
+    for tag, exp in (("TwentyFour", "p07_k16_b24"), ("Twelve", "p07_k16_kv100k")):
+        hit = [rec["agents"]["reviewer"]["hit_turn_limit"] for rec in raw_records(latest(exp))
+               if rec["channel"] == "B" and "error" not in rec]
+        m.add(f"RFourB{tag}RevLimit", f"{np.mean(hit) * 100:.0f}")
+    for tag, s in (("Four", "4b"), ("Eight", "8b")):
+        z = rows(f"p09_zcreplay_{s}")
+        gap(f"RFourZcReplay{tag}", by(z, "A1zc"), by(z, "A1"), sign=-1)
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -681,7 +756,7 @@ def judges(m: Macros) -> None:
 
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout, replay, repeat, judges, pressure, scope, pro6000]
+            fanout, replay, repeat, judges, pressure, scope, pro6000, round4]
 
 
 def main() -> int:
