@@ -15,8 +15,8 @@ from .data import Task
 from .llm import ContextOverflow, SaltedClient
 from .workspace import Workspace
 
-CHANNELS = ("A1", "A1zc", "A1w", "A2", "A2d", "B", "Bb", "Bd", "C", "D")
-MESSAGE_CHANNELS = ("A1", "A1zc", "A1w", "A2", "A2d")
+CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d", "B", "Bb", "Bd", "C", "D")
+MESSAGE_CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d")
 FILE_CHANNELS = ("B", "Bb", "Bd", "C", "D")
 
 TEAM = ("You are one agent in a team that answers a set of questions together. The agents work in this "
@@ -77,6 +77,12 @@ OUTPUT_FILES = {
                  "write_file. " + FORMAT),
 }
 DONE_RULE = "When your file is saved, reply DONE."
+# A1r: B's Researcher instruction with only the destination changed (a reply instead of files), the
+# wording control for A1w.
+OUTPUT_REPLY_MATCHED = ("The documents are in this message, so you do not need to read any file. The other agents "
+                        "cannot see your files; they see only your reply, which is passed on to them together with "
+                        "the source documents. Write your notes in your reply, in one or a few parts (choose the "
+                        "headings and how to split them).")
 
 INDEX_RULE = {
     "researcher": ("The workspace keeps an index file, index.md, listing every file with its author and first "
@@ -271,17 +277,21 @@ def build_messages(role: str, channel: str, chain: tuple[str, ...], task: Task, 
             channel = "B"
         if channel in ("A2d", "Bd"):
             channel = {"A2d": "A2", "Bd": "B"}[channel]
+        if channel == "A1r":
+            return [{"role": "system", "content": team_text(chain) + "\n\n" + ROLE_TEXT["researcher"] + "\n\n" +
+                     OUTPUT_REPLY_MATCHED},
+                    {"role": "user", "content": f"{qs}\n\n{docs}"}]
         if channel == "A1zc":
             return [{"role": "system", "content": team_text(chain)},
                     {"role": "user", "content": f"{qs}\n\n{docs}"},
                     {"role": "user", "content": instruction(role, channel, chain)}]
         return [{"role": "system", "content": system_prompt(role, channel, chain)},
                 {"role": "user", "content": f"{qs}\n\n{docs}"}]
-    if channel in ("A1", "A1zc", "A1w"):
+    if channel in ("A1", "A1zc", "A1w", "A1r"):
         # A1 copies everything said so far: the task (all questions and documents) and every earlier output.
         history = [{"role": "user", "content": f"{qs}\n\n{docs}"}]
         history += [{"role": "user", "content": f"[{display(r)}]\n{replies[r]}"} for r in before]
-        if channel in ("A1", "A1w"):
+        if channel in ("A1", "A1w", "A1r"):
             return [{"role": "system", "content": system_prompt(role, channel, chain)}] + history
         # A1zc: same content, shared history first and the role instruction last, so consecutive agents
         # share a prompt prefix that the serving engine can reuse.
@@ -327,7 +337,7 @@ def split_task(task: Task, n: int) -> list[Task]:
 
 async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: int = 12,
                    chain: tuple[str, ...] = ("researcher", "writer", "reviewer"), researchers: int = 1,
-                   fixed_notes: str | None = None) -> dict:
+                   fixed_notes: str | None = None, normalize_paths: bool = False) -> dict:
     """fixed_notes replays a given Researcher output instead of running the Researcher (reading-side test)."""
     assert channel in CHANNELS and chain[0] == "researcher" and chain[-1] == "reviewer"
     t0 = time.perf_counter()
@@ -336,7 +346,8 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
     files = channel in FILE_CHANNELS
     tag = f"{len(chain)}" if researchers == 1 else f"{len(chain)}r{researchers}"
     tag += "_replay" if fixed_notes is not None else ""
-    ws = Workspace(Path(workdir) / f"{task.task_id}_{channel}_{tag}") if files or channel == "A1w" else None
+    ws = Workspace(Path(workdir) / f"{task.task_id}_{channel}_{tag}", strip_prefix="workspace/" if normalize_paths
+                   else None) if files or channel == "A1w" else None
     if ws is not None:
         seed_workspace(ws, task, channel)
     tools = TOOLS_BATCH if channel == "Bb" else TOOLS

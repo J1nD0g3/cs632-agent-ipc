@@ -31,13 +31,17 @@ class Workspace:
     auto_index: bool = False
     authors: dict[str, str] = field(default_factory=dict)
     notes: dict[str, str] = field(default_factory=dict)
+    strip_prefix: str | None = None  # e.g. "workspace/": treat a path the agent prefixes with it as root-relative
 
     def __post_init__(self):
         self.root = Path(self.root)
         self.root.mkdir(parents=True, exist_ok=True)
 
     def _path(self, path: str) -> Path:
-        p = PurePosixPath(str(path).strip().lstrip("./") or ".")
+        path = str(path).strip()
+        if self.strip_prefix and path.lstrip("./").startswith(self.strip_prefix):
+            path = path.lstrip("./")[len(self.strip_prefix):]
+        p = PurePosixPath(path.lstrip("./") or ".")
         if p.is_absolute() or ".." in p.parts or str(p) == ".":
             raise WorkspaceError(f"invalid path: {path!r}")
         return self.root / p

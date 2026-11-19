@@ -99,7 +99,8 @@ async def run(cfg: dict, run_dir: Path, raw_dir: Path) -> list[dict]:
             try:
                 rec = await run_task(task, ch, client, work, cfg.get("max_turns", 12),
                                      tuple(cfg.get("chain", ["researcher", "writer", "reviewer"])),
-                                     cfg.get("researchers", 1), replay.get(task.task_id) if replay else None)
+                                     cfg.get("researchers", 1), replay.get(task.task_id) if replay else None,
+                                     cfg.get("normalize_paths", False))
             except Exception as e:  # keep going; a failed run is recorded, not dropped
                 rec = {"task_id": task.task_id, "channel": ch, "dataset": task.dataset, "k": len(task.questions),
                        "error": f"{type(e).__name__}: {e}"[:500], "agents": {}, "stage": {}}
@@ -150,7 +151,12 @@ def main() -> int:
     (run_dir / "config.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False))
     (run_dir / "env.json").write_text(json.dumps(env_info(cfg), indent=1))
     print(f"run dir: {run_dir}", flush=True)
+    t_start = dt.datetime.now()
     rows = asyncio.run(run(cfg, run_dir, raw_dir))
+    # Whole-run wall time: with one channel per server this is that channel's serving time for the task set.
+    (run_dir / "run_time.json").write_text(json.dumps({"start": t_start.isoformat(timespec="seconds"),
+                                                       "end": dt.datetime.now().isoformat(timespec="seconds"),
+                                                       "elapsed_s": round((dt.datetime.now() - t_start).total_seconds(), 1)}))
     with gzip.open(raw_dir / "rows.jsonl.gz", "wt") as f:
         for r in rows:
             f.write(json.dumps(r) + "\n")
