@@ -361,7 +361,41 @@ def chain4_ci(m: Macros) -> None:
         m.add(f"Chain{NAME[ch]}Hi", f"{hi * 100:+.0f}")
 
 
-SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness]
+def a1w(m: Macros) -> None:
+    """Researcher writes through write_file, later agents get the notes copied: isolates the writing side."""
+    from .analyze import paired
+    main = {(r["task_id"], r["channel"]): r for r in load_rows(latest("t07_main"))}
+    rows = [r for r in load_rows(latest("t09_a1w")) if (r["task_id"], "A1") in main]
+    m.add("WN", len(rows))
+    for ref in ("A1", "B"):
+        a = np.array([r["acc"] for r in rows], dtype=float)
+        b = np.array([main[(r["task_id"], ref)]["acc"] for r in rows], dtype=float)
+        mean, lo, hi = paired(a, b)
+        n = NAME[ref]
+        m.add(f"WAcc{n}", pct(b.mean()))
+        m.add(f"WGap{n}", f"{-mean * 100:.0f}")
+        m.add(f"WGap{n}Lo", f"{-hi * 100:.0f}")
+        m.add(f"WGap{n}Hi", f"{-lo * 100:.0f}")
+        m.add(f"WNotes{n}", f"{np.mean([main[(r['task_id'], ref)]['judge_recall_notes'] for r in rows]) * 100:.0f}")
+        m.add(f"WOver{n}", f"{mean * 100:.0f}")
+        m.add(f"WOver{n}Lo", f"{lo * 100:.0f}")
+        m.add(f"WOver{n}Hi", f"{hi * 100:.0f}")
+    m.add("WAcc", pct(np.mean([r["acc"] for r in rows])))
+    m.add("WNotes", f"{np.mean([r['judge_recall_notes'] for r in rows]) * 100:.0f}")
+    lens = {"w": [], "A1": [], "B": []}
+    ids = {r["task_id"] for r in rows}
+    for rec in raw_records(latest("t09_a1w")):
+        if rec["task_id"] in ids:
+            lens["w"].append(len(rec["stage"]["notes"]))
+    for rec in raw_records(latest("t07_main")):
+        if rec["task_id"] in ids and rec["channel"] in ("A1", "B"):
+            lens[rec["channel"]].append(len(rec["stage"]["notes"]))
+    m.add("WChars", f"{np.mean(lens['w']):,.0f}")
+    m.add("WCharsAOne", f"{np.mean(lens['A1']):,.0f}")
+    m.add("WCharsB", f"{np.mean(lens['B']):,.0f}")
+
+
+SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w]
 
 
 def main() -> int:

@@ -31,8 +31,8 @@ engine computes after prefix caching. With small payloads, copying is the most a
 ordering the prompt so the prefix cache reuses the shared history, a zero-copy broadcast, keeps its
 accuracy at \nZcRatioMin--\nZcRatioMax{}\% of its compute. Shared files send \nFileSentMin--\nFileSentMax{}$\times$
 the tokens, because every access is a model call that resends the conversation, and they lose
-information on both sides: agents write \nNotesShorter{}\% shorter notes to files, and readers without an
-index skip them. These results are conditional. Once prompts outgrow the KV cache, zero-copy saves nothing
+information on both sides: agents write \nNotesShorter{}\% shorter notes when they write through a
+tool call, and readers without an index skip them. These results are conditional. Once prompts outgrow the KV cache, zero-copy saves nothing
 and a pipe matches copying at \nCompATwoKSixteen{}$\times$ its compute; at large payloads plain files lose
 \nGapBKSixteen points while an index loses \nGapCKSixteen; and a 4B model loses up to \nSmallCGapMax points with
 files even with an index.
@@ -215,6 +215,14 @@ never opens the notes. With handles the Writer trusts the handoff and opens even
 the tasks, delivery rises to \nDelivCMin--\nDelivCMax{}\%, and C's accuracy comes within \nGapCMax points of
 broadcast (\nAccC{}\% vs \nAccAOne{}\%), while B loses \nGapBMin--\nGapBMax points.
 
+\paragraph{The tool call, not the file, shortens the notes.} To separate writing from reading we ran A1w:
+the Researcher writes its notes with \texttt{write\_file} exactly as in B, and the Writer and Reviewer
+receive them copied, as in A1, with the documents. Its notes are as short as B's (\nWChars vs \nWCharsB
+characters; \nWCharsAOne in A1) and state \nWNotes{}\% of the supporting facts (\nWNotesB{}\% in B, \nWNotesAOne{}\% in
+A1). On \nWN paired tasks A1w answers \nWAcc{}\%, \nWGapAOne points below broadcast (95\% interval
+\nWGapAOneLo--\nWGapAOneHi) and \nWOverB above B (\nWOverBLo--\nWOverBHi). More than half of B's loss therefore comes from asking the model to write its result as a tool-call
+argument; the rest comes from reading.
+
 \section{Sensitivity}
 \label{sec:sensitivity}
 
@@ -312,8 +320,9 @@ Which channel a pipeline of LLM agents should use depends on what it pays for, h
 next to the KV cache, and how well its model uses tools. Our measurements give four rules. When the shared
 history fits the cache, copy it and order prompts so the cache reuses it: zero-copy broadcast matched the most
 accurate channel, broadcast, and computed about as little as a pipe. When it does not fit, the pipe is the cheap choice
-and loses little, and a checking stage helps it more than any other channel. Share files only with an
-index, and only with a model that handles tools: plain files, as our B implements them, cost more tokens and
+and loses little, and a checking stage helps it more than any other channel. Let agents write long results as plain replies
+and have the system store them, since writing through a tool call shortened the notes. Share files only
+with an index, and only with a model that handles tools: plain files, as our B implements them, cost more tokens and
 lost accuracy in every setting, and cheaper bulk reads made it worse. Count the cost the deployment pays: files send \nFileSentMin--\nFileSentMax{}$\times$ the tokens of
 copying, but with up to five questions per task they compute \nFileCompMin--\nFileCompMax{}$\times$ as much. Our results come from one model
 family, linear pipelines, and multi-hop QA; artifacts larger than a context window, such as code bases,
