@@ -395,7 +395,38 @@ def a1w(m: Macros) -> None:
     m.add("WCharsB", f"{np.mean(lens['B']):,.0f}")
 
 
-SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w]
+def fanout(m: Macros) -> None:
+    """Three parallel Researchers at k=3, paired with the one-Researcher main run."""
+    from .analyze import paired
+    main = {(r["task_id"], r["channel"]): r for r in load_rows(latest("t07_main"))}
+    run = latest("t08_fanout")
+    rows = load_rows(run)
+    m.add("FanN", len({r["task_id"] for r in rows}))
+    for ch in ("A1", "B", "C", "D"):
+        pr = [(r["acc"], main[(r["task_id"], ch)]["acc"]) for r in rows if r["channel"] == ch]
+        a, b = np.array(pr, dtype=float).T
+        mean, lo, hi = paired(a, b)
+        n = NAME[ch]
+        m.add(f"Fan{n}Diff", f"{mean * 100:+.0f}")
+        m.add(f"Fan{n}Lo", f"{lo * 100:+.0f}")
+        m.add(f"Fan{n}Hi", f"{hi * 100:+.0f}")
+    clash, runs = {}, {}
+    for rec in raw_records(run):
+        if "error" in rec or rec["channel"] not in ("B", "C", "D"):
+            continue
+        by_path = {}
+        for o in rec["io_ops"]:
+            if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o:
+                by_path.setdefault(o["path"], set()).add(o["agent"])
+        ch = rec["channel"]
+        clash[ch] = clash.get(ch, 0) + any(len(v) > 1 for v in by_path.values())
+        runs[ch] = runs.get(ch, 0) + 1
+    for ch in clash:
+        m.add(f"FanClash{ch}", f"{clash[ch] / runs[ch] * 100:.0f}")
+
+
+SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
+            fanout]
 
 
 def main() -> int:

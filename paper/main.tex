@@ -254,7 +254,11 @@ state only \nLargeNotesB{}\% of the supporting facts against \nLargeNotesC{}\% i
 wrote the same path (\nClashC{}\%). C differs in two ways that can prevent the clash, an instruction to head
 each file with its questions and an index that lists who wrote what; we have not separated them, but either
 is the kind of naming discipline that shared memory needs. Message channels cannot race,
-because each agent's output is its own message.
+because each agent's output is its own message. The race comes from the parallel writers, not from the
+payload: with three Researchers on three-question tasks (\nFanN tasks), B's writers clash in \nFanClashB{}\% of
+tasks and B answers \nFanBDiff{} points (\nFanBLo{} to \nFanBHi{}) relative to one Researcher, while C changes by
+\nFanCDiff{} (\nFanCLo{} to \nFanCHi{}) with no clash. D's writers clash as often (\nFanClashD{}\%), but its
+handoffs still carry each Researcher's findings, and D changes by \nFanDDiff{} (\nFanDLo{} to \nFanDHi{}).
 
 \paragraph{A longer pipeline multiplies copies, not cached ones.} Adding a Fact-checker between the Writer and
 the Reviewer adds one more receiver. Broadcast then computes \nChainAOneComp\% more, because the history is
