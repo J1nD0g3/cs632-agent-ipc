@@ -2,7 +2,7 @@
 
 Claim at a glance: message channels copy content into the next prompt (broadcast all of it, zero-copy
 the same but served from the cache, the pipe only the last output); file channels leave results in a
-shared workspace that later agents must find and read (plus an index in C, plus a pushed handoff in D).
+shared workspace that later agents must find and read (plus an index in C).
 Plan: a 3 x 2 grid of panels with one identical layout: three robots (Researcher, Writer, Reviewer) in
 a row. Message panels show, under each hop, what the receiver's prompt holds as a strip of colored
 segments; file panels show the shared folder with its files and the write/read arrows. Same colors for
@@ -58,10 +58,11 @@ def strip(x, y, w, parts, cached=()):
 
 
 cols = fig.area.cols(3, gap=5)
+cols2 = fig.area.cols(2, gap=5)  # the file channels take the bottom row in two wider panels
 PANEL_H = 59
 rows = [Rect(fig.area.x, fig.area.y + 14, W, PANEL_H), Rect(fig.area.x, fig.area.y + 14 + PANEL_H + 5, W, PANEL_H)]
 PANELS = [("A1", "Broadcast", ""), ("A1zc", "Zero-copy broadcast", ""), ("A2", "Pipe", ""),
-          ("B", "Shared files", ""), ("C", "Files + index", ""), ("D", "Handles", "")]
+          ("B", "Shared files", ""), ("C", "Files + index", "")]
 LABEL = {"A1": "A1", "A1zc": "A1-zc", "A2": "A2", "B": "B", "C": "C", "D": "D"}
 
 fig.legend([("box", "white", "Questions"), ("box", "teal3", "Documents"), ("box", "navy3", "Notes"),
@@ -69,7 +70,8 @@ fig.legend([("box", "white", "Questions"), ("box", "teal3", "Documents"), ("box"
            fig.area.cx, fig.area.y, anchor="n")
 
 for i, (ch, name, sub) in enumerate(PANELS):
-    pr = Rect(cols[i % 3].x, rows[i // 3].y, cols[i % 3].w, PANEL_H)
+    c = cols[i] if i < 3 else cols2[i - 3]
+    pr = Rect(c.x, rows[i // 3].y, c.w, PANEL_H)
     fig.panel(pr, f"{LABEL[ch]}  {name}", fill="gray1")
     body = pr.inset(5, t=11, b=3)
     xs = [body.x + body.w * f for f in (1 / 6, 3 / 6, 5 / 6)]

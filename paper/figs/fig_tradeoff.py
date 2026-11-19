@@ -23,7 +23,6 @@ STYLE = {  # marker, fill, name
     "A2": ("o", "gray3", "A2 pipe"),
     "B": ("s", "teal2", "B files"),
     "C": ("s", "teal4", "C files+index"),
-    "D": ("s", "teal3", "D handles"),
 }
 # Label offsets (dx, dy, anchor) per panel, placed by hand so names never touch markers or each other.
 LABEL = {

@@ -17,7 +17,7 @@ DATA = json.loads((Path(__file__).parent / "data" / "fig4_scaling.json").read_te
 KS = sorted({r["k"] for r in DATA})
 CATS = [str(k) if k != 16 else "16 (fan-out)" for k in KS]
 STYLE = {"A1zc": ("#F2B53A", "*", "A1 zero-copy"), "A2": ("gray4", "o", "A2 pipe"),
-         "B": ("teal2", "s", "B files"), "C": ("teal5", "s", "C files+index"), "D": ("teal3", "^", "D handles")}
+         "B": ("teal2", "s", "B files"), "C": ("teal5", "s", "C files+index")}
 
 
 def series(ch, key):
@@ -40,7 +40,7 @@ for ch, (col, mk, name) in STYLE.items():
     ys = series(ch, "comp_rel")
     ax.line([x for x, y in zip(xs, ys) if y is not None], [y for y in ys if y is not None], color=col, marker=mk,
             label=name)
-fig.caption(left.cx, ca.t + 1, "(a) Compute: cache savings fade as payloads grow", size=7.5, weight=600)
+fig.caption(left.cx, ca.t + 1, "(a) Compute, 35k-token cache: savings fade as payloads grow", size=7.5, weight=600)
 
 pb, cb = right.take("bottom", 10, gap=2)
 bx = fig.axes(pb, cats=CATS, y=(-0.4, 0.06), yticks=[-0.4, -0.3, -0.2, -0.1, 0], yfmt=lambda v: f"{v * 100:+.0f}" if v else "0",

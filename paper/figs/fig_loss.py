@@ -14,8 +14,8 @@ from pathlib import Path
 from archfig import Figure, Rect
 
 DATA = json.loads((Path(__file__).parent / "data" / "fig3_loss.json").read_text())
-ORDER = ["A1", "A1zc", "A2", "B", "C", "D"]
-NAMES = ["A1", "A1-zc", "A2", "B", "C", "D"]
+ORDER = ["A1", "A1zc", "A2", "B", "C"]
+NAMES = ["A1", "A1-zc", "A2", "B", "C"]
 CH = {c["channel"]: c for c in DATA["channels"]}
 
 fig = Figure("text")
