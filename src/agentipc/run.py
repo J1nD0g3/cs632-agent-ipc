@@ -129,6 +129,31 @@ async def run(cfg: dict, run_dir: Path, raw_dir: Path) -> list[dict]:
     return rows
 
 
+METRICS = ("vllm:request_prefill_time_seconds_sum", "vllm:request_decode_time_seconds_sum",
+           "vllm:request_queue_time_seconds_sum", "vllm:e2e_request_latency_seconds_sum",
+           "vllm:e2e_request_latency_seconds_count", "vllm:prompt_tokens_total", "vllm:generation_tokens_total",
+           "vllm:num_preemptions_total", "vllm:prefix_cache_hits_total", "vllm:prefix_cache_queries_total",
+           "vllm:prompt_tokens_cached_total", "vllm:request_prefill_kv_computed_tokens_sum")
+
+
+def vllm_metrics(urls: list[str]) -> dict[str, float]:
+    """Sum of selected Prometheus counters over the servers (scraped before and after a run)."""
+    import urllib.request
+    out: dict[str, float] = {}
+    for u in urls:
+        try:
+            text = urllib.request.urlopen(u.rstrip("/") + "/metrics", timeout=10).read().decode()
+        except Exception:
+            continue
+        for line in text.splitlines():
+            if line.startswith("#"):
+                continue
+            name = line.split("{")[0].split(" ")[0]
+            if name in METRICS:
+                out[name] = out.get(name, 0.0) + float(line.rsplit(" ", 1)[1])
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("config")
@@ -152,11 +177,16 @@ def main() -> int:
     (run_dir / "env.json").write_text(json.dumps(env_info(cfg), indent=1))
     print(f"run dir: {run_dir}", flush=True)
     t_start = dt.datetime.now()
+    urls = cfg["server"].get("base_urls") or [cfg["server"]["base_url"]]
+    m0 = vllm_metrics(urls) if cfg.get("scrape_metrics") else None
     rows = asyncio.run(run(cfg, run_dir, raw_dir))
+    m1 = vllm_metrics(urls) if cfg.get("scrape_metrics") else None
     # Whole-run wall time: with one channel per server this is that channel's serving time for the task set.
     (run_dir / "run_time.json").write_text(json.dumps({"start": t_start.isoformat(timespec="seconds"),
                                                        "end": dt.datetime.now().isoformat(timespec="seconds"),
-                                                       "elapsed_s": round((dt.datetime.now() - t_start).total_seconds(), 1)}))
+                                                       "elapsed_s": round((dt.datetime.now() - t_start).total_seconds(), 1),
+                                                       "vllm_metrics": {k: round(m1[k] - m0.get(k, 0.0), 3) for k in m1}
+                                                       if m1 else None}, indent=1))
     with gzip.open(raw_dir / "rows.jsonl.gz", "wt") as f:
         for r in rows:
             f.write(json.dumps(r) + "\n")

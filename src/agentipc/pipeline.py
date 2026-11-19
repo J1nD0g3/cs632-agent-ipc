@@ -15,9 +15,9 @@ from .data import Task
 from .llm import ContextOverflow, SaltedClient
 from .workspace import Workspace
 
-CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d", "B", "Bb", "Bd", "C", "D")
+CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d", "B", "Bb", "Bd", "Bh", "Bn", "C", "D", "Dn")
 MESSAGE_CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d")
-FILE_CHANNELS = ("B", "Bb", "Bd", "C", "D")
+FILE_CHANNELS = ("B", "Bb", "Bd", "Bh", "C", "D")
 
 TEAM = ("You are one agent in a team that answers a set of questions together. The agents work in this "
         "order: {chain}.")
@@ -77,6 +77,8 @@ OUTPUT_FILES = {
                  "write_file. " + FORMAT),
 }
 DONE_RULE = "When your file is saved, reply DONE."
+# Bh: B plus only C's heading rule for Researchers (no index), to separate the two differences of C.
+HEADING_RULE = "Start each notes file with a heading that says which questions it covers."
 # A1r: B's Researcher instruction with only the destination changed (a reply instead of files), the
 # wording control for A1w.
 OUTPUT_REPLY_MATCHED = ("The documents are in this message, so you do not need to read any file. The other agents "
@@ -144,6 +146,8 @@ def instruction(role: str, channel: str, chain: tuple[str, ...]) -> str:
             parts.append(BATCH_RULE)
         if channel == "C":
             parts.append(INDEX_RULE["researcher" if role == "researcher" else "other"])
+        if channel == "Bh" and role == "researcher":
+            parts.append(HEADING_RULE)
         if channel == "D" and role != "researcher":
             parts.append(HANDOFF_READ)
     return "\n\n".join(parts)
@@ -340,14 +344,17 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
                    fixed_notes: str | None = None, normalize_paths: bool = False) -> dict:
     """fixed_notes replays a given Researcher output instead of running the Researcher (reading-side test)."""
     assert channel in CHANNELS and chain[0] == "researcher" and chain[-1] == "reviewer"
+    # Bn / Dn: B / D whose Researchers cannot overwrite a file another Researcher wrote (a write-write guard).
+    label, no_clobber = channel, channel in ("Bn", "Dn")
+    channel = channel[0] if no_clobber else channel
     t0 = time.perf_counter()
     client = SaltedClient(client, f"{task.task_id}.{channel}.{len(chain)}.{researchers}.{time.time_ns()}"
                           if researchers > 1 else f"{task.task_id}.{channel}.{len(chain)}.{time.time_ns()}")
     files = channel in FILE_CHANNELS
     tag = f"{len(chain)}" if researchers == 1 else f"{len(chain)}r{researchers}"
     tag += "_replay" if fixed_notes is not None else ""
-    ws = Workspace(Path(workdir) / f"{task.task_id}_{channel}_{tag}", strip_prefix="workspace/" if normalize_paths
-                   else None) if files or channel == "A1w" else None
+    ws = Workspace(Path(workdir) / f"{task.task_id}_{label}_{tag}", strip_prefix="workspace/" if normalize_paths
+                   else None, no_clobber=no_clobber) if files or channel == "A1w" else None
     if ws is not None:
         seed_workspace(ws, task, channel)
     tools = TOOLS_BATCH if channel == "Bb" else TOOLS
@@ -412,7 +419,7 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
         stage["final_from_reply"] = "1"
 
     return {
-        "task_id": task.task_id, "channel": channel, "dataset": task.dataset, "k": len(task.questions),
+        "task_id": task.task_id, "channel": label, "dataset": task.dataset, "k": len(task.questions),
         "chain": list(chain), "researchers": researchers, "replay": fixed_notes is not None,
         "wall_s": round(time.perf_counter() - t0, 2),
         "agents": {r: {"calls": a.calls, "hit_turn_limit": a.hit_turn_limit, "overflow": a.overflow,

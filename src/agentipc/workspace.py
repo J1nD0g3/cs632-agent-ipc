@@ -32,6 +32,8 @@ class Workspace:
     authors: dict[str, str] = field(default_factory=dict)
     notes: dict[str, str] = field(default_factory=dict)
     strip_prefix: str | None = None  # e.g. "workspace/": treat a path the agent prefixes with it as root-relative
+    no_clobber: bool = False  # refuse a Researcher's write to a path another Researcher wrote
+    writers: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self):
         self.root = Path(self.root)
@@ -99,6 +101,13 @@ class Workspace:
             st.errors += 1
             self.ops.append({"agent": agent, "op": "write", "path": str(path), "error": str(e)})
             return f"ERROR: {e}"
+        key = str(f.relative_to(self.root))
+        if self.no_clobber and agent.startswith("researcher") and self.writers.get(key, agent) != agent \
+                and self.writers[key].startswith("researcher"):
+            st.errors += 1
+            self.ops.append({"agent": agent, "op": "write", "path": str(path), "error": "written by another Researcher"})
+            return f"ERROR: {key} was written by another Researcher; save your notes under a different file name."
+        self.writers.setdefault(key, agent)
         f.parent.mkdir(parents=True, exist_ok=True)
         content = str(content)
         if append and f.exists():
