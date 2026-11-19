@@ -11,8 +11,8 @@
 | T06 Pilot run and checks | Experiments | Must | Done | 2026-11-18 | results/t06_pilot/20261118-210200-08f1221 | 360 runs, 0 errors |
 | T07 Main experiments: 5 channels x 2 datasets x 3 k | Experiments | Must | Done | 2026-11-19 | results/t07_main/20261118-212337-5d6c70f | 5400 runs, 0 errors, judged |
 | T08 Sensitivity: k = 8, five agents, zero-copy A1, Qwen3-4B | Experiments | Should | In progress | 2026-11-19 | Bb, 24-turn done | k8, chain4, 4B, k16, pressure, fan-out queued |
-| T09 Analysis and figures | Report | Must | In progress | 2026-11-19 | Figs. 1-3 drafted | paper/figs/out |
-| T10 Workshop paper and review rounds | Report | Must | Not started | | | 6 pages |
+| T09 Analysis and figures | Report | Must | In progress | 2026-11-19 | Figs. 1-4 | paper/figs/out |
+| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, round 1: 3/5, 3/5 | Revision experiments running |
 
 ## Key numbers
 | Key | Metric | Result | Source |
@@ -21,7 +21,7 @@
 | tokens | Total tokens per task: A / B / C | k=3 sent / computed: A1 13.3k/12.4k, A1-zc 13.6k/4.8k, A2 5.6k/4.7k, B 38.2k/9.8k, C 37.4k/9.8k, D 17.5k/7.2k | results/t07_main/20261118-212337-5d6c70f |
 | file_io | File reads and writes per task: A / B / C | k=3 file I/O ops: B 13.4-15.3, C 12.1-14.4, D 5.6-5.8 (message channels 0) | results/t07_main/20261118-212337-5d6c70f |
 | info_loss | Key facts lost between stages: A / B / C | k=3 facts in Researcher output / share delivered: A1 73%/99%, A2 72%/99%, B 59%/84%, C 63%/93%, D 50%/71% | results/t07_main/20261118-212337-5d6c70f (judge) |
-| recommendation | Which channel, and when | | |
+| recommendation | Which channel, and when | Shared history fits the KV cache: zero-copy broadcast; it does not: pipe; files only with an index and a tool-capable model | paper/main.tex (Conclusion) |
 
 ## Log
 - 2026-11-18 T00: Repo created from the proposal. Model Qwen3-8B (thinking off) on vLLM v0.33.0;
@@ -74,3 +74,14 @@
   k=16 (partial): the prefix cache stops helping (computed close to sent) and B drops sharply while C
   holds. Queue rescheduled so that k=8, four agents, Qwen3-4B, k=16, cache pressure (1/2 concurrent
   runs) and fan-out (50 tasks) all finish by about 10:00.
+- 2026-11-19 T08 results: k=8 and k=16 show the cache savings fade under six concurrent runs per server
+  (zero-copy 0.83x and 1.00x of broadcast's compute; files above broadcast), and the cache-pressure runs
+  (1-2 concurrent runs, k=16) bring them back (B computes 0.23 of what it sends instead of 0.83) with
+  accuracy unchanged. At k=16 the pipe matches broadcast at 0.37x compute and plain files lose 34 points
+  (index 5). Four agents: broadcast +38% compute, zero-copy +6%; the pipe gains 5.5 points, B loses 7.8.
+  Qwen3-4B: files lose 19-35 points even with an index and zero-copy costs 3-11 points at k=3-5.
+- 2026-11-19 T10: draft at 6 pages with Figs. 1-4 and 253 generated macros. Round-1 reviews (systems
+  3/5, methods 3/5) in paper/reviews/round_1. Text fixes applied (18 mismatches, harness rescue rates,
+  latency, concurrency, missing related work). Revision runs queued: A1w (Researcher writes via a tool
+  call, then copied), Researcher replay into A1/A2/B/C, and an A/A repeat; main run being re-judged with
+  per-question judge results for Fig. 3b.
