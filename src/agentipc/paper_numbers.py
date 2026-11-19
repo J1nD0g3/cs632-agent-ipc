@@ -613,6 +613,20 @@ def pro6000(m: Macros) -> None:
             m.add(f"{n}Lo", f"{-hi * 100:.0f}")
             m.add(f"{n}Hi", f"{-lo * 100:.0f}")
             m.add(f"PSize{tag}Acc{NAME[ch]}", pct(x.mean()))
+    notes = {}
+    for tag, exp in sizes.items():
+        rows = load_rows(latest(exp))
+        for ch in ("A1", "B", "C", "D"):
+            v = np.mean([r["as_recall_notes"] for r in rows if r["channel"] == ch and "as_recall_notes" in r])
+            notes[(tag, ch)] = v
+            m.add(f"PSize{tag}Notes{NAME[ch]}", f"{v * 100:.0f}")
+    rest = ("Four", "Eight", "ThirtyTwo")
+    files = [notes[(t, ch)] for t in rest for ch in ("B", "C")]
+    a1 = [notes[(t, "A1")] for t in rest]
+    m.add("PSizeFileNotesMin", f"{min(files) * 100:.0f}")
+    m.add("PSizeFileNotesMax", f"{max(files) * 100:.0f}")
+    m.add("PSizeAOneNotesMin", f"{min(a1) * 100:.0f}")
+    m.add("PSizeAOneNotesMax", f"{max(a1) * 100:.0f}")
     for tag, exp in (("ThirtyTwo", "p02_size_32b"), ("Corner", "p03_corner_32b_35k")):
         res = rescored(latest(exp))
         for ch in ("B", "C", "D"):

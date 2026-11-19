@@ -33,8 +33,8 @@ conversation. They also lose information on both sides. Notes written through a 
 \nNotesShorter{}\% shorter, and readers without an index skip them. Once the prompts of concurrent runs
 outgrow the KV cache, zero-copy's savings shrink, and at sixteen questions they vanish. When three parallel
 Researchers split sixteen questions, plain files lose \nGapBKSixteen points and files with an index
-\nGapCKSixteen. A 4B model loses up to \nSmallCGapMax points with files even when they have an index, and
-up to \nSmallAZcGapMaxThreeFive with zero-copy ordering.
+\nGapCKSixteen. A 4B model loses \nPSizeFourGapC points with files even when they have an index, and
+\nPSizeFourGapAZc with zero-copy ordering.
 \end{abstract}
 
 \maketitle
@@ -123,7 +123,7 @@ and Researchers are told to head each file with its questions.
 
 \paragraph{D, handles.} The Researcher and Writer write their files and also push a handoff of at most 120
 words that gives each question's key finding and the path of its details. Later agents read files only for
-what the handoff lacks. Production agents pass such references~\cite{anthropic-multiagent}.
+what the handoff lacks.
 
 \section{Methodology}
 \label{sec:method}
@@ -314,8 +314,7 @@ handoffs still carry each Researcher's findings, and D changes by \nFanDDiff{} p
 more, but zero-copy broadcast only \nChainAZcComp{}\% more, as the new agent reuses the cached history. On
 \nChainN tasks it raises the pipe from \nChainATwoAccRef{}\% to \nChainATwoAcc{}\% (\nChainATwoLo{} to
 \nChainATwoHi{}), although in the pipe the Fact-checker also sees only the draft. It lowers plain files
-from \nChainBAccRef{}\% to \nChainBAcc{}\% (\nChainBLo{} to \nChainBHi{}), where one more agent must find
-the notes. The other channels move at most \nChainOtherMax point.
+from \nChainBAccRef{}\% to \nChainBAcc{}\% (\nChainBLo{} to \nChainBHi{}). The others move at most \nChainOtherMax point.
 
 \paragraph{Cheaper reads make the Writer skip the notes.} A \texttt{read\_files} tool that reads several
 files in one call, the agent's \texttt{readv}, cuts B's calls from \nBbCallsB to \nBbCalls and its tokens by
@@ -335,9 +334,10 @@ the harness then finds no answer, so B and D trail broadcast by \nPSizeThirtyTwo
 points. Reading those files gives \nPRescueThirtyTwoB{}\% and \nPRescueThirtyTwoD{}\% against
 \nPSizeThirtyTwoAccAOne{}\%. In C the Researchers also prefixed paths (\nPSlipThirtyTwoCResearcher runs), but with the index
 no Writer or Reviewer did.
-On the RTX 3090 servers Qwen3-4B (\nSmallKv-token cache) loses up to
-\nSmallCGapMaxThreeFive points with indexed files and \nSmallAZcGapMaxThreeFive with zero-copy ordering at three and
-five questions.
+Shorter notes are not universal. At 4B, 8B, and 32B file channels' notes state
+\nPSizeFileNotesMin--\nPSizeFileNotesMax\% of the supporting facts against \nPSizeAOneNotesMin--\nPSizeAOneNotesMax\% in
+broadcast, but at 14B B's notes state \nPSizeFourteenNotesB\% against \nPSizeFourteenNotesAOne\%, yet B
+trails by \nPSizeFourteenGapB.
 
 \paragraph{Tool budget.} With 24 tool calls instead of 12, B and C change accuracy by at most
 \nTwFourAccMax points (\nTwFourN paired tasks per channel, $k=3$). At $k=16$ the 12-call budget binds harder (B's Reviewer hits
@@ -377,8 +377,8 @@ the model. When the shared history fits the cache, copy it and
 order prompts so the cache reuses it. For Qwen3-8B, zero-copy broadcast matched broadcast, the most accurate
 channel, and computed \nZcCut{}\% less at $k=3$. When the history does not fit, the pipe is the cheap
 choice, but its savings come from dropping the documents, which at $k=3$ cost Qwen3-8B's Reviewer. Long results
-are better written as plain replies that the system stores, since writing through a tool call shortened the
-notes. Files need a naming discipline, such as an index, and a model that handles tools. Plain files lost
+are better written as plain replies that the system stores, since writing through a tool call shortened
+Qwen3-8B's notes. Files need a naming discipline, such as an index, and a model that handles tools. Plain files lost
 accuracy and cost more tokens in every setting. Finally, a deployment should count the cost it pays, because
 plain and indexed files sent more tokens than copying but computed \nFileCompMin--\nFileCompMax{}$\times$ as
 much at up to five questions. Our results come from one model family, linear pipelines, and multi-hop QA, not
