@@ -232,7 +232,9 @@ argument; the rest comes from reading. To measure reading alone we replayed broa
 unchanged, into every channel, as one file \texttt{notes.md} for B and C. With the same notes, B and C both
 answer \nRepBGap points fewer questions than broadcast (\nRepBAcc{}\% vs \nRepAccAOne{}\%, 95\% interval
 \nRepBGapLo--\nRepBGapHi, \nRepN tasks), and the pipe \nRepATwoGap. With a single, clearly named notes file the
-index no longer matters; its value in the main run lay in finding notes the Researcher had named itself.
+index does not help: C's Writer opens the notes in \nRepOpenC{}\% of the tasks against B's \nRepOpenB{}\%, after
+reading an index that also lists thirty source documents (\nRepIndexC{}\% of tasks), and receives \nRepCDeliv{}\% of their
+facts against \nRepBDeliv{}\%. An index pays off when there are many files written by others, not one obvious one.
 
 \section{Sensitivity}
 \label{sec:sensitivity}
@@ -339,7 +341,8 @@ history fits the cache, copy it and order prompts so the cache reuses it: zero-c
 accurate channel, broadcast, and computed about as little as a pipe. When it does not fit, the pipe is the cheap choice
 and loses little, and a checking stage helps it more than any other channel. Let agents write long results as plain replies
 and have the system store them, since writing through a tool call shortened the notes. Share files only
-with an index, and only with a model that handles tools: plain files, as our B implements them, cost more tokens and
+with a naming discipline, such as an index, when several agents write, and only with a model that handles
+tools: plain files, as our B implements them, cost more tokens and
 lost accuracy in every setting, and cheaper bulk reads made it worse. Count the cost the deployment pays: files send \nFileSentMin--\nFileSentMax{}$\times$ the tokens of
 copying, but with up to five questions per task they compute \nFileCompMin--\nFileCompMax{}$\times$ as much. Our results come from one model
 family, linear pipelines, and multi-hop QA; artifacts larger than a context window, such as code bases,

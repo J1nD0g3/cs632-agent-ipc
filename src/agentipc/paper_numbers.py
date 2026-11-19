@@ -378,12 +378,12 @@ def a1w(m: Macros) -> None:
         m.add(f"WGap{n}", f"{-mean * 100:.0f}")
         m.add(f"WGap{n}Lo", f"{-hi * 100:.0f}")
         m.add(f"WGap{n}Hi", f"{-lo * 100:.0f}")
-        m.add(f"WNotes{n}", f"{np.mean([main[(r['task_id'], ref)]['judge_recall_notes'] for r in rows]) * 100:.0f}")
+        m.add(f"WNotes{n}", f"{np.mean([main[(r['task_id'], ref)]['as_recall_notes'] for r in rows]) * 100:.0f}")
         m.add(f"WOver{n}", f"{mean * 100:.0f}")
         m.add(f"WOver{n}Lo", f"{lo * 100:.0f}")
         m.add(f"WOver{n}Hi", f"{hi * 100:.0f}")
     m.add("WAcc", pct(np.mean([r["acc"] for r in rows])))
-    m.add("WNotes", f"{np.mean([r['judge_recall_notes'] for r in rows]) * 100:.0f}")
+    m.add("WNotes", f"{np.mean([r['as_recall_notes'] for r in rows]) * 100:.0f}")
     lens = {"w": [], "A1": [], "B": []}
     ids = {r["task_id"] for r in rows}
     for rec in raw_records(latest("t09_a1w")):
@@ -443,7 +443,17 @@ def replay(m: Macros) -> None:
         m.add(f"Rep{n}Gap", f"{-mean * 100:.0f}")
         m.add(f"Rep{n}GapLo", f"{-hi * 100:.0f}")
         m.add(f"Rep{n}GapHi", f"{-lo * 100:.0f}")
-        m.add(f"Rep{n}Deliv", f"{np.mean([r['judge_kept_writer_input'] for r in rs]) * 100:.0f}")
+        m.add(f"Rep{n}Deliv", f"{np.mean([r['as_kept_writer_input'] for r in rs if 'as_kept_writer_input' in r]) * 100:.0f}")
+    opened, index = {"B": [], "C": []}, []
+    for rec in raw_records(latest("t09_replay")):
+        if rec["channel"] in opened and "error" not in rec:
+            reads = [o["path"] for o in rec["io_ops"] if o["agent"] == "writer" and o["op"] == "read" and "error" not in o]
+            opened[rec["channel"]].append(any(x.endswith("notes.md") for x in reads))
+            if rec["channel"] == "C":
+                index.append("index.md" in reads)
+    for ch, v in opened.items():
+        m.add(f"RepOpen{ch}", f"{np.mean(v) * 100:.0f}")
+    m.add("RepIndexC", f"{np.mean(index) * 100:.0f}")
 
 
 def repeat(m: Macros) -> None:
