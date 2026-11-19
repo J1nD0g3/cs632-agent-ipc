@@ -425,8 +425,27 @@ def fanout(m: Macros) -> None:
         m.add(f"FanClash{ch}", f"{clash[ch] / runs[ch] * 100:.0f}")
 
 
+def replay(m: Macros) -> None:
+    """Every channel reads the same Researcher output (A1's, from the main run): the reading side alone."""
+    from .analyze import paired
+    rows = load_rows(latest("t09_replay"))
+    a1 = {r["task_id"]: r for r in rows if r["channel"] == "A1"}
+    m.add("RepN", len(a1))
+    m.add("RepAccAOne", pct(np.mean([r["acc"] for r in a1.values()])))
+    for ch in ("A2", "B", "C"):
+        rs = [r for r in rows if r["channel"] == ch]
+        mean, lo, hi = paired(np.array([r["acc"] for r in rs], dtype=float),
+                              np.array([a1[r["task_id"]]["acc"] for r in rs], dtype=float))
+        n = NAME[ch]
+        m.add(f"Rep{n}Acc", pct(np.mean([r["acc"] for r in rs])))
+        m.add(f"Rep{n}Gap", f"{-mean * 100:.0f}")
+        m.add(f"Rep{n}GapLo", f"{-hi * 100:.0f}")
+        m.add(f"Rep{n}GapHi", f"{-lo * 100:.0f}")
+        m.add(f"Rep{n}Deliv", f"{np.mean([r['judge_kept_writer_input'] for r in rs]) * 100:.0f}")
+
+
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout]
+            fanout, replay]
 
 
 def main() -> int:

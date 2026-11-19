@@ -75,7 +75,7 @@ We make three contributions:
 latency, file I/O, and where each supporting fact is lost (\S\ref{sec:method}).
 \item A measurement on two multi-hop QA benchmarks with \nMainTasks paired tasks per condition: copying is
 the most accurate; zero-copy ordering makes it as cheap to compute as a pipe; files cost more tokens and
-lose information on both the writing and the reading side; an index recovers most of the reading side
+lose information on both the writing and the reading side; an index helps readers find what other agents wrote
 (\S\ref{sec:results}).
 \item Sensitivity results on payload size, pipeline length, tool budget, batched reads, and model size,
 which turn the comparison into rules for when each channel is the right choice
@@ -204,7 +204,7 @@ fault.}
 \label{fig:loss}
 \end{figure*}
 
-\paragraph{Files lose information on both sides; an index fixes the reading side.} Writing to a file
+\paragraph{Files lose information on both sides; an index helps the reader find it.} Writing to a file
 changes the writer: given the same questions and documents, the Researcher writes
 \nNotesShorter{}\% shorter notes when they go to files through a tool call (\nNotesCharsFile vs \nNotesCharsMsg characters at $k=3$), and in B its notes state \nNotesB{}\% of the
 supporting facts instead of \nNotesAOne{}\% (Figure~\ref{fig:loss}a). On the reading side, the files B's Writer reads state only \nDelivBMin--\nDelivBMax{}\% of the facts in its
@@ -221,7 +221,11 @@ receive them copied, as in A1, with the documents. Its notes are as short as B's
 characters; \nWCharsAOne in A1) and state \nWNotes{}\% of the supporting facts (\nWNotesB{}\% in B, \nWNotesAOne{}\% in
 A1). On \nWN paired tasks A1w answers \nWAcc{}\%, \nWGapAOne points below broadcast (95\% interval
 \nWGapAOneLo--\nWGapAOneHi) and \nWOverB above B (\nWOverBLo--\nWOverBHi). More than half of B's loss therefore comes from asking the model to write its result as a tool-call
-argument; the rest comes from reading.
+argument; the rest comes from reading. To measure reading alone we replayed broadcast's Researcher output,
+unchanged, into every channel, as one file \texttt{notes.md} for B and C. With the same notes, B and C both
+answer \nRepBGap points fewer questions than broadcast (\nRepBAcc{}\% vs \nRepAccAOne{}\%, 95\% interval
+\nRepBGapLo--\nRepBGapHi, \nRepN tasks), and the pipe \nRepATwoGap. With a single, clearly named notes file the
+index no longer matters; its value in the main run lay in finding notes the Researcher had named itself.
 
 \section{Sensitivity}
 \label{sec:sensitivity}
