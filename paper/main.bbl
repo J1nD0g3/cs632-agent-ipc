@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{23}
+\begin{thebibliography}{27}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -85,6 +85,16 @@
 \shownote{arXiv:2410.08115}.
 
 
+\bibitem[Gim et~al\mbox{.}(2024)]%
+        {promptcache}
+\bibfield{author}{\bibinfo{person}{In Gim} {et~al\mbox{.}}}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Prompt Cache: Modular Attention Reuse for
+  Low-Latency Inference}. In \bibinfo{booktitle}{\emph{Conference on Machine
+  Learning and Systems (MLSys)}}.
+\newblock
+
+
 \bibitem[Han and Zhang(2025)]%
         {lbmas}
 \bibfield{author}{\bibinfo{person}{Bochen Han} {and} \bibinfo{person}{Songmao
@@ -160,6 +170,26 @@
 \href{https://doi.org/10.1145/168619.168633}{doi:\nolinkurl{10.1145/168619.168633}}
 
 
+\bibitem[Lin et~al\mbox{.}(2024)]%
+        {parrot}
+\bibfield{author}{\bibinfo{person}{Chaofan Lin} {et~al\mbox{.}}}
+  \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{Parrot: Efficient Serving of {LLM}-based
+  Applications with Semantic Variable}. In \bibinfo{booktitle}{\emph{USENIX
+  Symposium on Operating Systems Design and Implementation (OSDI)}}.
+\newblock
+
+
+\bibitem[Pan et~al\mbox{.}(2025)]%
+        {kvflow}
+\bibfield{author}{\bibinfo{person}{Zaifeng Pan} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{{KVFlow}: Efficient Prefix Caching for Accelerating
+  {LLM}-Based Multi-Agent Workflows}. In \bibinfo{booktitle}{\emph{Advances in
+  Neural Information Processing Systems (NeurIPS)}}.
+\newblock
+
+
 \bibitem[Qian et~al\mbox{.}(2024)]%
         {chatdev}
 \bibfield{author}{\bibinfo{person}{Chen Qian} {et~al\mbox{.}}}
@@ -179,6 +209,18 @@
 \newblock
 \newblock
 \shownote{arXiv:2510.01285}.
+
+
+\bibitem[Sharma(2026)]%
+        {toap}
+\bibfield{author}{\bibinfo{person}{T. Sharma}.}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \bibinfo{title}{{TOAP}: The Token-Optimized Agent Protocol ---
+  Reference, Summary, or {KV} Cache? Measuring How Multi-Agent Systems Should
+  Share Context}.
+\newblock
+\newblock
+\shownote{Zenodo preprint, not peer reviewed, doi:10.5281/zenodo.20671083}.
 
 
 \bibitem[Wang et~al\mbox{.}(2025a)]%

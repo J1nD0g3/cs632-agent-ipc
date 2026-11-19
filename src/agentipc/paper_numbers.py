@@ -276,7 +276,75 @@ def kv_tokens(model: str) -> int:
     raise ValueError(f"no server log for {model}")
 
 
-SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, qwen4b]
+def harness(m: Macros) -> None:
+    """How often the harness steps in, and what accuracy would be if its rescues counted as failures."""
+    run = latest("t07_main")
+    forced = {ch: {"writer": [], "reviewer": [], "acc": [], "acc_strict": []} for ch in ("B", "C", "D")}
+    for rec in raw_records(run):
+        if rec["k"] != 3 or rec["channel"] not in forced or "error" in rec:
+            continue
+        f = forced[rec["channel"]]
+        fw = any(c.get("forced_write") for c in rec["agents"]["writer"]["calls"])
+        fr = any(c.get("forced_write") for c in rec["agents"]["reviewer"]["calls"])
+        f.setdefault("w_reply", []).append(fw and not rec["agents"]["writer"]["hit_turn_limit"])
+        f.setdefault("r_budget", []).append(fr and rec["agents"]["reviewer"]["hit_turn_limit"])
+        f["writer"].append(fw)
+        f["reviewer"].append(fr)
+        f["acc"].append(rec["score"]["acc"])
+        f["acc_strict"].append(0.0 if (fw or fr) else rec["score"]["acc"])
+    for ch, f in forced.items():
+        m.add(f"Forced{ch}Writer", f"{np.mean(f['writer']) * 100:.0f}")
+        m.add(f"Forced{ch}Reviewer", f"{np.mean(f['reviewer']) * 100:.0f}")
+        m.add(f"Strict{ch}", pct(np.mean(f["acc_strict"])))
+        m.add(f"Forced{ch}WriterReply", f"{np.mean(f['w_reply']) * 100:.0f}")
+        m.add(f"Forced{ch}ReviewerBudget", f"{np.mean(f['r_budget']) * 100:.0f}")
+    # Zero-copy under exact match, per cell, to qualify "within the noise".
+    res = analyze_metric(load_rows(run), "em")
+    gaps = [-g[0] for key, g in res.items() if key.endswith("|A1zc")]
+    m.add("ZcEmGapMax", f"{max(gaps) * 100:.0f}")
+    # Tool-budget hits per role at k=16 (B), the setting behind the large-payload collapse.
+    big = latest("t08_large")
+    hits = {"writer": [], "reviewer": []}
+    for rec in raw_records(big):
+        if rec["channel"] == "B" and "error" not in rec:
+            for role in hits:
+                hits[role].append(rec["agents"][role]["hit_turn_limit"])
+    m.add("LargeBWriterLimit", f"{np.mean(hits['writer']) * 100:.0f}")
+    m.add("LargeBReviewerLimit", f"{np.mean(hits['reviewer']) * 100:.0f}")
+
+
+def analyze_metric(rows: list[dict], metric: str) -> dict:
+    """Paired (channel - A1) difference of one metric per (dataset, k, channel)."""
+    from .analyze import paired
+    by = {}
+    for r in rows:
+        by.setdefault((r["dataset"], r["k"]), {}).setdefault(r["channel"], {})[r["task_id"]] = r
+    out = {}
+    for (ds, k), chans in by.items():
+        base = chans["A1"]
+        for ch, runs in chans.items():
+            if ch == "A1":
+                continue
+            common = [t for t in runs if t in base]
+            a = np.array([runs[t][metric] for t in common], dtype=float)
+            b = np.array([base[t][metric] for t in common], dtype=float)
+            out[f"{ds}|k{k}|{ch}"] = paired(a, b)
+    return out
+
+
+def chain4_ci(m: Macros) -> None:
+    from .analyze import paired
+    main = {(r["task_id"], r["channel"]): r for r in load_rows(latest("t07_main"))}
+    rows = load_rows(latest("t08_chain4"))
+    for ch in ("A2", "B"):
+        pr = [(r["acc"], main[(r["task_id"], ch)]["acc"]) for r in rows if r["channel"] == ch and (r["task_id"], ch) in main]
+        a, b = np.array(pr, dtype=float).T
+        _, lo, hi = paired(a, b)
+        m.add(f"Chain{NAME[ch]}Lo", f"{lo * 100:+.0f}")
+        m.add(f"Chain{NAME[ch]}Hi", f"{hi * 100:+.0f}")
+
+
+SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness]
 
 
 def main() -> int:
