@@ -296,8 +296,10 @@ budget (\nTwelveLimitMin--\nTwelveLimitMax\% at 12). At $k=3$ the 12-call limit,
 of B under this budget.
 
 \paragraph{Run-to-run noise.} Greedy decoding on a batching server is not deterministic: two channels whose
-Researcher receives the identical prompt produce identical output in \nSamePrompt{}\% of tasks. Small differences
-between channels therefore carry run-level noise that pairing tasks does not remove.
+Researcher receives the identical prompt produce identical output in \nSamePrompt{}\% of tasks. Rerunning A1 and B on
+\nAAN of the main tasks (an A/A control) gives the same accuracy within \nAAWorst points at 95\% (\nAAAOneDiff{} and
+\nAABDiff{} points), the same score on \nAABSame--\nAAAOneSame\% of tasks, and the same B--A1 gap (\nAAGapRepeat
+vs \nAAGapMain points); the effects we report are larger than this noise.
 
 \section{Related Work}
 

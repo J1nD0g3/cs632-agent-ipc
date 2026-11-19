@@ -444,8 +444,31 @@ def replay(m: Macros) -> None:
         m.add(f"Rep{n}Deliv", f"{np.mean([r['judge_kept_writer_input'] for r in rs]) * 100:.0f}")
 
 
+def repeat(m: Macros) -> None:
+    """A/A control: A1 and B rerun on the main run's first 100 tasks per dataset."""
+    from .analyze import paired
+    main = {(r["task_id"], r["channel"]): r for r in load_rows(latest("t07_main"))}
+    rows = load_rows(latest("t09_repeat"))
+    worst = 0.0
+    for ch in ("A1", "B"):
+        rs = [r for r in rows if r["channel"] == ch]
+        a = np.array([r["acc"] for r in rs], dtype=float)
+        b = np.array([main[(r["task_id"], ch)]["acc"] for r in rs], dtype=float)
+        mean, lo, hi = paired(a, b)
+        worst = max(worst, abs(lo), abs(hi))
+        m.add(f"AA{NAME[ch]}Diff", f"{mean * 100:+.1f}")
+        m.add(f"AA{NAME[ch]}Same", f"{np.mean(np.isclose(a, b)) * 100:.0f}")
+    m.add("AAN", len({r["task_id"] for r in rows}))
+    m.add("AAWorst", f"{worst * 100:.0f}")
+    gap = lambda src: (np.mean([src(t, "B") for t in {r["task_id"] for r in rows}]) -
+                       np.mean([src(t, "A1") for t in {r["task_id"] for r in rows}]))
+    rep = {(r["task_id"], r["channel"]): r["acc"] for r in rows}
+    m.add("AAGapRepeat", f"{-gap(lambda t, c: rep[(t, c)]) * 100:.1f}")
+    m.add("AAGapMain", f"{-gap(lambda t, c: main[(t, c)]['acc']) * 100:.1f}")
+
+
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout, replay]
+            fanout, replay, repeat]
 
 
 def main() -> int:
