@@ -54,6 +54,7 @@ def main() -> int:
         draft = parse_answers(rec["stage"].get("draft", ""), len(qs))
         overflow = any(a["overflow"] for a in rec["agents"].values())
         counts = dict.fromkeys(KINDS, 0)
+        right_but_missing = 0  # base rate: correct answers whose Researcher output misses a fact
         for qi, q in enumerate(qs):
             good, d_ok = correct(final[qi], q.answer), correct(draft[qi], q.answer)
             n_has = all(h.get(("notes", qi, fi), False) for fi in range(len(q.facts)))
@@ -62,7 +63,9 @@ def main() -> int:
                 "no_answer" if not final[qi] else "reviewer_broke" if d_ok else \
                 "research_miss" if not n_has else "delivery_miss" if not g_has else "writer_wrong"
             counts[kind] += 1
+            right_but_missing += good and not n_has
         row.update({f"aq_{k}": v / len(qs) for k, v in counts.items()})
+        row["aq_right_notes_miss"] = right_but_missing / len(qs)
         rows.append(row)
     with gzip.open(raw / "alignscore_rows.jsonl.gz", "wt") as f:
         for r in rows:

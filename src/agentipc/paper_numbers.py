@@ -84,6 +84,10 @@ def main_run(m: Macros) -> None:
         m.add(f"Gap{NAME[ch]}Min", f"{-max(diffs) * 100:.0f}")
         m.add(f"Gap{NAME[ch]}Max", f"{-min(diffs) * 100:.0f}")
         m.add(f"Gap{NAME[ch]}Sig", n_sig)
+    vs_b = analyze(rows, "B")
+    m.add("CoverBSig", sum(1 for key, g in vs_b.items() if key.endswith("|C") and g.get("acc_diff", (0, 0, 0))[1] > 0))
+    right = [r for r in rows if r["channel"] == "A1" and r["k"] == 3 and "aq_right_notes_miss" in r]
+    m.add("RightMissAOne", f"{sum(r['aq_right_notes_miss'] for r in right) / sum(r['acc'] for r in right) * 100:.0f}")
     zc_ratio = [g["prefill_tokens"] / res[key.replace("A1zc", "A1")]["prefill_tokens"]
                 for key, g in res.items() if key.endswith("|A1zc")]
     m.add("ZcRatioMin", f"{min(zc_ratio) * 100:.0f}")

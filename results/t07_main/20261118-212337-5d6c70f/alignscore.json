@@ -39,6 +39,11 @@
     "lo": 0.0156,
     "hi": 0.0444
    },
+   "aq_right_notes_miss": {
+    "mean": 0.6556,
+    "lo": 0.6067,
+    "hi": 0.7022
+   },
    "aq_writer_wrong": {
     "mean": 0.02,
     "lo": 0.0089,
@@ -91,6 +96,11 @@
     "mean": 0.0311,
     "lo": 0.0178,
     "hi": 0.0467
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.5978,
+    "lo": 0.5489,
+    "hi": 0.6422
    },
    "aq_writer_wrong": {
     "mean": 0.0378,
@@ -145,6 +155,11 @@
     "lo": 0.0244,
     "hi": 0.0622
    },
+   "aq_right_notes_miss": {
+    "mean": 0.5311,
+    "lo": 0.4822,
+    "hi": 0.58
+   },
    "aq_writer_wrong": {
     "mean": 0.0178,
     "lo": 0.0067,
@@ -197,6 +212,11 @@
     "mean": 0.1533,
     "lo": 0.1156,
     "hi": 0.1956
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.5622,
+    "lo": 0.5111,
+    "hi": 0.6111
    },
    "aq_writer_wrong": {
     "mean": 0.02,
@@ -251,6 +271,11 @@
     "lo": 0.0378,
     "hi": 0.0867
    },
+   "aq_right_notes_miss": {
+    "mean": 0.6267,
+    "lo": 0.58,
+    "hi": 0.6711
+   },
    "aq_writer_wrong": {
     "mean": 0.0156,
     "lo": 0.0044,
@@ -303,6 +328,11 @@
     "mean": 0.0356,
     "lo": 0.0178,
     "hi": 0.0556
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.6178,
+    "lo": 0.5689,
+    "hi": 0.6622
    },
    "aq_writer_wrong": {
     "mean": 0.0022,
@@ -357,6 +387,11 @@
     "lo": 0.0044,
     "hi": 0.0267
    },
+   "aq_right_notes_miss": {
+    "mean": 0.4378,
+    "lo": 0.3911,
+    "hi": 0.4889
+   },
    "aq_writer_wrong": {
     "mean": 0.1044,
     "lo": 0.0756,
@@ -409,6 +444,11 @@
     "mean": 0.0111,
     "lo": 0.0022,
     "hi": 0.0244
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.4222,
+    "lo": 0.3755,
+    "hi": 0.4711
    },
    "aq_writer_wrong": {
     "mean": 0.1089,
@@ -463,6 +503,11 @@
     "lo": 0.0044,
     "hi": 0.0267
    },
+   "aq_right_notes_miss": {
+    "mean": 0.4022,
+    "lo": 0.3533,
+    "hi": 0.4489
+   },
    "aq_writer_wrong": {
     "mean": 0.1089,
     "lo": 0.0778,
@@ -515,6 +560,11 @@
     "mean": 0.0756,
     "lo": 0.0466,
     "hi": 0.1089
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.4578,
+    "lo": 0.4067,
+    "hi": 0.5067
    },
    "aq_writer_wrong": {
     "mean": 0.0533,
@@ -569,6 +619,11 @@
     "lo": 0.0089,
     "hi": 0.04
    },
+   "aq_right_notes_miss": {
+    "mean": 0.5067,
+    "lo": 0.46,
+    "hi": 0.5556
+   },
    "aq_writer_wrong": {
     "mean": 0.0489,
     "lo": 0.0289,
@@ -621,6 +676,11 @@
     "mean": 0.0533,
     "lo": 0.0311,
     "hi": 0.0822
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.5378,
+    "lo": 0.4888,
+    "hi": 0.5867
    },
    "aq_writer_wrong": {
     "mean": 0.0178,
