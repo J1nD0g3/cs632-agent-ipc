@@ -149,11 +149,17 @@ which supporting sentences a text states. We judge the Researcher's output and w
 the copied notes in message channels (so delivery is complete by construction), or the text of the files
 it read in file channels, source documents included. We attribute each wrong answer to a stage: the
 Reviewer if the draft answer was right; otherwise the Researcher if its output misses a supporting fact,
-delivery if the Writer did not receive one, and the Writer if it had them all. The judge is noisy: on
-\nJxFacts sampled facts, Llama-3-8B-Instruct given the same prompt agrees with it on \nJxAgree\% ($\kappa$ =
-\nJxKappa), and lexical matching on \nJxLexAgree\% ($\kappa$ = \nJxLexKappa). We therefore read fact-level numbers as
-estimates and back each conclusion with a measure that needs no judge: accuracy, note length, which files
-an agent opened, and which files two agents both wrote. \emph{Latency} is wall time per task under the
+delivery if the Writer did not receive one, and the Writer if it had them all. The judge is lenient. On
+\nSynN pairs built from the task documents with labels known by construction, it accepts every present
+sentence (\nSynQPresent{}\%) but rejects only \nSynQDropped{}\% of removed ones and \nSynQSwapped{}\% of sentences whose key
+entity we replaced (Llama-3-8B-Instruct: \nSynLPresent, \nSynLDropped, \nSynLSwapped{}\%); on \nJxFacts real facts the two
+judges agree on \nJxAgree{}\% ($\kappa$ = \nJxKappa). We therefore read judge numbers as upper-bound estimates and back
+each conclusion with measures that need no judge: accuracy; the entities of each question's gold chain
+(the subjects and objects of 2Wiki's evidence triples, the titles of HotpotQA's supporting paragraphs) found
+by exact string match, as answer-string recall is used for retrieval~\cite{dpr}; note length; which files
+an agent opened; and which files two agents both wrote. By entity match the Researcher's output keeps
+\nEntAOneNotes{}\% of the chain entities in A1, \nEntCNotes{}\% in C, \nEntDNotes{}\% in D, and \nEntBNotes{}\% in B, and the Writer
+receives \nEntBDeliv{}\% of them in B, \nEntDDeliv{}\% in D, and \nEntCDeliv{}\% in C: the same order as the judge. \emph{Latency} is wall time per task under the
 shared load.
 
 \paragraph{Harness.} An agent may make up to 12 tool calls. If it stops without leaving its output file, it
@@ -269,40 +275,40 @@ tasks and B answers \nFanBDiff{} points (\nFanBLo{} to \nFanBHi{}) relative to o
 handoffs still carry each Researcher's findings, and D changes by \nFanDDiff{} (\nFanDLo{} to \nFanDHi{}).
 
 \paragraph{A longer pipeline multiplies copies, not cached ones.} Adding a Fact-checker between the Writer and
-the Reviewer adds one more receiver. Broadcast then computes \nChainAOneComp\% more, because the history is
-copied once more; zero-copy broadcast computes only \nChainAZcComp\% more, because the new agent reuses the
-cached history. The extra check helps the pipe, whose Reviewer was the weak point (\nChainATwoAccRef\% to
-\nChainATwoAcc\%), and hurts plain files, where one more agent has to find the notes on its own
-(\nChainBAccRef\% to \nChainBAcc\%); the paired 95\% intervals are \nChainATwoLo{} to \nChainATwoHi{} and \nChainBLo{} to \nChainBHi{} points on
+the Reviewer adds one more receiver. Broadcast then computes \nChainAOneComp{}\% more, because the history is
+copied once more; zero-copy broadcast computes only \nChainAZcComp{}\% more, because the new agent reuses the
+cached history. The extra check helps the pipe, whose Reviewer was the weak point (\nChainATwoAccRef{}\% to
+\nChainATwoAcc{}\%), and hurts plain files, where one more agent has to find the notes on its own
+(\nChainBAccRef{}\% to \nChainBAcc{}\%); the paired 95\% intervals are \nChainATwoLo{} to \nChainATwoHi{} and \nChainBLo{} to \nChainBHi{} points on
 \nChainN tasks, and the other channels move by at most \nChainOtherMax point.
 
 \paragraph{Cheaper reads make the Writer skip the notes.} A \texttt{read\_files} tool that reads several files
 in one call, the agent's \texttt{readv}, cuts B's calls from \nBbCallsB to \nBbCalls and its tokens by
-\nBbTokCut\%, but costs \nBbAccLo--\nBbAccHi points of accuracy on \nBbN paired tasks (\nBbAcc\% vs
-\nBbAccB\%). Given a cheap bulk read, the Writer reads the source documents itself: \nBbDocReads\% of its reads
-are documents, and in \nBbNoNotes\% of the tasks it never opens the Researcher's notes. Cheap access is not
+\nBbTokCut{}\%, but costs \nBbAccLo--\nBbAccHi points of accuracy on \nBbN paired tasks (\nBbAcc{}\% vs
+\nBbAccB{}\%). Given a cheap bulk read, the Writer reads the source documents itself: \nBbDocReads{}\% of its reads
+are documents, and in \nBbNoNotes{}\% of the tasks it never opens the Researcher's notes. Cheap access is not
 enough; the reader also has to know where the result is.
 
 \paragraph{A smaller model needs simpler channels.} With Qwen3-4B, whose smaller weights leave a larger cache
 (\nSmallKv tokens vs \nBigKv), the file channels fall far behind broadcast: B by \nSmallBGapMin--\nSmallBGapMax
-points and C by \nSmallCGapMinThreeFive--\nSmallCGapMaxThreeFive at three and five questions. The index helps less: C uses up its tool budget in \nSmallCLimitMin--\nSmallCLimitMax\% of those runs (B in
-\nSmallBLimitMin--\nSmallBLimitMax\%). Handles lose
+points and C by \nSmallCGapMinThreeFive--\nSmallCGapMaxThreeFive at three and five questions. The index helps less: C uses up its tool budget in \nSmallCLimitMin--\nSmallCLimitMax{}\% of those runs (B in
+\nSmallBLimitMin--\nSmallBLimitMax{}\%). Handles lose
 \nSmallDGapMin--\nSmallDGapMax points, and the pipe at most \nSmallATwoGapMaxThreeFive at three and five
 questions. Zero-copy ordering, free for Qwen3-8B, costs the smaller model \nSmallAZcGapMinThreeFive--\nSmallAZcGapMaxThreeFive
 points there (significant in \nSmallAZcSigThreeFive of four settings); a plausible cause, which we have not
 tested, is that it reads its instruction last, after thousands of tokens of documents.
 
 \paragraph{The tool budget does not drive the results.} With 24 tool calls instead of 12, B and C send
-\nTwFourTokMin--\nTwFourTokMax\% more tokens and change accuracy by at most \nTwFourAccMax points on \nTwFourN
-paired tasks per channel ($k=3$, both datasets); \nTwFourLimitMin--\nTwFourLimitMax\% of their runs still use the whole
-budget (\nTwelveLimitMin--\nTwelveLimitMax\% at 12). At $k=3$ the 12-call limit, if anything, understates their cost; at $k=16$ it binds harder (B's Writer in
+\nTwFourTokMin--\nTwFourTokMax{}\% more tokens and change accuracy by at most \nTwFourAccMax points on \nTwFourN
+paired tasks per channel ($k=3$, both datasets); \nTwFourLimitMin--\nTwFourLimitMax{}\% of their runs still use the whole
+budget (\nTwelveLimitMin--\nTwelveLimitMax{}\% at 12). At $k=3$ the 12-call limit, if anything, understates their cost; at $k=16$ it binds harder (B's Writer in
 \nLargeBWriterLimit{}\% of runs, its Reviewer in \nLargeBReviewerLimit{}\%), so the large-payload collapse is that
 of B under this budget.
 
 \paragraph{Run-to-run noise.} Greedy decoding on a batching server is not deterministic: two channels whose
 Researcher receives the identical prompt produce identical output in \nSamePrompt{}\% of tasks. Rerunning A1 and B on
 \nAAN of the main tasks (an A/A control) gives the same accuracy within \nAAWorst points at 95\% (\nAAAOneDiff{} and
-\nAABDiff{} points), the same score on \nAABSame--\nAAAOneSame\% of tasks, and the same B--A1 gap (\nAAGapRepeat
+\nAABDiff{} points), the same score on \nAABSame--\nAAAOneSame{}\% of tasks, and the same B--A1 gap (\nAAGapRepeat
 vs \nAAGapMain points); the effects we report are larger than this noise.
 
 \section{Related Work}

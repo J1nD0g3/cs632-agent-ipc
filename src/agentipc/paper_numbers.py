@@ -468,6 +468,15 @@ def repeat(m: Macros) -> None:
 
 
 def judges(m: Macros) -> None:
+    syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
+    for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
+        for kind in ("present", "dropped", "swapped"):
+            m.add(f"Syn{n}{kind.capitalize()}", f"{syn[key][kind] * 100:.0f}")
+    m.add("SynN", syn["n"])
+    ent = json.loads((latest("t07_main") / "entities.json").read_text())["pooled"]
+    for ch in CH:
+        m.add(f"Ent{NAME[ch]}Notes", f"{ent[f'k3|{ch}']['ent_recall_notes'] * 100:.0f}")
+        m.add(f"Ent{NAME[ch]}Deliv", f"{ent[f'k3|{ch}']['ent_kept_writer_input'] * 100:.0f}")
     d = json.loads((latest("t07_main") / "judge_cross.json").read_text())
     m.add("JxFacts", d["facts"])
     m.add("JxAgree", f"{d['qwen_vs_other']['agree'] * 100:.0f}")
