@@ -1,0 +1,16 @@
+# KV capacity actually used per run, extracted by script from the vLLM server logs (logs/vllm_gpu*_*.log).
+# blocks = --num-gpu-blocks-override (16-token blocks); kv_tokens = vLLM 'GPU KV cache size: N tokens' line;
+# gpu_mem_util = vLLM 'Desired GPU memory utilization' line. Log-to-run mapping from GPU and start time in the queue logs.
+# P2 gate file logs/pro6000_claims/p2_kv_blocks = 6250
+# exp	run_id	gpu	model	blocks	kv_tokens	gpu_mem_util	server_log
+p01_cache_35k	20261119-123811-4c8ded9	2	Qwen/Qwen3-8B	2179	34,864	0.92	logs/vllm_gpu2_20261119_123720.log
+p01_cache_100k	20261119-123813-4c8ded9	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261119_123722.log
+p01_cache_400k	20261119-123815-4c8ded9	4	Qwen/Qwen3-8B	25000	400,000	0.92	logs/vllm_gpu4_20261119_123724.log
+p02_size_4b	20261119-172319-034205b	3	Qwen/Qwen3-4B	6250	100,000	0.92	logs/vllm_gpu3_20261119_172219.log
+p02_size_8b	20261119-142311-4c8ded9	2	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu2_20261119_142221.log
+p02_size_14b	20261119-135325-4c8ded9	4	Qwen/Qwen3-14B	6250	100,000	0.92	logs/vllm_gpu4_20261119_135215.log
+p02_size_32b	20261119-135351-4c8ded9	3	Qwen/Qwen3-32B	6250	100,000	0.95	logs/vllm_gpu3_20261119_135241.log
+p03_corner_32b_35k	20261119-151146-034205b	1	Qwen/Qwen3-32B	2179	34,864	0.95	logs/vllm_gpu1_20261119_151016.log
+p02_size_4b_STOPPED_first_attempt	20261119-152502-034205b	2	Qwen/Qwen3-4B	6250	100,000	0.92	logs/vllm_gpu2_20261119_152402.log
+setup_smoke_t01_not_a_run	t01_smoke_20261119-123519-d8fbe6b	2	Qwen/Qwen3-8B	none(default)	493,408	0.9	logs/vllm_gpu2_20261119_123154.log
+setup_kv_size_check_not_a_run	-	2	Qwen/Qwen3-8B	2179	34,864	0.92	logs/vllm_gpu2_20261119_123614.log

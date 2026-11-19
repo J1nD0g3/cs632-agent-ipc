@@ -1,0 +1,26 @@
+First p02_size_4b attempt: run 20261119-152502-034205b (PRO 6000, GPU 2) -- NOT a result, do not use.
+
+Why it was rerun
+- P2 Qwen3-4B started on GPU 2 at 15:24:02 (server up 15:25:02, Qwen/Qwen3-4B, --num-gpu-blocks-override 6250
+  = 100,000 KV tokens, gpu_memory_utilization 0.92; same settings as every other P2 run).
+- Mid-run, two GPUs had to be freed for another user. GPU 2 was one of them, so the operator stopped this run
+  by PID: queue worker (bash, pid 1247355), the agentipc.run process (pid 1294061), then the vLLM server
+  (pid 1293271), at 15:30:48 KST. Progress at that moment: 160/1200 runs (last progress line in
+  logs/p02_size_4b_stopped_20261119-152502-034205b.log).
+  (results/_failed/notes.txt on the PRO 6000 says "15:26"; the actual kill command ran at 15:30:48.)
+- Nothing was wrong with the run itself: no errors, no overflow seen. It was stopped only to release the GPU.
+- Since a partial run cannot be resumed, P2 4B was rerun from scratch on GPU 3 after p02_size_32b finished:
+  run 20261119-172319-034205b (17:23:19 - 18:05:22), 1200/1200 runs, 0 errors, same config and settings.
+  That rerun is the P2 4B result.
+
+What is in failed_4b.tar.gz (copied as is; nothing deleted or changed on the PRO 6000 side)
+- results/_failed/p02_size_4b_20261119-152502-034205b/: config.yaml, env.json, task_stats.json
+  (no summary.json, because the run never finished).
+- results_raw/_failed/p02_size_4b_20261119-152502-034205b/:
+  - records.jsonl.gz: the gzip stream is truncated (process killed before closing it), so gunzip reports
+    "unexpected end of file". 153 complete JSON records can be read from it (0 with an error field), plus one
+    partial line. 160 runs had been reported done; the last few were still in the write buffer.
+  - workspaces/: 83 unpacked workspace directories (normally packed into workspaces.tar.gz at the end of a run).
+  - no rows.jsonl.gz (written only at the end of a run).
+- Related logs (in run_logs.tar.gz / vllm_logs.tar.gz): logs/p02_size_4b_stopped_20261119-152502-034205b.log,
+  logs/queue_pro6000_g2.log, logs/vllm_gpu2_20261119_152402.log.
