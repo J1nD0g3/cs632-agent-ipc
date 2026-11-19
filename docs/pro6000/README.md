@@ -69,3 +69,27 @@ Expect several hours. Never edit a queue script while it runs; kill by PID only.
 - `python -m agentipc.report results/<exp>/<run>` per run; commit `results/p0*/` (config, env, summaries), never
   `results_raw/`; push the `pro6000` branch.
 - Report per run: errors, accuracy and tokens sent/computed per channel, and anything odd.
+
+## Hand the raw records back (needed for fact scoring)
+
+Fact presence is scored after the runs with AlignScore (Zha et al., ACL 2023) on the main server, which
+reads `results_raw/<exp>/<run>/records.jsonl.gz`. Those files are not in git, so pack them:
+
+```bash
+tar czf $STORE/pro6000_raw.tar.gz -C results_raw $(cd results_raw && ls -d p0*)
+ls -la $STORE/pro6000_raw.tar.gz
+```
+
+and copy the archive to the main server's `cs632/results_raw/` (scp, or ask Jin). Do not commit it.
+
+## Optional: AlignScore on this server
+
+Only if the main server is not available. In a separate venv (Python 3.10, `torch==1.13.1`, `numpy<2`,
+`transformers>=4.30,<4.40`, `pytorch_lightning>=1.9,<2`, `spacy>=3.7,<3.8` with `en_core_web_sm-3.7.1`,
+`nltk`, `setuptools<70`), install the official code with `uv pip install --no-deps` from a clone of
+github.com/yuh-zha/AlignScore, download `AlignScore-large.ckpt` from huggingface.co/yzha/AlignScore into
+`$STORE/alignscore/ckpt/`, and put NLTK's `punkt_tab` in a private directory (`umask 077`; NLTK refuses
+group-writable data directories). Then export each run's pairs with
+`python -m agentipc.factpairs --export results/<exp>/<run> pairs.jsonl` and score them with
+`scripts/alignscore_score.py pairs.jsonl scored.jsonl`. Installing and running third-party code may need
+Jin's approval in the session.

@@ -1,7 +1,7 @@
 """Labeled (context, fact) pairs for validating fact-presence measures, and real pairs to score.
 
-python -m agentipc.factpairs results/t07_main/<run_id> OUT_DIR
-Writes OUT_DIR/synthetic.jsonl and OUT_DIR/real.jsonl.
+python -m agentipc.factpairs results/t07_main/<run_id> OUT_DIR       (synthetic.jsonl, real.jsonl)
+python -m agentipc.factpairs --export results/<exp>/<run_id> OUT.jsonl [k]   (pairs of one run to score)
 
 synthetic.jsonl: labels known by construction, from the task's own documents. For a supporting sentence
 F of a question, the context is the sentences of the question's paragraphs, shuffled:
@@ -73,7 +73,32 @@ def synthetic(tasks, n_per_kind: int, seed: int) -> list[dict]:
     return rows
 
 
+def export_run(run_dir: Path, out_file: Path, k: int | None = None) -> int:
+    """One (context, fact) pair per supporting fact, run, and stage (Researcher output, Writer input)."""
+    cfg, tasks = tasks_of(run_dir)
+    raw = ROOT / "results_raw" / cfg["exp"] / run_dir.name
+    n = 0
+    with open(out_file, "w") as out:
+        for line in gzip.open(raw / "records.jsonl.gz", "rt"):
+            rec = json.loads(line)
+            if "error" in rec or (k is not None and rec["k"] != k):
+                continue
+            for stage in ("notes", "writer_input"):
+                text = rec["stage"].get(stage, "") or " "
+                for qi, q in enumerate(tasks[rec["task_id"]].questions):
+                    for fi, f in enumerate(q.facts):
+                        out.write(json.dumps({"task_id": rec["task_id"], "channel": rec["channel"], "k": rec["k"],
+                                              "stage": stage, "q": qi, "f": fi, "fact": f.text,
+                                              "context": text}) + "\n")
+                        n += 1
+    return n
+
+
 def main() -> int:
+    if sys.argv[1] == "--export":
+        k = int(sys.argv[4]) if len(sys.argv) > 4 else None
+        print(export_run(Path(sys.argv[2]), Path(sys.argv[3]), k), "pairs")
+        return 0
     run_dir, out = Path(sys.argv[1]), Path(sys.argv[2])
     out.mkdir(parents=True, exist_ok=True)
     cfg, tasks = tasks_of(run_dir)
