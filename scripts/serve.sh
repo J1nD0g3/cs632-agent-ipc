@@ -12,7 +12,7 @@ SERVE_MODEL=${SERVE_MODEL:-$MODEL}
 SERVED_NAME=${SERVED_NAME:-qwen3-8b}
 CUDA_VISIBLE_DEVICES=$GPU nohup "$VLLM_BIN" serve "$SERVE_MODEL" \
   --served-model-name "$SERVED_NAME" --port "$PORT" \
-  --max-model-len 32768 --gpu-memory-utilization 0.90 \
+  --max-model-len "${MAX_LEN:-32768}" --gpu-memory-utilization 0.90 \
   --enable-prefix-caching --enable-prompt-tokens-details \
   --enable-auto-tool-choice --tool-call-parser hermes \
   --seed 0 > "$LOG" 2>&1 &
