@@ -21,7 +21,7 @@
 | tokens | Total tokens per task: A / B / C | k=3 sent / computed: A1 13.3k/12.4k, A1-zc 13.6k/4.8k, A2 5.6k/4.7k, B 38.2k/9.8k, C 37.4k/9.8k, D 17.5k/7.2k | results/t07_main/20261118-212337-5d6c70f |
 | file_io | File reads and writes per task: A / B / C | k=3 file I/O ops: B 13.4-15.3, C 12.1-14.4, D 5.6-5.8 (message channels 0) | results/t07_main/20261118-212337-5d6c70f |
 | info_loss | Key facts lost between stages: A / B / C | k=3 AlignScore, facts in Researcher output / share delivered: A1 45%/100%, A1-zc 50%/100%, A2 45%/100%, B 32%/91%, C 30%/95%, D 25%/51% | results/t07_main/20261118-212337-5d6c70f/alignscore.json |
-| recommendation | Which channel, and when | History fits the KV cache: zero-copy broadcast (Qwen3-8B). It does not: pipe, whose savings come from dropping the documents. Files only with a naming discipline (index) and a tool-capable model | paper/main.tex (Conclusion) |
+| recommendation | Which channel, and when | History fits the KV cache: zero-copy broadcast (saves prefill, not serving time). It does not: pipe, whose savings come from dropping the documents. Write long results as plain replies (tool-call writing shortens notes at 4B/8B/32B). Files need a tool-capable model; an index helps 8B find notes among many files | paper/main.tex (Conclusion) |
 
 ## Log
 - 2026-11-18 T00: Repo created from the proposal. Model Qwen3-8B (thinking off) on vLLM v0.33.0;
