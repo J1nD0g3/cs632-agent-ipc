@@ -309,6 +309,23 @@ def harness(m: Macros) -> None:
         if rec["channel"] == "B" and "error" not in rec:
             for role in hits:
                 hits[role].append(rec["agents"][role]["hit_turn_limit"])
+    # Parallel Researchers that wrote the same workspace path (the later write replaces the earlier one).
+    clash, runs = {}, {}
+    for rec in raw_records(big):
+        if "error" in rec or rec["channel"] not in ("B", "Bb", "C", "D"):
+            continue
+        by_path = {}
+        for o in rec["io_ops"]:
+            if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o:
+                by_path.setdefault(o["path"], set()).add(o["agent"])
+        ch = rec["channel"]
+        clash[ch] = clash.get(ch, 0) + any(len(v) > 1 for v in by_path.values())
+        runs[ch] = runs.get(ch, 0) + 1
+    for ch in clash:
+        m.add(f"Clash{NAME.get(ch, ch)}", f"{clash[ch] / runs[ch] * 100:.0f}")
+    big_rows = load_rows(big)
+    for ch in ("B", "C", "D"):
+        m.add(f"LargeNotes{ch}", f"{np.mean([r['judge_recall_notes'] for r in big_rows if r['channel'] == ch]) * 100:.0f}")
     m.add("LargeBWriterLimit", f"{np.mean(hits['writer']) * 100:.0f}")
     m.add("LargeBReviewerLimit", f"{np.mean(hits['reviewer']) * 100:.0f}")
 
