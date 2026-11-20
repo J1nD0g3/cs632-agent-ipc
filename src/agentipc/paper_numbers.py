@@ -81,6 +81,15 @@ def main_run(m: Macros) -> None:
     a1c, zc = pool("A1", 3, "prefill_tokens"), pool("A1zc", 3, "prefill_tokens")
     m.add("ZcCut", f"{(1 - zc / a1c) * 100:.0f}")
     m.add("PooledGapC", f"{(pool('A1', 3, 'acc') - pool('C', 3, 'acc')) * 100:.1f}")
+    # Zero-copy minus broadcast at k=3, both datasets pooled, paired by task.
+    a1k3 = {(r["dataset"], r["task_id"]): r["acc"] for r in rows if r["channel"] == "A1" and r["k"] == 3}
+    zck3 = {(r["dataset"], r["task_id"]): r["acc"] for r in rows if r["channel"] == "A1zc" and r["k"] == 3}
+    ids = sorted(set(a1k3) & set(zck3))
+    zmean, zlo, zhi = paired(np.array([zck3[i] for i in ids], float), np.array([a1k3[i] for i in ids], float))
+    m.add("ZcPooledDiff", f"{zmean * 100:.1f}")
+    m.add("ZcPooledDiffLo", f"{zlo * 100:.1f}")
+    m.add("ZcPooledDiffHi", f"{zhi * 100:.1f}")
+    m.add("ZcPooledDiffN", len(ids))
     for ch in ("B", "C", "D", "A2"):
         m.add(f"SentRatio{NAME[ch]}", f"{pool(ch, 3, 'total_tokens') / pool('A1', 3, 'total_tokens'):.1f}")
         m.add(f"CompRatio{NAME[ch]}", f"{pool(ch, 3, 'prefill_tokens') / pool('A1', 3, 'prefill_tokens'):.2f}")
@@ -530,7 +539,7 @@ def repeat(m: Macros) -> None:
         m.add(f"AA{NAME[ch]}Diff", f"{mean * 100:+.1f}")
         m.add(f"AA{NAME[ch]}Same", f"{np.mean(np.isclose(a, b)) * 100:.0f}")
     m.add("AAN", len({r["task_id"] for r in rows}))
-    m.add("AAWorst", f"{worst * 100:.0f}")
+    m.add("AAWorst", f"{worst * 100:.1f}")
     gap = lambda src: (np.mean([src(t, "B") for t in {r["task_id"] for r in rows}]) -
                        np.mean([src(t, "A1") for t in {r["task_id"] for r in rows}]))
     rep = {(r["task_id"], r["channel"]): r["acc"] for r in rows}
@@ -753,26 +762,37 @@ def round6(m: Macros) -> None:
 
     sizes = {"Four": "4b", "Eight": "8b", "Fourteen": "14b", "ThirtyTwo": "32b"}
     sig_write = sig_read = 0
+    null_bound = []
     for tag, s in sizes.items():
         rs = rows(f"p10_write_{s}")
         a1, r, w, b = (by(rs, c) for c in ("A1", "A1r", "A1w", "B"))
         for lab, d in (("AOne", a1), ("R", r), ("W", w), ("B", b)):
             m.add(f"RSix{tag}Acc{lab}", pct(avg(d, "acc")))
             m.add(f"RSix{tag}Notes{lab}", f"{avg(d, 'as_recall_notes') * 100:.0f}")
-        gap(f"RSix{tag}Wording", r, a1)
+        _, wlo, whi_ = gap(f"RSix{tag}Wording", r, a1)
+        if wlo <= 0 <= whi_:
+            null_bound.append(max(abs(wlo), abs(whi_)))
         _, _, whi = gap(f"RSix{tag}Write", w, r)
+        # Tool-write tasks where a Researcher call hit the 4,096-token cap, and the write effect without them.
+        cut = {x["task_id"] for x in raw_records(latest(f"p10_write_{s}")) if x["channel"] == "A1w"
+               and any(c.get("finish_reason") == "length" for c in x["agents"]["researcher"]["calls"])}
+        m.add(f"RSixWCut{tag}", len(cut))
+        gap(f"RSix{tag}WriteUncut", {i: v for i, v in w.items() if i not in cut}, r)
         _, _, rhi = gap(f"RSix{tag}Read", b, w)
         gap(f"RSix{tag}Total", b, a1)
         sig_write += whi < 0
         sig_read += rhi < 0
     m.add("RSixWriteSigWord", word(sig_write))
+    # Widest end of the wording intervals at the sizes where the interval includes zero.
+    m.add("RSixWordingNullBound", f"{max(null_bound) * 100:.1f}")
     m.add("RSixReadSigWord", word(sig_read))
     m.add("RSixN", len(by(rows("p10_write_8b"), "A1")))
     # Serving time: three runs per channel served alone (p06 and p11 _r2, _r3), six tasks at a time.
-    t, pre, dec = {}, {}, {}
+    t, pre, dec, gen = {}, {}, {}, {}
     for ch in ("A1", "A1zc", "A2", "B", "C"):
         runs = [latest(f"p06_alone_{ch}"), latest(f"p11_alone_{ch}_r2"), latest(f"p11_alone_{ch}_r3")]
         rt = [json.loads((x / "run_time.json").read_text()) for x in runs]
+        gen[ch] = np.mean([np.mean([r["completion_tokens"] for r in load_rows(x)]) for x in runs])
         t[ch] = [d["elapsed_s"] for d in rt]
         vm = [d["vllm_metrics"] for d in rt if d.get("vllm_metrics")]
         pre[ch] = np.mean([v["vllm:request_prefill_time_seconds_sum"] for v in vm])
@@ -783,6 +803,9 @@ def round6(m: Macros) -> None:
         m.add(f"RSixTime{NAME[ch]}Min", f"{min(ratios):.2f}")
         m.add(f"RSixTime{NAME[ch]}Max", f"{max(ratios):.2f}")
         m.add(f"RSixPrefillTime{NAME[ch]}", f"{pre[ch] / pre['A1']:.2f}")
+        m.add(f"RSixGen{NAME[ch]}", f"{gen[ch] / gen['A1']:.1f}")
+    m.add("RSixAloneN", len(load_rows(latest("p11_alone_A1_r2"))))
+    m.add("RSixHiN", len(load_rows(latest("p11_c32_A1_r1"))))
     m.add("RSixTimeAOneMin", f"{min(t['A1']):.0f}")
     m.add("RSixTimeAOneMax", f"{max(t['A1']):.0f}")
     m.add("RSixDecodeShareAOne", f"{dec['A1'] / (dec['A1'] + pre['A1']) * 100:.0f}")

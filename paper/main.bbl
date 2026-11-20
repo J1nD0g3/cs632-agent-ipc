@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{29}
+\begin{thebibliography}{28}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -132,16 +132,6 @@
 \newblock
 \newblock
 \shownote{arXiv:2606.05304}.
-
-
-\bibitem[Karpukhin et~al\mbox{.}(2020)]%
-        {dpr}
-\bibfield{author}{\bibinfo{person}{Vladimir Karpukhin} {et~al\mbox{.}}}
-  \bibinfo{year}{2020}\natexlab{}.
-\newblock \showarticletitle{Dense Passage Retrieval for Open-Domain Question
-  Answering}. In \bibinfo{booktitle}{\emph{Conference on Empirical Methods in
-  Natural Language Processing (EMNLP)}}.
-\newblock
 
 
 \bibitem[Kwon et~al\mbox{.}(2023)]%
