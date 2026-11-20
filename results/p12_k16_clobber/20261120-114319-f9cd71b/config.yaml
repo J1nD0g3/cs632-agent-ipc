@@ -1,0 +1,30 @@
+exp: p12_k16_clobber
+datasets:
+  hotpotqa: data/raw/hotpot_distractor_validation.parquet
+  2wiki: data/raw/2wiki_dev.json
+model: Qwen/Qwen3-8B
+server:
+  base_url: http://localhost:8211
+  base_urls:
+  - http://localhost:8211
+  served_name: qwen3-8b
+  gpu: 1
+  vllm_src: ''
+  flags: see scripts/queue_pro6000.sh
+  gpus:
+  - 1
+channels:
+- A1
+- B
+- Bn
+- Bh
+k:
+- 16
+seeds:
+- 4
+n_tasks: 30
+max_tokens: 2048
+max_turns: 12
+concurrency: 6
+researchers: 3
+scrape_metrics: true

@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="506pt" height="120.03pt" viewBox="0 0 506 120.03">
+<line x1="29.39" y1="72.65" x2="232.43" y2="72.65" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="29.39" y1="46.26" x2="232.43" y2="46.26" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<rect x="34.98" y="36.41" width="9.9" height="62.63" fill="#4A6390" stroke="#000000" stroke-width="0.5"/>
+<rect x="85.73" y="41.62" width="9.9" height="57.42" fill="#4A6390" stroke="#000000" stroke-width="0.5"/>
+<rect x="136.49" y="41.8" width="9.9" height="57.24" fill="#4A6390" stroke="#000000" stroke-width="0.5"/>
+<rect x="187.25" y="40.19" width="9.9" height="58.85" fill="#4A6390" stroke="#000000" stroke-width="0.5"/>
+<rect x="44.87" y="35.3" width="9.9" height="63.74" fill="#BCC7DA" stroke="#000000" stroke-width="0.5"/>
+<rect x="95.63" y="40.19" width="9.9" height="58.85" fill="#BCC7DA" stroke="#000000" stroke-width="0.5"/>
+<rect x="146.39" y="39.71" width="9.9" height="59.33" fill="#BCC7DA" stroke="#000000" stroke-width="0.5"/>
+<rect x="197.15" y="34.55" width="9.9" height="64.49" fill="#BCC7DA" stroke="#000000" stroke-width="0.5"/>
+<rect x="54.77" y="70.34" width="9.9" height="28.7" fill="#3D5E64" stroke="#000000" stroke-width="0.5"/>
+<rect x="105.53" y="58.25" width="9.9" height="40.79" fill="#3D5E64" stroke="#000000" stroke-width="0.5"/>
+<rect x="156.29" y="35.22" width="9.9" height="63.82" fill="#3D5E64" stroke="#000000" stroke-width="0.5"/>
+<rect x="207.05" y="51.81" width="9.9" height="47.23" fill="#3D5E64" stroke="#000000" stroke-width="0.5"/>
+<rect x="64.67" y="68.61" width="9.9" height="30.43" fill="#C0D8DA" stroke="#000000" stroke-width="0.5"/>
+<rect x="115.43" y="54.61" width="9.9" height="44.43" fill="#C0D8DA" stroke="#000000" stroke-width="0.5"/>
+<rect x="166.19" y="34.27" width="9.9" height="64.77" fill="#C0D8DA" stroke="#000000" stroke-width="0.5"/>
+<rect x="216.95" y="50.97" width="9.9" height="48.07" fill="#C0D8DA" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="56.48" y="117.46" font-size="7.5" font-weight="600" fill="#000000">(a)</tspan><tspan x="68.27" y="117.46" font-size="7.5" font-weight="600" fill="#000000">The</tspan><tspan x="84.14" y="117.46" font-size="7.5" font-weight="600" fill="#000000">tool-call</tspan><tspan x="115.86" y="117.46" font-size="7.5" font-weight="600" fill="#000000">write</tspan><tspan x="136.04" y="117.46" font-size="7.5" font-weight="600" fill="#000000">drops</tspan><tspan x="158.79" y="117.46" font-size="7.5" font-weight="600" fill="#000000">facts</tspan></text>
+<line x1="275.14" y1="79.25" x2="505" y2="79.25" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="275.14" y1="59.45" x2="505" y2="59.45" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="275.14" y1="39.66" x2="505" y2="39.66" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<rect x="281.46" y="27.35" width="14.94" height="12.31" fill="#D9D9D9" stroke="#000000" stroke-width="0.5"/>
+<rect x="338.92" y="38.33" width="14.94" height="1.33" fill="#D9D9D9" stroke="#000000" stroke-width="0.5"/>
+<rect x="396.39" y="38.33" width="14.94" height="1.33" fill="#D9D9D9" stroke="#000000" stroke-width="0.5"/>
+<rect x="453.86" y="39.22" width="14.94" height="0.44" fill="#D9D9D9" stroke="#000000" stroke-width="0.5"/>
+<rect x="296.4" y="39.66" width="14.94" height="17.16" fill="#6A9096" stroke="#000000" stroke-width="0.5"/>
+<rect x="353.86" y="39.66" width="14.94" height="11.01" fill="#6A9096" stroke="#000000" stroke-width="0.5"/>
+<rect x="411.33" y="39.66" width="14.94" height="0.44" fill="#6A9096" stroke="#000000" stroke-width="0.5"/>
+<rect x="468.8" y="39.66" width="14.94" height="8.79" fill="#6A9096" stroke="#000000" stroke-width="0.5"/>
+<rect x="311.34" y="39.66" width="14.94" height="42.68" fill="#D7C26E" stroke="#000000" stroke-width="0.5"/>
+<rect x="368.81" y="39.66" width="14.94" height="3.09" fill="#D7C26E" stroke="#000000" stroke-width="0.5"/>
+<rect x="426.27" y="39.66" width="14.94" height="17.6" fill="#D7C26E" stroke="#000000" stroke-width="0.5"/>
+<rect x="483.74" y="39.66" width="14.94" height="16.71" fill="#D7C26E" stroke="#000000" stroke-width="0.5"/>
+<path d="M288.93,20.74 L288.93,33.94" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M285.19,20.74 L292.66,20.74" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M285.19,33.94 L292.66,33.94" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M346.39,33.5 L346.39,43.18" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M342.66,33.5 L350.13,33.5" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M342.66,43.18 L350.13,43.18" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M403.86,33.94 L403.86,42.75" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M400.12,33.94 L407.6,33.94" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M400.12,42.75 L407.6,42.75" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M461.33,34.37 L461.33,44.05" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M457.59,34.37 L465.06,34.37" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M457.59,44.05 L465.06,44.05" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M303.87,48.45 L303.87,65.17" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M300.13,48.45 L307.6,48.45" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M300.13,65.17 L307.6,65.17" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M361.33,43.18 L361.33,58.13" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M357.6,43.18 L365.07,43.18" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M357.6,58.13 L365.07,58.13" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M418.8,34.83 L418.8,45.38" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M415.07,34.83 L422.54,34.83" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M415.07,45.38 L422.54,45.38" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M476.27,42.29 L476.27,55.06" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M472.53,42.29 L480,42.29" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M472.53,55.06 L480,55.06" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M318.81,71.76 L318.81,92.89" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M315.07,71.76 L322.55,71.76" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M315.07,92.89 L322.55,92.89" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M376.28,35.26 L376.28,50.21" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M372.54,35.26 L380.01,35.26" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M372.54,50.21 L380.01,50.21" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M433.74,49.77 L433.74,65.17" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M430.01,49.77 L437.48,49.77" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M430.01,65.17 L437.48,65.17" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M491.21,48.9 L491.21,63.85" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M487.47,48.9 L494.94,48.9" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M487.47,63.85 L494.94,63.85" fill="none" stroke="#000000" stroke-width="0.5" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="288.58" y="117.46" font-size="7.5" font-weight="600" fill="#000000">(b)</tspan><tspan x="300.75" y="117.46" font-size="7.5" font-weight="600" fill="#000000">Accuracy</tspan><tspan x="337.17" y="117.46" font-size="7.5" font-weight="600" fill="#000000">cost</tspan><tspan x="354.76" y="117.46" font-size="7.5" font-weight="600" fill="#000000">of</tspan><tspan x="364.13" y="117.46" font-size="7.5" font-weight="600" fill="#000000">each</tspan><tspan x="383.8" y="117.46" font-size="7.5" font-weight="600" fill="#000000">step</tspan><tspan x="401.49" y="117.46" font-size="7.5" font-weight="600" fill="#000000">vs</tspan><tspan x="411.91" y="117.46" font-size="7.5" font-weight="600" fill="#000000">the</tspan><tspan x="425.48" y="117.46" font-size="7.5" font-weight="600" fill="#000000">step</tspan><tspan x="443.18" y="117.46" font-size="7.5" font-weight="600" fill="#000000">before</tspan></text>
+<rect x="7.73" y="1" width="217.96" height="11.6" fill="white" stroke="#000" stroke-width="0.5"/>
+<rect x="10.53" y="3.8" width="6" height="6" fill="#4A6390" stroke="#000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="18.53" y="9.16" font-size="6.5" font-weight="500" fill="#000000">Broadcast</tspan></text>
+<rect x="55.61" y="3.8" width="6" height="6" fill="#BCC7DA" stroke="#000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="63.61" y="9.16" font-size="6.5" font-weight="500" fill="#000000">Reply,</tspan><tspan x="84.35" y="9.16" font-size="6.5" font-weight="500" fill="#000000">files&#x27;</tspan><tspan x="101.18" y="9.16" font-size="6.5" font-weight="500" fill="#000000">wording</tspan></text>
+<rect x="131.87" y="3.8" width="6" height="6" fill="#3D5E64" stroke="#000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="139.87" y="9.16" font-size="6.5" font-weight="500" fill="#000000">Tool-call</tspan><tspan x="168.62" y="9.16" font-size="6.5" font-weight="500" fill="#000000">write</tspan></text>
+<rect x="189.68" y="3.8" width="6" height="6" fill="#C0D8DA" stroke="#000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="197.68" y="9.16" font-size="6.5" font-weight="500" fill="#000000">Files</tspan><tspan x="213.84" y="9.16" font-size="6.5" font-weight="500" fill="#000000">(B)</tspan></text>
+<rect x="302.16" y="1" width="151.11" height="11.6" fill="white" stroke="#000" stroke-width="0.5"/>
+<rect x="304.96" y="3.8" width="6" height="6" fill="#D9D9D9" stroke="#000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="312.96" y="9.16" font-size="6.5" font-weight="500" fill="#000000">Wording</tspan></text>
+<rect x="344.56" y="3.8" width="6" height="6" fill="#6A9096" stroke="#000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="352.56" y="9.16" font-size="6.5" font-weight="500" fill="#000000">Tool-call</tspan><tspan x="381.31" y="9.16" font-size="6.5" font-weight="500" fill="#000000">write</tspan></text>
+<rect x="402.37" y="3.8" width="6" height="6" fill="#D7C26E" stroke="#000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="410.37" y="9.16" font-size="6.5" font-weight="500" fill="#000000">Reading</tspan><tspan x="437.39" y="9.16" font-size="6.5" font-weight="500" fill="#000000">files</tspan></text>
+<rect x="29.39" y="19.86" width="203.04" height="79.18" fill="none" stroke="#000" stroke-width="0.75"/>
+<line x1="27.39" y1="99.04" x2="29.39" y2="99.04" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="15.14" y="101.41" font-size="6.5" font-weight="500" fill="#000000">0%</tspan></text>
+<line x1="27.39" y1="72.65" x2="29.39" y2="72.65" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="11.14" y="75.01" font-size="6.5" font-weight="500" fill="#000000">20%</tspan></text>
+<line x1="27.39" y1="46.26" x2="29.39" y2="46.26" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="10.88" y="48.62" font-size="6.5" font-weight="500" fill="#000000">40%</tspan></text>
+<line x1="27.39" y1="19.86" x2="29.39" y2="19.86" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="11.05" y="22.23" font-size="6.5" font-weight="500" fill="#000000">60%</tspan></text>
+<text font-family="Inter" transform="rotate(-90 4.75 59.45)"><tspan x="-20.38" y="62.18" font-size="7.5" font-weight="600" fill="#000000">Facts</tspan><tspan x="1.16" y="62.18" font-size="7.5" font-weight="600" fill="#000000">in</tspan><tspan x="9.6" y="62.18" font-size="7.5" font-weight="600" fill="#000000">notes</tspan></text>
+<text font-family="Inter"><tspan x="50.5" y="107.57" font-size="6.5" font-weight="500" fill="#000000">4B</tspan></text>
+<text font-family="Inter"><tspan x="101.35" y="107.57" font-size="6.5" font-weight="500" fill="#000000">8B</tspan></text>
+<text font-family="Inter"><tspan x="150.67" y="107.57" font-size="6.5" font-weight="500" fill="#000000">14B</tspan></text>
+<text font-family="Inter"><tspan x="200.87" y="107.57" font-size="6.5" font-weight="500" fill="#000000">32B</tspan></text>
+<rect x="275.14" y="19.86" width="229.86" height="79.18" fill="none" stroke="#000" stroke-width="0.75"/>
+<line x1="273.14" y1="99.04" x2="275.14" y2="99.04" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="260.32" y="101.41" font-size="6.5" font-weight="500" fill="#000000">-30</tspan></text>
+<line x1="273.14" y1="79.25" x2="275.14" y2="79.25" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="260.52" y="81.61" font-size="6.5" font-weight="500" fill="#000000">-20</tspan></text>
+<line x1="273.14" y1="59.45" x2="275.14" y2="59.45" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="261.64" y="61.82" font-size="6.5" font-weight="500" fill="#000000">-10</tspan></text>
+<line x1="273.14" y1="39.66" x2="275.14" y2="39.66" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="267.34" y="42.02" font-size="6.5" font-weight="500" fill="#000000">0</tspan></text>
+<line x1="273.14" y1="19.86" x2="275.14" y2="19.86" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="260.3" y="22.23" font-size="6.5" font-weight="500" fill="#000000">+10</tspan></text>
+<text font-family="Inter" transform="rotate(-90 254.18 59.45)"><tspan x="210.31" y="62.18" font-size="7.5" font-weight="600" fill="#000000">Accuracy</tspan><tspan x="246.73" y="62.18" font-size="7.5" font-weight="600" fill="#000000">effect</tspan><tspan x="269.85" y="62.18" font-size="7.5" font-weight="600" fill="#000000">(points)</tspan></text>
+<text font-family="Inter"><tspan x="299.6" y="107.57" font-size="6.5" font-weight="500" fill="#000000">4B</tspan></text>
+<text font-family="Inter"><tspan x="357.15" y="107.57" font-size="6.5" font-weight="500" fill="#000000">8B</tspan></text>
+<text font-family="Inter"><tspan x="413.18" y="107.57" font-size="6.5" font-weight="500" fill="#000000">14B</tspan></text>
+<text font-family="Inter"><tspan x="470.09" y="107.57" font-size="6.5" font-weight="500" fill="#000000">32B</tspan></text>
+</svg>

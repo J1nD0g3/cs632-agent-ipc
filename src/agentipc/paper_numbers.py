@@ -729,6 +729,93 @@ def round4(m: Macros) -> None:
         gap(f"RFourZcReplay{tag}", by(z, "A1zc"), by(z, "A1"), sign=-1)
 
 
+def round6(m: Macros) -> None:
+    """Round-6 PRO 6000 runs: in-run writing control, timing repeats and load, k=16 write guard, k=8 fan-out."""
+    from .stats import ci as _ci
+
+    def rows(exp):
+        return load_rows(latest(exp))
+
+    def by(rs, ch):
+        return {r["task_id"]: r for r in rs if r["channel"] == ch and not r.get("error")}
+
+    def gap(name, x, y, sign=1, metric="acc"):
+        ids = sorted(set(x) & set(y))
+        mean, lo, hi = paired(np.array([x[i][metric] for i in ids], float), np.array([y[i][metric] for i in ids], float))
+        m.add(name, f"{sign * mean * 100:.1f}")
+        m.add(f"{name}Lo", f"{min(sign * lo, sign * hi) * 100:.1f}")
+        m.add(f"{name}Hi", f"{max(sign * lo, sign * hi) * 100:.1f}")
+        m.add(f"{name}N", len(ids))
+        return mean, lo, hi
+
+    def avg(d, metric):
+        return np.mean([v[metric] for v in d.values() if metric in v])
+
+    sizes = {"Four": "4b", "Eight": "8b", "Fourteen": "14b", "ThirtyTwo": "32b"}
+    sig_write = sig_read = 0
+    for tag, s in sizes.items():
+        rs = rows(f"p10_write_{s}")
+        a1, r, w, b = (by(rs, c) for c in ("A1", "A1r", "A1w", "B"))
+        for lab, d in (("AOne", a1), ("R", r), ("W", w), ("B", b)):
+            m.add(f"RSix{tag}Acc{lab}", pct(avg(d, "acc")))
+            m.add(f"RSix{tag}Notes{lab}", f"{avg(d, 'as_recall_notes') * 100:.0f}")
+        gap(f"RSix{tag}Wording", r, a1)
+        _, _, whi = gap(f"RSix{tag}Write", w, r)
+        _, _, rhi = gap(f"RSix{tag}Read", b, w)
+        gap(f"RSix{tag}Total", b, a1)
+        sig_write += whi < 0
+        sig_read += rhi < 0
+    m.add("RSixWriteSigWord", word(sig_write))
+    m.add("RSixReadSigWord", word(sig_read))
+    m.add("RSixN", len(by(rows("p10_write_8b"), "A1")))
+    # Serving time: three runs per channel served alone (p06 and p11 _r2, _r3), six tasks at a time.
+    t, pre, dec = {}, {}, {}
+    for ch in ("A1", "A1zc", "A2", "B", "C"):
+        runs = [latest(f"p06_alone_{ch}"), latest(f"p11_alone_{ch}_r2"), latest(f"p11_alone_{ch}_r3")]
+        rt = [json.loads((x / "run_time.json").read_text()) for x in runs]
+        t[ch] = [d["elapsed_s"] for d in rt]
+        vm = [d["vllm_metrics"] for d in rt if d.get("vllm_metrics")]
+        pre[ch] = np.mean([v["vllm:request_prefill_time_seconds_sum"] for v in vm])
+        dec[ch] = np.mean([v["vllm:request_decode_time_seconds_sum"] for v in vm])
+    for ch in ("A1zc", "A2", "B", "C"):
+        ratios = [x / np.mean(t["A1"]) for x in t[ch]]
+        m.add(f"RSixTime{NAME[ch]}", f"{np.mean(ratios):.2f}")
+        m.add(f"RSixTime{NAME[ch]}Min", f"{min(ratios):.2f}")
+        m.add(f"RSixTime{NAME[ch]}Max", f"{max(ratios):.2f}")
+        m.add(f"RSixPrefillTime{NAME[ch]}", f"{pre[ch] / pre['A1']:.2f}")
+    m.add("RSixTimeAOneMin", f"{min(t['A1']):.0f}")
+    m.add("RSixTimeAOneMax", f"{max(t['A1']):.0f}")
+    m.add("RSixDecodeShareAOne", f"{dec['A1'] / (dec['A1'] + pre['A1']) * 100:.0f}")
+    t32 = {ch: [json.loads((latest(f"p11_c32_{ch}_r{i}") / "run_time.json").read_text()) for i in (1, 2)]
+           for ch in ("A1", "A1zc", "B")}
+    base = np.mean([d["elapsed_s"] for d in t32["A1"]])
+    pbase = np.mean([d["vllm_metrics"]["vllm:request_prefill_time_seconds_sum"] for d in t32["A1"]])
+    for ch in ("A1zc", "B"):
+        m.add(f"RSixHiTime{NAME[ch]}", f"{np.mean([d['elapsed_s'] for d in t32[ch]]) / base:.2f}")
+        m.add(f"RSixHiPrefillTime{NAME[ch]}",
+              f"{np.mean([d['vllm_metrics']['vllm:request_prefill_time_seconds_sum'] for d in t32[ch]]) / pbase:.2f}")
+    # k=16 with a write guard and with the heading rule only (same run as their A1 and B references).
+    k = rows("p12_k16_clobber")
+    a1, b = by(k, "A1"), by(k, "B")
+    for ch, lab in (("B", "B"), ("Bn", "Guard"), ("Bh", "Heading")):
+        d = by(k, ch)
+        gap(f"RSixKSixteen{lab}Gap", d, a1, sign=-1)
+        m.add(f"RSixKSixteen{lab}Notes", f"{avg(d, 'as_recall_notes') * 100:.0f}")
+        if ch != "B":
+            gap(f"RSixKSixteen{lab}OverB", d, b)
+    m.add("RSixKSixteenAOneNotes", f"{avg(a1, 'as_recall_notes') * 100:.0f}")
+    # k=8 with three Researchers (p13) against one Researcher on the same tasks and cache (p01_cache_100k).
+    three, one = rows("p13_k8_fanout"), rows("p01_cache_100k")
+    for ch, lab in (("A1", "AOne"), ("B", "B"), ("C", "C")):
+        gap(f"RSixFan{lab}", by(three, ch), by(one, ch))
+    a3, a1_, b3, b1 = by(three, "A1"), by(one, "A1"), by(three, "B"), by(one, "B")
+    ids = sorted(set(a3) & set(a1_) & set(b3) & set(b1))
+    mean, lo, hi = _ci([(b3[i]["acc"] - b1[i]["acc"]) - (a3[i]["acc"] - a1_[i]["acc"]) for i in ids])
+    m.add("RSixFanDiD", f"{mean * 100:.1f}")
+    m.add("RSixFanDiDLo", f"{lo * 100:.1f}")
+    m.add("RSixFanDiDHi", f"{hi * 100:.1f}")
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -756,7 +843,7 @@ def judges(m: Macros) -> None:
 
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout, replay, repeat, judges, pressure, scope, pro6000, round4]
+            fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6]
 
 
 def main() -> int:

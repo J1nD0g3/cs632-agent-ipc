@@ -1,0 +1,32 @@
+# Round-6 runs on the PRO 6000: KV capacity per run. model, blocks and KV tokens are read from each vLLM server log
+# ('model' / 'num_gpu_blocks_override' in the non-default args, and the 'GPU KV cache size: N tokens' line); gpu_mem_util
+# from 'Desired GPU memory utilization'. start/end = run start (after the server checks) and run end, KST.
+# prefill_metric_lines = curl <server>/metrics | grep -c request_prefill_time, taken before the run.
+# timing_order = position in logs/round6_timing_order.txt (random.Random(20261120).shuffle); '-' for non-timing runs.
+# host_other (timing runs only): other GPU processes on the host and busy GPUs, sampled every 15 s during the run
+#   (logs/round6_hostmon_<exp>.log); none of our other runs ran during a timing run (phase barriers). '-' = not a timing run.
+# exp	run_id	gpu	model	blocks	kv_tokens	gpu_mem_util	server_log	start	end	prefill_metric_lines	timing_order	host_other
+p10_write_14b	20261120-084209-9d90b0b	1	Qwen/Qwen3-14B	6250	100,000	0.92	logs/vllm_gpu1_20261120_084119.log	2026-11-20 08:42:09	2026-11-20 09:33:30	29	-	-
+p10_write_8b	20261120-093426-9d90b0b	1	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu1_20261120_093336.log	2026-11-20 09:34:26	2026-11-20 10:07:50	29	-	-
+p10_write_32b	20261120-084227-9d90b0b	3	Qwen/Qwen3-32B	6250	100,000	0.95	logs/vllm_gpu3_20261120_084117.log	2026-11-20 08:42:27	2026-11-20 10:21:41	29	-	-
+p10_write_4b	20261120-100835-9d90b0b	1	Qwen/Qwen3-4B	6250	100,000	0.92	logs/vllm_gpu1_20261120_100755.log	2026-11-20 10:08:35	2026-11-20 10:30:32	29	-	-
+p11_alone_A2_r2	20261120-103137-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_103047.log	2026-11-20 10:31:37	2026-11-20 10:34:49	29	1	none (no other GPU process in 13 samples)
+p11_alone_D_r3	20261120-103535-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_103455.log	2026-11-20 10:35:35	2026-11-20 10:41:04	29	2	none (no other GPU process in 22 samples)
+p11_alone_A1_r2	20261120-104149-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_104109.log	2026-11-20 10:41:49	2026-11-20 10:45:57	29	3	none (no other GPU process in 17 samples)
+p11_alone_B_r2	20261120-104643-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_104602.log	2026-11-20 10:46:42	2026-11-20 10:53:38	29	4	none (no other GPU process in 28 samples)
+p11_alone_C_r3	20261120-105434-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_105344.log	2026-11-20 10:54:34	2026-11-20 11:01:16	29	5	none (no other GPU process in 27 samples)
+p11_alone_A1zc_r2	20261120-110202-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_110122.log	2026-11-20 11:02:02	2026-11-20 11:06:30	29	6	none (no other GPU process in 18 samples)
+p11_alone_D_r2	20261120-110716-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_110636.log	2026-11-20 11:07:16	2026-11-20 11:12:31	29	7	none (no other GPU process in 21 samples)
+p11_alone_C_r2	20261120-111317-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_111236.log	2026-11-20 11:13:17	2026-11-20 11:19:33	29	8	none (no other GPU process in 25 samples)
+p11_alone_A1_r3	20261120-112029-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_111939.log	2026-11-20 11:20:29	2026-11-20 11:24:38	29	9	none (no other GPU process in 17 samples)
+p11_alone_A2_r3	20261120-112533-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_112443.log	2026-11-20 11:25:33	2026-11-20 11:28:48	29	10	none (no other GPU process in 13 samples)
+p11_alone_B_r3	20261120-112934-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_112853.log	2026-11-20 11:29:33	2026-11-20 11:36:52	29	11	none (no other GPU process in 29 samples)
+p11_alone_A1zc_r3	20261120-113737-f9cd71b	3	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu3_20261120_113657.log	2026-11-20 11:37:37	2026-11-20 11:42:05	29	12	none (no other GPU process in 18 samples)
+p13_k8_fanout	20261120-114319-f9cd71b	2	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu2_20261120_114229.log	2026-11-20 11:43:19	2026-11-20 12:18:17	29	-	-
+p12_k16_clobber	20261120-114319-f9cd71b	1	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu1_20261120_114229.log	2026-11-20 11:43:19	2026-11-20 12:36:33	29	-	-
+p11_c32_A1_r2	20261120-123721-f9cd71b	3	Qwen/Qwen3-8B	25000	400,000	0.92	logs/vllm_gpu3_20261120_123641.log	2026-11-20 12:37:21	2026-11-20 12:39:26	29	13	none (no other GPU process in 9 samples)
+p11_c32_A1zc_r2	20261120-124022-f9cd71b	3	Qwen/Qwen3-8B	25000	400,000	0.92	logs/vllm_gpu3_20261120_123931.log	2026-11-20 12:40:22	2026-11-20 12:42:27	29	14	none (no other GPU process in 9 samples)
+p11_c32_A1_r1	20261120-124313-f9cd71b	3	Qwen/Qwen3-8B	25000	400,000	0.92	logs/vllm_gpu3_20261120_124232.log	2026-11-20 12:43:12	2026-11-20 12:45:19	29	15	none (no other GPU process in 9 samples)
+p11_c32_B_r1	20261120-124605-f9cd71b	3	Qwen/Qwen3-8B	25000	400,000	0.92	logs/vllm_gpu3_20261120_124525.log	2026-11-20 12:46:05	2026-11-20 12:49:41	29	16	none (no other GPU process in 15 samples)
+p11_c32_B_r2	20261120-125037-f9cd71b	3	Qwen/Qwen3-8B	25000	400,000	0.92	logs/vllm_gpu3_20261120_124947.log	2026-11-20 12:50:37	2026-11-20 12:54:11	29	17	none (no other GPU process in 14 samples)
+p11_c32_A1zc_r1	20261120-125457-f9cd71b	3	Qwen/Qwen3-8B	25000	400,000	0.92	logs/vllm_gpu3_20261120_125417.log	2026-11-20 12:54:57	2026-11-20 12:57:04	29	18	none (no other GPU process in 9 samples)

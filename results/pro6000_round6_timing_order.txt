@@ -1,0 +1,19 @@
+# round-6 timing runs, order drawn with random.Random(20261120).shuffle, p11_alone list then p11_c32 list
+p11_alone_A2_r2
+p11_alone_D_r3
+p11_alone_A1_r2
+p11_alone_B_r2
+p11_alone_C_r3
+p11_alone_A1zc_r2
+p11_alone_D_r2
+p11_alone_C_r2
+p11_alone_A1_r3
+p11_alone_A2_r3
+p11_alone_B_r3
+p11_alone_A1zc_r3
+p11_c32_A1_r2
+p11_c32_A1zc_r2
+p11_c32_A1_r1
+p11_c32_B_r1
+p11_c32_B_r2
+p11_c32_A1zc_r1

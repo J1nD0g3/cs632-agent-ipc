@@ -1,0 +1,26 @@
+{
+ "hotpotqa_k3_s2": {
+  "tasks": 75,
+  "questions": 225,
+  "docs_mean": 29.9,
+  "doc_chars_mean": 16436.8,
+  "support_facts_mean": 7.3,
+  "types": {
+   "bridge": 189,
+   "comparison": 36
+  }
+ },
+ "2wiki_k3_s2": {
+  "tasks": 75,
+  "questions": 225,
+  "docs_mean": 29.6,
+  "doc_chars_mean": 10478.0,
+  "support_facts_mean": 7.4,
+  "types": {
+   "bridge_comparison": 53,
+   "compositional": 92,
+   "inference": 27,
+   "comparison": 53
+  }
+ }
+}

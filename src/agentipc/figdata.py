@@ -64,6 +64,27 @@ def fig3(rows: list[dict], src: Path, k: int = 3) -> None:
                         "channels": table}, table)
 
 
+def fig3_split() -> None:
+    """Writing control in one run per model size (p10): facts in the Researcher's output per arm, and the
+    paired accuracy effects of wording (A1r-A1), writing through a tool call (A1w-A1r) and reading files (B-A1w)."""
+    from .analyze import paired
+    table = []
+    for size in ("4b", "8b", "14b", "32b"):
+        run = latest(f"p10_write_{size}")
+        rows = load_rows(run)
+        by = {ch: {r["task_id"]: r for r in rows if r["channel"] == ch} for ch in ("A1", "A1r", "A1w", "B")}
+        row = {"size": size.upper(), "source": str(run.relative_to(ROOT))}
+        for ch, d in by.items():
+            row[f"notes_{ch}"] = round(float(np.mean([r["as_recall_notes"] for r in d.values() if "as_recall_notes" in r])), 4)
+            row[f"acc_{ch}"] = round(float(np.mean([r["acc"] for r in d.values()])), 4)
+        for name, x, y in (("wording", "A1r", "A1"), ("tool_write", "A1w", "A1r"), ("read_files", "B", "A1w")):
+            ids = sorted(set(by[x]) & set(by[y]))
+            mean, lo, hi = paired(np.array([by[x][i]["acc"] for i in ids], float), np.array([by[y][i]["acc"] for i in ids], float))
+            row.update({name: round(mean, 4), f"{name}_lo": round(lo, 4), f"{name}_hi": round(hi, 4), f"{name}_n": len(ids)})
+        table.append(row)
+    write("fig3_split", {"rows": table}, table)
+
+
 def fig4(rows_by_k: dict[int, list[dict]], sources: dict[int, str]) -> None:
     """Per k: computed and sent tokens relative to A1, and accuracy relative to A1, both datasets pooled."""
     table = []
@@ -98,6 +119,7 @@ def main() -> int:
             by_k[k] = load_rows(run)
             sources[k] = str(run.relative_to(ROOT))
     fig4(by_k, sources)
+    fig3_split()
     print(f"wrote {OUT}/fig2_tradeoff.json, fig3_loss.json from {src.relative_to(ROOT)}")
     return 0
 
