@@ -15,9 +15,9 @@ from .data import Task
 from .llm import ContextOverflow, SaltedClient
 from .workspace import Workspace
 
-CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d", "B", "Bb", "Bd", "Bf", "Bh", "Bn", "Br", "C", "D", "Dn")
+CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d", "B", "Bb", "Bd", "Bf", "Bh", "Bn", "Br", "Bs", "C", "D", "Dn")
 MESSAGE_CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d")
-FILE_CHANNELS = ("B", "Bb", "Bd", "Bh", "Br", "C", "D")
+FILE_CHANNELS = ("B", "Bb", "Bd", "Bh", "Br", "Bs", "C", "D")
 
 TEAM = ("You are one agent in a team that answers a set of questions together. The agents work in this "
         "order: {chain}.")
@@ -179,6 +179,12 @@ class AgentRun:
 
 WRITE_ONLY = [t for t in TOOLS if t["function"]["name"] == "write_file"]
 READ_TOOLS = [t for t in TOOLS if t["function"]["name"] in ("list_files", "read_file")]
+# Bs: the Researcher answers in a plain reply, which the system saves to notes.md; later agents work as in B.
+# Its instruction matches A1r's except for where the reply goes.
+OUTPUT_REPLY_STORED = ("The documents are in this message, so you do not need to read any file. The other agents "
+                       "cannot see your reply directly; the system saves it as notes.md in the shared workspace, where "
+                       "the source documents also are (under docs/). Write your notes in your reply, in one or a few "
+                       "parts (choose the headings and how to split them).")
 # Bb: B plus a batched read, the agent analogue of readv(): several files in one round trip.
 READ_MANY = {"type": "function", "function": {
     "name": "read_files", "description": "Read several workspace files in one call.",
@@ -300,9 +306,9 @@ def build_messages(role: str, channel: str, chain: tuple[str, ...], task: Task, 
             channel = "B"
         if channel in ("A2d", "Bd"):
             channel = {"A2d": "A2", "Bd": "B"}[channel]
-        if channel == "A1r":
+        if channel in ("A1r", "Bs"):
             return [{"role": "system", "content": team_text(chain) + "\n\n" + ROLE_TEXT["researcher"] + "\n\n" +
-                     OUTPUT_REPLY_MATCHED},
+                     (OUTPUT_REPLY_MATCHED if channel == "A1r" else OUTPUT_REPLY_STORED)},
                     {"role": "user", "content": f"{qs}\n\n{docs}"}]
         if channel == "A1zc":
             return [{"role": "system", "content": team_text(chain)},
@@ -405,8 +411,9 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
                 ws.refresh_index()
         stage["notes"] = fixed_notes
     else:
-        res = await asyncio.gather(*(run_agent(client, ws, r, build_messages(r, channel, shown, task, replies, flat, sub),
-                                               max_turns if ws is not None else 1, None, tools)
+        rws = None if channel == "Bs" else ws  # the Bs Researcher has no tools; it replies once
+        res = await asyncio.gather(*(run_agent(client, rws, r, build_messages(r, channel, shown, task, replies, flat, sub),
+                                               max_turns if rws is not None else 1, None, tools)
                                      for r, sub in zip(rroles, parts)))
         for r, run in zip(rroles, res):
             runs[r], replies[r] = run, run.reply
@@ -414,7 +421,13 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
             # The notes the Researcher wrote to its file are what A1w copies forward.
             for r in rroles:
                 replies[r] = ws.written_by(r)
-    if fixed_notes is None and files:
+        if channel == "Bs":
+            # The system, not the agent, stores the reply as the notes file.
+            ws.seed("notes.md", "\n\n".join(replies[r] for r in rroles))
+            ws.authors["notes.md"] = rroles[0]
+    if fixed_notes is None and channel == "Bs":
+        stage["notes"] = "\n".join(replies[r] for r in rroles)
+    elif fixed_notes is None and files:
         stage["notes"] = "\n".join(ws.written_by(r) for r in rroles)
         if channel == "D":
             stage["notes"] += "\n" + "\n".join(replies[r] for r in rroles)
