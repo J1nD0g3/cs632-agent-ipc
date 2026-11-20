@@ -1,0 +1,11 @@
+# Round-8 runs on the PRO 6000: KV capacity per run, read from each vLLM server log ('model', 'num_gpu_blocks_override',
+# 'GPU KV cache size: N tokens', 'Desired GPU memory utilization'). start/end = run start (after the server checks) and end, KST.
+# GPU indices are the post-reboot ones (2026-11-20 14:36): GPU 0 and 4 are RTX PRO 6000.
+# p15_k8_one and p15_k8_three ran back to back on the same server (same server log), not restarted in between.
+# exp	run_id	gpu	model	blocks	kv_tokens	gpu_mem_util	server_log	start	end	prefill_metric_lines
+p14_read_14b	20261120-153603-574056f	4	Qwen/Qwen3-14B	6250	100,000	0.92	logs/vllm_gpu4_20261120_153453.log	2026-11-20 15:36:03	2026-11-20 16:19:50	29
+p14_read_32b	20261120-151843-50f3897	0	Qwen/Qwen3-32B	6250	100,000	0.95	logs/vllm_gpu0_20261120_151642.log	2026-11-20 15:18:43	2026-11-20 16:26:13	29
+p15_k8_one	20261120-162056-574056f	4	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu4_20261120_161956.log	2026-11-20 16:20:56	2026-11-20 16:46:12	29
+p14_read_8b	20261120-162659-574056f	0	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu0_20261120_162619.log	2026-11-20 16:26:59	2026-11-20 16:56:04	29
+p14_read_4b	20261120-165710-574056f	0	Qwen/Qwen3-4B	6250	100,000	0.92	logs/vllm_gpu0_20261120_165610.log	2026-11-20 16:57:10	2026-11-20 17:15:54	29
+p15_k8_three	20261120-164612-574056f	4	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu4_20261120_161956.log	2026-11-20 16:46:12	2026-11-20 17:21:44	29

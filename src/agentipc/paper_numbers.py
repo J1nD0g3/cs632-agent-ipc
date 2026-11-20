@@ -839,6 +839,62 @@ def round6(m: Macros) -> None:
     m.add("RSixFanDiDHi", f"{hi * 100:.1f}")
 
 
+def round8(m: Macros) -> None:
+    """Round 8: k=8 fan-out with one vs three Researchers on one server (p15), the reply-output variant (p14),
+    and decode time per generated token from vLLM's counters (p11)."""
+    from .stats import ci as _ci
+
+    def rows(exp):
+        return load_rows(latest(exp))
+
+    def by(rs, ch):
+        return {r["task_id"]: r for r in rs if r["channel"] == ch and not r.get("error")}
+
+    def gap(name, x, y, sign=1):
+        ids = sorted(set(x) & set(y))
+        mean, lo, hi = paired(np.array([x[i]["acc"] for i in ids], float), np.array([y[i]["acc"] for i in ids], float))
+        m.add(name, f"{sign * mean * 100:.1f}")
+        m.add(f"{name}Lo", f"{min(sign * lo, sign * hi) * 100:.1f}")
+        m.add(f"{name}Hi", f"{max(sign * lo, sign * hi) * 100:.1f}")
+        m.add(f"{name}N", len(ids))
+
+    one, three = rows("p15_k8_one"), rows("p15_k8_three")
+    for ch, lab in (("A1", "AOne"), ("B", "B")):
+        gap(f"REightFan{lab}", by(three, ch), by(one, ch))
+        m.add(f"REightOne{lab}Acc", pct(np.mean([v["acc"] for v in by(one, ch).values()])))
+        m.add(f"REightThree{lab}Acc", pct(np.mean([v["acc"] for v in by(three, ch).values()])))
+    m.add("REightThreeFoldersAcc", pct(np.mean([v["acc"] for v in by(three, "Bf").values()])))
+    gap("REightFoldersOverB", by(three, "Bf"), by(three, "B"))
+    gap("REightFoldersVsOne", by(three, "Bf"), by(one, "B"))
+    a3, a1, b3, b1 = by(three, "A1"), by(one, "A1"), by(three, "B"), by(one, "B")
+    ids = sorted(set(a3) & set(a1) & set(b3) & set(b1))
+    mean, lo, hi = _ci([(b3[i]["acc"] - b1[i]["acc"]) - (a3[i]["acc"] - a1[i]["acc"]) for i in ids])
+    m.add("REightFanDiD", f"{mean * 100:.1f}"); m.add("REightFanDiDLo", f"{lo * 100:.1f}"); m.add("REightFanDiDHi", f"{hi * 100:.1f}")
+    for ch, lab in (("B", "B"), ("Bf", "Folders")):
+        m.add(f"REightThree{lab}Notes", f"{np.mean([v['as_recall_notes'] for v in by(three, ch).values() if 'as_recall_notes' in v]) * 100:.0f}")
+    m.add("REightOneBNotes", f"{np.mean([v['as_recall_notes'] for v in by(one, 'B').values() if 'as_recall_notes' in v]) * 100:.0f}")
+    # Reply-output variant: does the Writer open the notes before answering?
+    for tag, s in (("Eight", "8b"), ("ThirtyTwo", "32b")):
+        opened = {"Br": [], "B": []}
+        for rec in raw_records(latest(f"p14_read_{s}")):
+            if rec["channel"] in opened and "error" not in rec:
+                opened[rec["channel"]].append(any(o["agent"] == "writer" and o["op"] == "read" and "error" not in o
+                                                  and not o.get("path", "").startswith("docs") for o in rec["io_ops"]))
+        m.add(f"REightReply{tag}Open", f"{np.mean(opened['Br']) * 100:.0f}")
+        m.add(f"REightFile{tag}Open", f"{np.mean(opened['B']) * 100:.0f}")
+        r = rows(f"p14_read_{s}")
+        gap(f"REightReply{tag}VsB", by(r, "Br"), by(r, "B"))
+    # Decode time per generated token (summed per-request decode time / generated tokens), vLLM counters.
+    for ch in ("A1", "A1zc", "A2", "B"):
+        v = [json.loads((latest(f"p11_alone_{ch}_r{i}") / "run_time.json").read_text())["vllm_metrics"] for i in (2, 3)]
+        ms = np.mean([x["vllm:request_decode_time_seconds_sum"] / x["vllm:generation_tokens_total"] * 1000 for x in v])
+        m.add(f"REightDecodeMs{NAME[ch]}", f"{ms:.1f}")
+    for ch in ("A1", "A1zc", "B"):
+        v = [json.loads((latest(f"p11_c32_{ch}_r{i}") / "run_time.json").read_text())["vllm_metrics"] for i in (1, 2)]
+        ms = np.mean([x["vllm:request_decode_time_seconds_sum"] / x["vllm:generation_tokens_total"] * 1000 for x in v])
+        m.add(f"REightHiDecodeMs{NAME[ch]}", f"{ms:.1f}")
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -866,7 +922,7 @@ def judges(m: Macros) -> None:
 
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6]
+            fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6, round8]
 
 
 def main() -> int:
