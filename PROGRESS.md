@@ -12,7 +12,7 @@
 | T07 Main experiments: 5 channels x 2 datasets x 3 k | Experiments | Must | Done | 2026-11-19 | results/t07_main/20261118-212337-5d6c70f | 5400 runs, 0 errors, judged |
 | T08 Sensitivity: k = 8, five agents, zero-copy A1, Qwen3-4B | Experiments | Should | In progress | 2026-11-19 | Bb, 24-turn done | k8, chain4, 4B, k16, pressure, fan-out queued |
 | T09 Analysis and figures | Report | Must | In progress | 2026-11-19 | Figs. 1-4 | paper/figs/out |
-| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, round 4: 3/5, 3/5; E1-E5 added | AlignScore is the fact measure; scope controls added |
+| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, round 7: 3/5, 3/5; rounds 6 and 8 runs added | AlignScore is the fact measure; scope controls added |
 
 ## Key numbers
 | Key | Metric | Result | Source |
@@ -21,7 +21,7 @@
 | tokens | Total tokens per task: A / B / C | k=3 sent / computed: A1 13.3k/12.4k, A1-zc 13.6k/4.8k, A2 5.6k/4.7k, B 38.2k/9.8k, C 37.4k/9.8k, D 17.5k/7.2k | results/t07_main/20261118-212337-5d6c70f |
 | file_io | File reads and writes per task: A / B / C | k=3 file I/O ops: B 13.4-15.3, C 12.1-14.4, D 5.6-5.8 (message channels 0) | results/t07_main/20261118-212337-5d6c70f |
 | info_loss | Key facts lost between stages: A / B / C | k=3 AlignScore, facts in Researcher output / share delivered: A1 45%/100%, A1-zc 50%/100%, A2 45%/100%, B 32%/91%, C 30%/95%, D 25%/51% | results/t07_main/20261118-212337-5d6c70f/alignscore.json |
-| recommendation | Which channel, and when | History fits the KV cache: zero-copy broadcast (saves prefill, not serving time). It does not: pipe, whose savings come from dropping the documents. Write long results as plain replies (tool-call writing shortens notes at 4B/8B/32B). Files need a tool-capable model; an index helps 8B find notes among many files | paper/main.tex (Conclusion) |
+| recommendation | Which channel, and when | History fits in context: copy it with the shared prefix first (zero-copy; saves prefill, not serving time). Pipe is cheap but drops the documents. Write long results as plain replies. With parallel writers, give each its own folder (or guard writes / head files with their questions). | paper/main.tex (Conclusion) |
 
 ## Log
 - 2026-11-18 T00: Repo created from the proposal. Model Qwen3-8B (thinking off) on vLLM v0.33.0;
@@ -99,3 +99,10 @@
   14B), 32B with normalized paths (files still 8-17 points behind), serving time per channel (zero-copy saves no
   time; files 1.3-2.0x), k=16 with a 100k cache and 24 calls (neither closes B's 34-point gap), zero-copy with fixed
   notes (4B loss is from prompt order). Paper revised; meaning audit found 12 issues, all fixed. Still 6 pages.
+
+- 2026-11-20 T10: Rounds 5-8. Fresh reviewers each round (3/5-4/5). PRO 6000 round 6 (4,740 runs) and round 8
+  (2,300 runs): in-run writing control at 4 sizes (tool-call writing costs at 4B/8B after Holm), serving time in
+  three repeats (zero-copy 1.09x at six tasks at a time, 1.00x at 32), k=16 write guard and heading rule, and a
+  same-server k=8 fan-out (three Researchers cost B 21.2 points; per-Researcher folders recover 19.8). Paper cut
+  to four channels (D, batched reads and the fact-checker removed), retitled "Messages or Files?", Fig. 3 now
+  splits writing from the rest of the file channel. Meaning audits after each pass (22 and 19 fixes). 6 pages.
