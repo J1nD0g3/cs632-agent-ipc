@@ -36,7 +36,7 @@ fig = Figure("text")
 strip, body = fig.area.take("top", 12, gap=4)
 body = Rect(body.x, body.y, body.w, 118)
 left, right = body.cols(2, gap=16)
-panels = [(left, "total_tokens", "sent", (0, 42000), "(a) Tokens sent per task (API billing)"),
+panels = [(left, "total_tokens", "sent", (0, 42000), "(a) Tokens sent per task (billed tokens, no cache discount)"),
           (right, "prefill_tokens", "comp", (0, 14000), "(b) Tokens computed per task (self-hosted)")]
 for rect, metric, key, xr, title in panels:
     chart, cap = rect.take("bottom", 10, gap=2)
@@ -61,12 +61,12 @@ for rect, metric, key, xr, title in panels:
         (ax_, ay), (bx, by) = ax.px(CH["A1"][metric], CH["A1"]["acc"]), ax.px(CH["A1zc"][metric], CH["A1zc"]["acc"])
         cut = 1 - CH["A1zc"][metric] / CH["A1"][metric]
         fig.arrow((ax_ - 5, by + 2), (bx + 6, by + 2), color="good", sw=1.0,
-                  label=f"−{cut * 100:.0f}% computed, same accuracy", label_side="above", label_color="good")
+                  label=f"−{cut * 100:.0f}% computed, no sig. loss", label_side="above", label_color="good")
     fig.caption(rect.cx, cap.t + 1, title, size=7.5, weight=600)
 
 fig.legend([("marker", "o:navy4", "Message channels"), ("marker", "s:teal3", "File channels"),
             ("marker", "*:#F2B53A", "Zero-copy broadcast"), ("line", "gray5", "95% CI")],
            fig.width / 2, strip.y)
 # The saving label rides on its arrow, as a dimension label would.
-fig.ignore.add(("text-near-line", "computed, same"))
+fig.ignore.add(("text-near-line", "computed, no sig."))
 fig.save(str(Path(__file__).parent / "out" / "fig_tradeoff"))

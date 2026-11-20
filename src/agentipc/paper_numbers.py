@@ -90,6 +90,8 @@ def main_run(m: Macros) -> None:
     m.add("ZcPooledDiffLo", f"{zlo * 100:.1f}")
     m.add("ZcPooledDiffHi", f"{zhi * 100:.1f}")
     m.add("ZcPooledDiffN", len(ids))
+    # Largest loss the interval does not exclude.
+    m.add("ZcPooledLossMax", f"{-zlo * 100:.1f}")
     for ch in ("B", "C", "D", "A2"):
         m.add(f"SentRatio{NAME[ch]}", f"{pool(ch, 3, 'total_tokens') / pool('A1', 3, 'total_tokens'):.1f}")
         m.add(f"CompRatio{NAME[ch]}", f"{pool(ch, 3, 'prefill_tokens') / pool('A1', 3, 'prefill_tokens'):.2f}")
@@ -861,6 +863,7 @@ def round8(m: Macros) -> None:
     one, three = rows("p15_k8_one"), rows("p15_k8_three")
     for ch, lab in (("A1", "AOne"), ("B", "B")):
         gap(f"REightFan{lab}", by(three, ch), by(one, ch))
+        m.add(f"REightFan{lab}Abs", f"{abs(np.mean([by(three, ch)[i]['acc'] - by(one, ch)[i]['acc'] for i in sorted(set(by(three, ch)) & set(by(one, ch)))])) * 100:.1f}")
         m.add(f"REightOne{lab}Acc", pct(np.mean([v["acc"] for v in by(one, ch).values()])))
         m.add(f"REightThree{lab}Acc", pct(np.mean([v["acc"] for v in by(three, ch).values()])))
     m.add("REightThreeFoldersAcc", pct(np.mean([v["acc"] for v in by(three, "Bf").values()])))
@@ -872,6 +875,23 @@ def round8(m: Macros) -> None:
     m.add("REightFanDiD", f"{mean * 100:.1f}"); m.add("REightFanDiDLo", f"{lo * 100:.1f}"); m.add("REightFanDiDHi", f"{hi * 100:.1f}")
     for ch, lab in (("B", "B"), ("Bf", "Folders")):
         m.add(f"REightThree{lab}Notes", f"{np.mean([v['as_recall_notes'] for v in by(three, ch).values() if 'as_recall_notes' in v]) * 100:.0f}")
+    # Three-Researcher B: tasks where at least two Researchers wrote the same path, and tasks where only one
+    # Researcher's notes were left, replaying successful Researcher writes (an append keeps earlier content).
+    clash, one_left, n = 0, 0, 0
+    for rec in raw_records(latest("p15_k8_three")):
+        if rec["channel"] != "B" or "error" in rec:
+            continue
+        writers, owners = {}, {}
+        for o in rec["io_ops"]:
+            if not o["agent"].startswith("researcher") or o["op"] != "write" or "error" in o:
+                continue
+            writers.setdefault(o["path"], set()).add(o["agent"])
+            owners[o["path"]] = owners.get(o["path"], set()) | {o["agent"]} if o.get("append") else {o["agent"]}
+        n += 1
+        clash += any(len(w) >= 2 for w in writers.values())
+        one_left += len(set().union(*owners.values())) == 1
+    m.add("REightClashB", f"{clash / n * 100:.0f}")
+    m.add("REightOneLeftB", f"{one_left / n * 100:.0f}")
     m.add("REightOneBNotes", f"{np.mean([v['as_recall_notes'] for v in by(one, 'B').values() if 'as_recall_notes' in v]) * 100:.0f}")
     # Reply-output variant: does the Writer open the notes before answering?
     for tag, s in (("Eight", "8b"), ("ThirtyTwo", "32b")):
@@ -893,6 +913,39 @@ def round8(m: Macros) -> None:
         v = [json.loads((latest(f"p11_c32_{ch}_r{i}") / "run_time.json").read_text())["vllm_metrics"] for i in (1, 2)]
         ms = np.mean([x["vllm:request_decode_time_seconds_sum"] / x["vllm:generation_tokens_total"] * 1000 for x in v])
         m.add(f"REightHiDecodeMs{NAME[ch]}", f"{ms:.1f}")
+    # At 32 tasks at a time: mean generated tokens per task and summed request time (e2e), relative to A1.
+    hi_gen, hi_req = {}, {}
+    for ch in ("A1", "A1zc"):
+        runs = [latest(f"p11_c32_{ch}_r{i}") for i in (1, 2)]
+        hi_gen[ch] = np.mean([np.mean([r["completion_tokens"] for r in load_rows(x)]) for x in runs])
+        hi_req[ch] = np.mean([json.loads((x / "run_time.json").read_text())["vllm_metrics"]
+                              ["vllm:e2e_request_latency_seconds_sum"] for x in runs])
+    m.add("REightHiGenAZc", f"{hi_gen['A1zc'] / hi_gen['A1']:.2f}")
+    m.add("REightHiReqAZc", f"{hi_req['A1zc'] / hi_req['A1']:.2f}")
+    # Holm correction over the 12 writing-control tests (4 sizes x wording/write/read, p10), using a paired
+    # sign-flip permutation test on per-task accuracy differences.
+    rng = np.random.default_rng(0)
+    tests = {}
+    for tag, s in (("Four", "4b"), ("Eight", "8b"), ("Fourteen", "14b"), ("ThirtyTwo", "32b")):
+        rs = rows(f"p10_write_{s}")
+        a1_, r_, w_, b_ = (by(rs, c) for c in ("A1", "A1r", "A1w", "B"))
+        for step, x, y in (("Wording", r_, a1_), ("Write", w_, r_), ("Read", b_, w_)):
+            ids = sorted(set(x) & set(y))
+            d = np.array([x[i]["acc"] - y[i]["acc"] for i in ids], float)
+            flips = rng.choice((-1.0, 1.0), size=(20000, d.size))
+            null = np.abs((flips * d).mean(axis=1))
+            tests[(tag, step)] = (np.sum(null >= abs(d.mean()) - 1e-12) + 1) / (null.size + 1)
+    order = sorted(tests, key=tests.get)
+    survive, prev = set(), True
+    for j, key in enumerate(order):
+        prev = prev and tests[key] <= 0.05 / (len(order) - j)
+        if prev:
+            survive.add(key)
+    for step in ("Write", "Read"):
+        m.add(f"REightHolm{step}SigWord", word(sum((t, step) in survive for t in ("Four", "Eight", "Fourteen", "ThirtyTwo"))))
+    for tag in ("Eight", "ThirtyTwo"):
+        m.add(f"REightHolmWriteP{tag}", f"{tests[(tag, 'Write')]:.3f}")
+    print("holm", {f"{k[0]}{k[1]}": (round(v, 4), k in survive) for k, v in tests.items()})
 
 
 def judges(m: Macros) -> None:

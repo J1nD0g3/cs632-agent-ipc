@@ -1,10 +1,10 @@
 """Fig. 3: where the file channel's loss comes from, per model size (one interleaved run per size).
 
 Claim at a glance: writing notes through a tool call drops facts and accuracy (4B, 8B, 32B; not 14B), while
-the wording of the instruction changes nothing; reading from files costs more on top at 4B, 14B and 32B.
+the wording of the instruction changes nothing; the rest of the file channel costs more on top at 4B, 14B and 32B.
 Form: (a) grouped bars per model size: share of supporting facts in the Researcher's output for broadcast,
 the reply with B's wording, the tool-call write, and files; the tool-written arms share the files' teal;
-(b) grouped bars per size of the three paired accuracy effects (wording, tool write, reading files) with
+(b) grouped bars per size of the three paired accuracy effects (wording, tool write, rest of file channel) with
 95% intervals drawn exactly; the tool-write effect is the dark bar.
 Data: figs/data/fig3_split.json (agentipc.figdata from results/p10_write_*).
 """
@@ -28,10 +28,10 @@ ax.bars({"Broadcast": [r["notes_A1"] for r in ROWS],
          "Tool-call write": [r["notes_A1w"] for r in ROWS],
          "Files (B)": [r["notes_B"] for r in ROWS]},
         ["navy4", "navy2", "teal5", "teal2"])
-fig.caption(left.cx, left.b - 9, "(a) The tool-call write drops facts", size=7.5, weight=600)
+fig.caption(left.cx, left.b - 9, "(a) Facts in the Researcher's notes", size=7.5, weight=600)
 
 EFFECTS = [("wording", "Wording", "gray2"), ("tool_write", "Tool-call write", "teal4"),
-           ("read_files", "Reading files", "gold3")]
+           ("read_files", "Rest of file channel", "gold3")]
 bx = fig.axes(right.take("bottom", 10, gap=2)[0], cats=SIZES, y=(-0.3, 0.1), yticks=[-0.3, -0.2, -0.1, 0, 0.1],
               yfmt=lambda v: f"{v * 100:+.0f}" if v else "0", ylabel="Accuracy effect (points)", grid=True)
 bx.bars({name: [r[key] for r in ROWS] for key, name, _ in EFFECTS}, [c for _, _, c in EFFECTS], base=0)
