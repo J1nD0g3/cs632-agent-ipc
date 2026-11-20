@@ -33,6 +33,7 @@ class Workspace:
     notes: dict[str, str] = field(default_factory=dict)
     strip_prefix: str | None = None  # e.g. "workspace/": treat a path the agent prefixes with it as root-relative
     no_clobber: bool = False  # refuse a Researcher's write to a path another Researcher wrote
+    researcher_dirs: bool = False  # each parallel Researcher (researcher1, ...) writes under its own folder
     writers: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -95,6 +96,9 @@ class Workspace:
 
     def write_file(self, agent: str, path: str, content: str, append: bool = False) -> str:
         st = self._st(agent)
+        if self.researcher_dirs and agent.startswith("researcher") and agent[10:].isdigit():
+            path = str(path).strip().lstrip("./")
+            path = path if path.startswith(agent + "/") else f"{agent}/{path}"
         try:
             f = self._path(path)
         except WorkspaceError as e:

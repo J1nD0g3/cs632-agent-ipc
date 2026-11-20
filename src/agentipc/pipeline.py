@@ -15,9 +15,9 @@ from .data import Task
 from .llm import ContextOverflow, SaltedClient
 from .workspace import Workspace
 
-CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d", "B", "Bb", "Bd", "Bh", "Bn", "C", "D", "Dn")
+CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d", "B", "Bb", "Bd", "Bf", "Bh", "Bn", "Br", "C", "D", "Dn")
 MESSAGE_CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d")
-FILE_CHANNELS = ("B", "Bb", "Bd", "Bh", "C", "D")
+FILE_CHANNELS = ("B", "Bb", "Bd", "Bh", "Br", "C", "D")
 
 TEAM = ("You are one agent in a team that answers a set of questions together. The agents work in this "
         "order: {chain}.")
@@ -79,6 +79,15 @@ OUTPUT_FILES = {
 DONE_RULE = "When your file is saved, reply DONE."
 # Bh: B plus only C's heading rule for Researchers (no index), to separate the two differences of C.
 HEADING_RULE = "Start each notes file with a heading that says which questions it covers."
+# Br: B's Writer and Reviewer read the workspace with read-only tools but answer in a plain reply, which is
+# passed on as a message; this separates reading the notes from writing outputs through tool calls.
+OUTPUT_READ_REPLY = {
+    "writer": ("The Researcher's notes and the source documents are in the shared workspace. Find the notes "
+               "with list_files and read them with read_file; read a source document only to check a doubtful "
+               "fact. Reply with the draft. " + FORMAT),
+    "reviewer": ("The Writer's draft is below. The Researcher's notes and the source documents are in the shared "
+                 "workspace. Read what you need with read_file. Reply with the final answers. " + FORMAT),
+}
 # A1r: B's Researcher instruction with only the destination changed (a reply instead of files), the
 # wording control for A1w.
 OUTPUT_REPLY_MATCHED = ("The documents are in this message, so you do not need to read any file. The other agents "
@@ -140,6 +149,8 @@ def instruction(role: str, channel: str, chain: tuple[str, ...]) -> str:
     else:
         i = chain.index(role) if role in chain else 0
         prev_file = OUT_FILE.get(chain[i - 1], "draft.md") if i > 0 else ""
+        if channel == "Br" and role != "researcher":
+            return "\n\n".join(parts + [OUTPUT_READ_REPLY[role]])
         parts.append(OUTPUT_FILES[role].format(prev_file=prev_file))
         parts.append(HANDOFF_RULE if channel == "D" and role != "reviewer" else DONE_RULE)
         if channel == "Bb" and role != "researcher":
@@ -167,6 +178,7 @@ class AgentRun:
 
 
 WRITE_ONLY = [t for t in TOOLS if t["function"]["name"] == "write_file"]
+READ_TOOLS = [t for t in TOOLS if t["function"]["name"] in ("list_files", "read_file")]
 # Bb: B plus a batched read, the agent analogue of readv(): several files in one round trip.
 READ_MANY = {"type": "function", "function": {
     "name": "read_files", "description": "Read several workspace files in one call.",
@@ -217,7 +229,7 @@ async def _chat(client, run: AgentRun, messages, tools, turn: int, forced: bool)
 
 
 async def run_agent(client, ws: Workspace | None, role: str, messages: list[dict], max_turns: int,
-                    out_file: str | None = None, full_tools: list[dict] = TOOLS) -> AgentRun:
+                    out_file: str | None = None, full_tools: list[dict] = TOOLS, reply_only: bool = False) -> AgentRun:
     """Tool loop. An agent that stops without leaving its output gets one forced write_file turn."""
     run = AgentRun(role)
     tools = None if ws is None else (WRITE_ONLY if base_role(role) == "researcher" else full_tools)
@@ -246,6 +258,13 @@ async def run_agent(client, ws: Workspace | None, role: str, messages: list[dict
             messages.append({"role": "tool", "tool_call_id": tc.get("id", ""), "content": out})
     else:
         run.hit_turn_limit = ws is not None
+    if reply_only:
+        # Br: no output file; an agent that ran out of tool turns gets one turn to reply without tools.
+        if not plain_reply:
+            messages.append({"role": "user", "content": "Reply with your output now."})
+            r, call = await _chat(client, run, messages, None, max_turns, False)
+            run.reply = r.content if r is not None else ""
+        return run
     if ws is not None and _missing_output(ws, role, out_file):
         if plain_reply:
             messages.append({"role": "assistant", "content": run.reply or ""})
@@ -309,6 +328,10 @@ def build_messages(role: str, channel: str, chain: tuple[str, ...], task: Task, 
         given = f"{qs}\n\n{docs}" if channel == "A2d" else qs
         return [{"role": "system", "content": system_prompt(role, channel, chain)},
                 {"role": "user", "content": f"{given}\n\n{body}"}]
+    if channel == "Br":
+        draft = "".join(f"\n\n[{display(r)}]\n{replies[r]}" for r in before if base_role(r) == "writer")
+        return [{"role": "system", "content": system_prompt(role, channel, chain)},
+                {"role": "user", "content": qs + draft}]
     msgs = [{"role": "system", "content": system_prompt(role, channel, chain)},
             {"role": "user", "content": f"{qs}\n\n{docs}" if channel == "Bd" else qs}]
     if channel == "D":
@@ -345,8 +368,8 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
     """fixed_notes replays a given Researcher output instead of running the Researcher (reading-side test)."""
     assert channel in CHANNELS and chain[0] == "researcher" and chain[-1] == "reviewer"
     # Bn / Dn: B / D whose Researchers cannot overwrite a file another Researcher wrote (a write-write guard).
-    label, no_clobber = channel, channel in ("Bn", "Dn")
-    channel = channel[0] if no_clobber else channel
+    label, no_clobber, own_dirs = channel, channel in ("Bn", "Dn"), channel == "Bf"
+    channel = channel[0] if no_clobber or own_dirs else channel
     t0 = time.perf_counter()
     client = SaltedClient(client, f"{task.task_id}.{channel}.{len(chain)}.{researchers}.{time.time_ns()}"
                           if researchers > 1 else f"{task.task_id}.{channel}.{len(chain)}.{time.time_ns()}")
@@ -354,7 +377,7 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
     tag = f"{len(chain)}" if researchers == 1 else f"{len(chain)}r{researchers}"
     tag += "_replay" if fixed_notes is not None else ""
     ws = Workspace(Path(workdir) / f"{task.task_id}_{label}_{tag}", strip_prefix="workspace/" if normalize_paths
-                   else None, no_clobber=no_clobber) if files or channel == "A1w" else None
+                   else None, no_clobber=no_clobber, researcher_dirs=own_dirs) if files or channel == "A1w" else None
     if ws is not None:
         seed_workspace(ws, task, channel)
     tools = TOOLS_BATCH if channel == "Bb" else TOOLS
@@ -400,10 +423,13 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
 
     for role in chain[1:]:
         msgs = build_messages(role, channel, shown, task, replies, flat)
-        runs[role] = await run_agent(client, ws if files else None, role, msgs, turns, OUT_FILE.get(role), tools)
+        if channel == "Br":
+            runs[role] = await run_agent(client, ws, role, msgs, turns, None, READ_TOOLS, reply_only=True)
+        else:
+            runs[role] = await run_agent(client, ws if files else None, role, msgs, turns, OUT_FILE.get(role), tools)
         replies[role] = runs[role].reply
         out = replies[role]
-        if files:
+        if files and channel != "Br":
             f = ws.root / OUT_FILE[role]
             out = f.read_text() if f.is_file() else ""
         stage[{"writer": "draft", "reviewer": "final"}.get(role, role)] = out
