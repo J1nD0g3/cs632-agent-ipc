@@ -19,7 +19,7 @@ DATA = json.loads((Path(__file__).parent / "data" / "fig2_tradeoff.json").read_t
 CH = {c["channel"]: c for c in DATA["channels"]}
 STYLE = {  # marker, fill, name
     "A1": ("o", "navy4", "A1 broadcast"),
-    "A1zc": ("*", "#F2B53A", "A1 zero-copy"),
+    "A1zc": ("*", "#F2B53A", "A1-zc zero-copy"),
     "A2": ("o", "gray3", "A2 pipe"),
     "B": ("s", "teal2", "B files"),
     "C": ("s", "teal4", "C files+index"),
@@ -61,12 +61,12 @@ for rect, metric, key, xr, title in panels:
         (ax_, ay), (bx, by) = ax.px(CH["A1"][metric], CH["A1"]["acc"]), ax.px(CH["A1zc"][metric], CH["A1zc"]["acc"])
         cut = 1 - CH["A1zc"][metric] / CH["A1"][metric]
         fig.arrow((ax_ - 5, by + 2), (bx + 6, by + 2), color="good", sw=1.0,
-                  label=f"−{cut * 100:.0f}% computed, no sig. loss", label_side="above", label_color="good")
+                  label=f"−{cut * 100:.0f}% prefill, no significant loss", label_side="above", label_color="good")
     fig.caption(rect.cx, cap.t + 1, title, size=7.5, weight=600)
 
 fig.legend([("marker", "o:navy4", "Message channels"), ("marker", "s:teal3", "File channels"),
             ("marker", "*:#F2B53A", "Zero-copy broadcast"), ("line", "gray5", "95% CI")],
            fig.width / 2, strip.y)
 # The saving label rides on its arrow, as a dimension label would.
-fig.ignore.add(("text-near-line", "computed, no sig."))
+fig.ignore.add(("text-near-line", "prefill, no significant"))
 fig.save(str(Path(__file__).parent / "out" / "fig_tradeoff"))

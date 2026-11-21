@@ -2,8 +2,8 @@
 
 Claim at a glance: the cache savings belong to small payloads. Once the agents' prompts no longer fit
 the KV cache together, zero-copy broadcast computes as much as broadcast and the file channels compute
-more than it (a); the file channels keep losing accuracy, and only the index keeps B's large-payload
-collapse away (b).
+more than it (a); the file channels lose accuracy at every k, and B drops sharply only at k=16, where three
+parallel Researchers write to one shared folder (b).
 Form: two line panels over k on a categorical axis (1, 3, 5, 8 with one Researcher; 16 with three
 parallel Researchers, set apart by a dashed separator); broadcast is the dashed reference at 1 / 0.
 Data: figs/data/fig4_scaling.json (agentipc.figdata from the main, k=8 and k=16 runs).
@@ -16,7 +16,7 @@ from archfig import Figure, Rect
 DATA = json.loads((Path(__file__).parent / "data" / "fig4_scaling.json").read_text())["rows"]
 KS = sorted({r["k"] for r in DATA})
 CATS = [str(k) if k != 16 else "16 (fan-out)" for k in KS]
-STYLE = {"A1zc": ("#F2B53A", "*", "A1 zero-copy"), "A2": ("gray4", "o", "A2 pipe"),
+STYLE = {"A1zc": ("#F2B53A", "*", "A1-zc zero-copy"), "A2": ("gray4", "o", "A2 pipe"),
          "B": ("teal2", "s", "B files"), "C": ("teal5", "s", "C files+index")}
 
 
@@ -40,7 +40,7 @@ for ch, (col, mk, name) in STYLE.items():
     ys = series(ch, "comp_rel")
     ax.line([x for x, y in zip(xs, ys) if y is not None], [y for y in ys if y is not None], color=col, marker=mk,
             label=name)
-fig.caption(left.cx, ca.t + 1, "(a) Compute, 35k-token cache: savings fade as payloads grow", size=7.5, weight=600)
+fig.caption(left.cx, ca.t + 1, "(a) Prefill on a 35k-token cache: savings fade as payloads grow", size=7.3, weight=600)
 
 pb, cb = right.take("bottom", 10, gap=2)
 bx = fig.axes(pb, cats=CATS, y=(-0.4, 0.06), yticks=[-0.4, -0.3, -0.2, -0.1, 0], yfmt=lambda v: f"{v * 100:+.0f}" if v else "0",
@@ -50,7 +50,7 @@ for ch, (col, mk, name) in STYLE.items():
     ys = series(ch, "acc_diff")
     bx.line([x for x, y in zip(xs, ys) if y is not None], [y for y in ys if y is not None], color=col, marker=mk,
             label=name)
-fig.caption(right.cx, cb.t + 1, "(b) Accuracy: plain files collapse at large k; the pipe recovers", size=7.5, weight=600)
+fig.caption(right.cx - 1.5, cb.t + 1, "(b) Accuracy: B drops at k=16, where three Researchers share a folder", size=7.3, weight=600)
 
 fig.legend(ax.legend_items, fig.width / 2, strip.y)
 fig.save(str(Path(__file__).parent / "out" / "fig_scaling"))

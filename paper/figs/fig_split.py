@@ -1,8 +1,8 @@
 """Fig. 3: how notes are written and how they reach the Writer, per model size (one interleaved run per size).
 
-Claim at a glance: copying notes forward keeps accuracy high whichever way they were written, though a tool-call
-write loses facts and some accuracy (4B, 8B, 32B); once notes go through files, accuracy drops, and most at 14B and
-32B when the system stores a reply under a generic name the Writer seldom opens.
+Claim at a glance: copied replies are the most accurate arm at every size (tied with copied tool writes at 14B);
+a tool-call write loses facts and some accuracy when copied (4B, 8B, 32B); once notes go through files, accuracy
+drops, and a reply the harness stores as notes.md does no better than tool-written files (much worse at 14B, 32B).
 Form: two panels with the same layout, one group of four bars per model size, in a fixed order: reply copied,
 tool write copied, reply stored as a file, tool write in files. Navy = copied forward, teal = delivered through
 files; dark = tool-call write, light = reply. (a) share of supporting facts in the Researcher's notes; (b) accuracy

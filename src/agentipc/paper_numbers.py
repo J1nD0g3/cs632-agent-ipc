@@ -106,8 +106,8 @@ def main_run(m: Macros) -> None:
         diffs = [g["acc_diff"][0] for key, g in res.items() if key.endswith(f"|{ch}") and "acc_diff" in g]
         sig = [g["acc_diff"] for key, g in res.items() if key.endswith(f"|{ch}") and "acc_diff" in g]
         n_sig = sum(1 for d in sig if d[2] < 0)
-        m.add(f"Gap{NAME[ch]}Min", f"{-max(diffs) * 100:.0f}")
-        m.add(f"Gap{NAME[ch]}Max", f"{-min(diffs) * 100:.0f}")
+        m.add(f"Gap{NAME[ch]}Min", f"{-max(diffs) * 100:.1f}")
+        m.add(f"Gap{NAME[ch]}Max", f"{-min(diffs) * 100:.1f}")
         m.add(f"Gap{NAME[ch]}Sig", n_sig)
         m.add(f"Gap{NAME[ch]}SigWord", word(n_sig))
     vs_b = analyze(rows, "B")
@@ -246,7 +246,15 @@ def scaling(m: Macros) -> None:
         kk = {1: "One", 3: "Three", 5: "Five", 8: "Eight", 16: "Sixteen"}[k]
         for ch in ("A1zc", "A2", "B", "C", "D"):
             m.add(f"Comp{NAME[ch]}K{kk}", f"{get(k, ch, 'comp_rel'):.2f}")
-            m.add(f"Gap{NAME[ch]}K{kk}", f"{-get(k, ch, 'acc_diff') * 100:.0f}")
+            m.add(f"Gap{NAME[ch]}K{kk}", f"{-get(k, ch, 'acc_diff') * 100:.1f}")
+        if k > 5:
+            m.add(f"ScaleN{kk}", get(k, "A1", "n"))
+    main_n = {get(k, "A1", "n") for k in {r["k"] for r in rows} if k <= 5}
+    assert len(main_n) == 1, main_n
+    m.add("ScaleNMain", main_n.pop())
+    cfg = lambda name: yaml.safe_load((ROOT / "configs" / f"{name}.yaml").read_text())
+    m.add("KEightPerSet", cfg("t08_k8")["n_tasks"])
+    m.add("KSixteenPerSet", cfg("t08_large")["n_tasks"])
 
 
 def file_compute_range(m: Macros) -> None:
@@ -353,7 +361,7 @@ def harness(m: Macros) -> None:
     # Zero-copy under exact match, per cell, to qualify "within the noise".
     res = analyze_metric(load_rows(run), "em")
     gaps = [-g[0] for key, g in res.items() if key.endswith("|A1zc")]
-    m.add("ZcEmGapMax", f"{max(gaps) * 100:.0f}")
+    m.add("ZcEmGapMax", f"{max(gaps) * 100:.1f}")
     # Tool-budget hits per role at k=16 (B), the setting behind the large-payload collapse.
     big = latest("t08_large")
     hits = {"writer": [], "reviewer": []}
@@ -514,9 +522,9 @@ def replay(m: Macros) -> None:
                               np.array([a1[r["task_id"]]["acc"] for r in rs], dtype=float))
         n = NAME[ch]
         m.add(f"Rep{n}Acc", pct(np.mean([r["acc"] for r in rs])))
-        m.add(f"Rep{n}Gap", f"{-mean * 100:.0f}")
-        m.add(f"Rep{n}GapLo", f"{-hi * 100:.0f}")
-        m.add(f"Rep{n}GapHi", f"{-lo * 100:.0f}")
+        m.add(f"Rep{n}Gap", f"{-mean * 100:.1f}")
+        m.add(f"Rep{n}GapLo", f"{-hi * 100:.1f}")
+        m.add(f"Rep{n}GapHi", f"{-lo * 100:.1f}")
         m.add(f"Rep{n}Deliv", f"{np.mean([r['as_kept_writer_input'] for r in rs if 'as_kept_writer_input' in r]) * 100:.0f}")
     opened, index = {"B": [], "C": []}, []
     for rec in raw_records(latest("t09_replay")):
@@ -542,7 +550,7 @@ def repeat(m: Macros) -> None:
         b = np.array([main[(r["task_id"], ch)]["acc"] for r in rs], dtype=float)
         mean, lo, hi = paired(a, b)
         worst = max(worst, abs(lo), abs(hi))
-        m.add(f"AA{NAME[ch]}Diff", f"{mean * 100:+.1f}")
+        m.add(f"AA{NAME[ch]}Diff", f"{mean * 100:.1f}")
         m.add(f"AA{NAME[ch]}Same", f"{np.mean(np.isclose(a, b)) * 100:.0f}")
     m.add("AAN", len({r["task_id"] for r in rows}))
     m.add("AAWorst", f"{worst * 100:.1f}")
@@ -587,9 +595,9 @@ def scope(m: Macros) -> None:
         for ref, rn in (("A1", "AOne"), ("A2", "ATwo"), ("B", "B")):
             y = np.array([main[(t, ref)]["acc"] for t in ids], dtype=float)
             mean, lo, hi = paired(x, y)
-            m.add(f"Scope{tag}Vs{rn}", f"{mean * 100:+.1f}")
-            m.add(f"Scope{tag}Vs{rn}Lo", f"{lo * 100:+.1f}")
-            m.add(f"Scope{tag}Vs{rn}Hi", f"{hi * 100:+.1f}")
+            m.add(f"Scope{tag}Vs{rn}", f"{mean * 100:.1f}")
+            m.add(f"Scope{tag}Vs{rn}Lo", f"{lo * 100:.1f}")
+            m.add(f"Scope{tag}Vs{rn}Hi", f"{hi * 100:.1f}")
             m.add(f"Scope{tag}Ref{rn}", pct(y.mean()))
             m.add(f"Scope{tag}Vs{rn}Abs", f"{abs(mean) * 100:.1f}")
         m.add(f"Scope{tag}Limit", f"{np.mean([r['turn_limit'] for r in rs]) * 100:.0f}")
@@ -618,6 +626,7 @@ def pro6000(m: Macros) -> None:
         m.add(f"PKv{tag}N", len(a1))
     m.add("PKvAccShiftMax", f"{max(max(v) - min(v) for v in accs.values()) * 100:.1f}")
     sizes = {"Four": "p02_size_4b", "Eight": "p02_size_8b", "Fourteen": "p02_size_14b", "ThirtyTwo": "p02_size_32b"}
+    size_gap = {}
     for tag, exp in sizes.items():
         rows = load_rows(latest(exp))
         a1 = {r["task_id"]: r for r in rows if r["channel"] == "A1"}
@@ -629,10 +638,18 @@ def pro6000(m: Macros) -> None:
             y = np.array([a1[r["task_id"]]["acc"] for r in rs], dtype=float)
             mean, lo, hi = paired(x, y)
             n = f"PSize{tag}Gap{NAME[ch]}"
-            m.add(n, f"{-mean * 100:.0f}")
-            m.add(f"{n}Lo", f"{-hi * 100:.0f}")
-            m.add(f"{n}Hi", f"{-lo * 100:.0f}")
+            m.add(n, f"{-mean * 100:.1f}")
+            m.add(f"{n}Lo", f"{-hi * 100:.1f}")
+            m.add(f"{n}Hi", f"{-lo * 100:.1f}")
+            size_gap[(tag, ch)] = -mean
             m.add(f"PSize{tag}Acc{NAME[ch]}", pct(x.mean()))
+    a1_32 = {r["task_id"]: r for r in load_rows(latest("p02_size_32b")) if r["channel"] == "A1"}
+    for ch in ("B", "C"):
+        rs = [r for r in load_rows(latest("p08_norm_32b")) if r["channel"] == ch and r["task_id"] in a1_32]
+        rerun, _, _ = paired(np.array([r["acc"] for r in rs], float), np.array([a1_32[r["task_id"]]["acc"] for r in rs], float))
+        v = [size_gap[(t, ch)] for t in ("Four", "Eight", "Fourteen")] + [-rerun]
+        m.add(f"PSizeGap{ch}Min", f"{min(v) * 100:.1f}")
+        m.add(f"PSizeGap{ch}Max", f"{max(v) * 100:.1f}")
     notes = {}
     for tag, exp in sizes.items():
         rows = load_rows(latest(exp))
@@ -994,6 +1011,73 @@ def round10(m: Macros) -> None:
     m.add("RTenN", len(by(load_rows(latest("p16_store_8b")), "A1r")))
 
 
+def round10_text(m: Macros) -> None:
+    """Round-10 text: Holm over the 16 simple effects of the 2x2 (p16), setup constants read from the configs and
+    the PRO 6000 queue script, files' prefill against zero-copy's, and median task latency in the timing runs."""
+    import re
+
+    def by(rs, ch):
+        return {r["task_id"]: r for r in rs if r["channel"] == ch and not r.get("error")}
+
+    # Holm over the 2x2 simple effects (4 sizes x 4 effects), paired sign-flip permutation test as in round8.
+    rng = np.random.default_rng(0)
+    tests, unc = {}, {}
+    effects = {"WriteCopy": ("A1w", "A1r"), "WriteFile": ("B", "Bs"), "FileReply": ("Bs", "A1r"), "FileTool": ("B", "A1w")}
+    for tag, s in (("Four", "4b"), ("Eight", "8b"), ("Fourteen", "14b"), ("ThirtyTwo", "32b")):
+        rs = load_rows(latest(f"p16_store_{s}"))
+        for eff, (cx, cy) in effects.items():
+            x, y = by(rs, cx), by(rs, cy)
+            ids = sorted(set(x) & set(y))
+            _, lo, hi = paired(np.array([x[i]["acc"] for i in ids], float), np.array([y[i]["acc"] for i in ids], float))
+            unc[(tag, eff)] = lo > 0 or hi < 0
+            d = np.array([x[i]["acc"] - y[i]["acc"] for i in ids], float)
+            flips = rng.choice((-1.0, 1.0), size=(20000, d.size))
+            null = np.abs((flips * d).mean(axis=1))
+            tests[(tag, eff)] = (np.sum(null >= abs(d.mean()) - 1e-12) + 1) / (null.size + 1)
+    order = sorted(tests, key=tests.get)
+    survive, prev = set(), True
+    for j, key in enumerate(order):
+        prev = prev and tests[key] <= 0.05 / (len(order) - j)
+        if prev:
+            survive.add(key)
+    m.add("RTenHolmTests", len(tests))
+    sizes = ("Four", "Eight", "Fourteen", "ThirtyTwo")
+    for eff in effects:
+        m.add(f"RTenHolm{eff}SigWord", word(sum((t, eff) in survive for t in sizes)))
+        m.add(f"RTen{eff}SigWord", word(sum(unc[(t, eff)] for t in sizes)))
+        for t in sizes:
+            m.add(f"RTenHolm{eff}P{t}", f"{tests[(t, eff)]:.3f}")
+            # Table mark for an effect that stays significant after the Holm correction.
+            m.add(f"RTenMark{eff}{t}", "\\textsuperscript{\\dag}" if (t, eff) in survive else "")
+    print("holm2x2", {f"{k[0]}{k[1]}": (round(v, 4), k in survive) for k, v in tests.items()})
+
+    # Setup constants.
+    cfg = lambda name: yaml.safe_load((ROOT / "configs" / f"{name}.yaml").read_text())
+    m.add("CapMain", f"{cfg('t07_main')['max_tokens']:,}")
+    m.add("CapSplit", f"{cfg('p16_store_8b')['max_tokens']:,}")
+    m.add("Turns", cfg("t07_main")["max_turns"])
+    m.add("TurnsHi", cfg("p07_k16_b24")["max_turns"])
+    m.add("Conc", cfg("t07_main")["concurrency"])
+    m.add("ConcWord", word(cfg("t07_main")["concurrency"]))
+    m.add("ConcHi", cfg("p11_c32_A1_r1")["concurrency"])
+    q = (ROOT / "scripts" / "queue_pro6000.sh").read_text()
+    blocks = dict(re.findall(r"(\d+k):(\d+)", re.search(r"for spec in ([0-9k: ]+);", q).group(1)))
+    for lab, key in (("KvProSmall", "35k"), ("KvPro", "100k"), ("KvProHi", "400k")):
+        m.add(lab, f"{int(blocks[key]) * 16 / 1000:.0f}k")
+
+    # Files' prefill against zero-copy's at k=3 (main run, both datasets pooled).
+    rows = load_rows(latest("t07_main"))
+    pool = lambda ch: np.mean([r["prefill_tokens"] for r in rows if r["channel"] == ch and r["k"] == 3])
+    m.add("CompRatioBAZc", f"{pool('B') / pool('A1zc'):.1f}")
+    m.add("CompRatioCAZc", f"{pool('C') / pool('A1zc'):.1f}")
+
+    # Median task latency (wall_s per task) of zero-copy over broadcast in the serving-time runs.
+    def med(exp):
+        return np.median([r["wall_s"] for r in load_rows(latest(exp))])
+    m.add("RTenHiMedAZc", f"{np.mean([med(f'p11_c32_A1zc_r{i}') / med(f'p11_c32_A1_r{i}') for i in (1, 2)]):.2f}")
+    m.add("RTenMedAZc", f"{np.mean([med(f'p11_alone_A1zc_r{i}') / med(f'p11_alone_A1_r{i}') for i in (2, 3)]):.2f}")
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -1021,7 +1105,7 @@ def judges(m: Macros) -> None:
 
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6, round8, round10]
+            fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6, round8, round10, round10_text]
 
 
 def main() -> int:
