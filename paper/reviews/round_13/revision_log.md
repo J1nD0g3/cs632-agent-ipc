@@ -119,3 +119,93 @@ writing" became "replied without writing"; "the rescue is an outcome of the chan
 on the channel". We also dropped the closing sentence "Dropping the output file thus does not remove the file
 channel's cost.", because the new Br-versus-B sentence already says this. The paper is 6 pages with references,
 with no undefined references and no overfull boxes. `% TODO p18` is unchanged.
+
+## p18: first-listed stored reply at 14B (`% TODO p18` filled)
+
+Snapshot before editing: `/mnt/sda/heojin/cs632-store/main_pre_p18.tex`. Data: `results/p18_first_14b/20261121-191515-8d096a4`
+(Qwen3-14B, the 150 tasks and settings of p17_told_14b, arms Bt, Bs0, Bt0, B interleaved in one run).
+
+New section `round13_first` in `paper_numbers.py` (macro prefix `RFirst`). Drafts are scored like final answers
+(as in `round13`), opens use `writer_opened_notes(rec, agent=...)`, and paired intervals use `paired` (2,000
+resamples, task ids sorted as in every other section).
+
+- Final accuracy: B 64.7, Bt 43.6, Bs0 45.3, Bt0 44.7 (`RFirstAcc{Tool,Told,FirstUntold,FirstTold}`).
+- Writer opens notes: 99 / 5 / 21 / 70%. Reviewer: 79 / 1 / 3 / 15% (`RFirstOpen*`, `RFirstReviewerOpen*`).
+- Draft Bt0 - Bt +17.3 (12.4 to 22.4), `RFirstDraftFirstToldOverTold`. Draft Bt0 - B -8.4 (-13.1 to -3.8),
+  `RFirstDraftFirstToldOverTool` (computed, not in the text).
+- Final - draft: B -5.8 (-8.7 to -3.1), Bt -1.1 (-4.7 to 2.7), Bs0 -6.4, Bt0 -17.3 (-22.7 to -12.0)
+  (`RFirstRevise*`). Final Bt0 - Bt +1.1 (-2.4 to 4.9), `RFirstAccFirstToldOverTold`.
+- Bt0 split by Reviewer opening the notes (observational): 23 tasks -4.3, 127 tasks -19.7
+  (`RFirstReviseFirstTold{Opened,Skipped}` and `...N`).
+- Point estimates match the brief. Some interval ends differ from the brief by up to 0.3 points; the bootstrap
+  draws depend on task order, and this section sorts task ids like the rest of the file. The final Bt0 - Bt
+  interval matches exactly.
+
+Text changes:
+1. Results: the 32B paragraph and the 14B sentences are one paragraph, retitled "The stored reply trails
+   tool-written notes partly because later agents do not find it." The 14B part now says: naming the path
+   alone moves accuracy by 0.9 points (p17), list_files lists notes.md after the documents, so the first-listed
+   run names it 00_notes.md. The told Writer then opens it in 70% of tasks instead of 5% and its draft gains
+   17.3 points. The Reviewer opens it in 15% and revises the gain away (-17.3 draft to final against -1.1 for
+   told notes.md), so final accuracy rises only 1.1. The 23/127 Reviewer split is marked observational. The
+   docs/ placement observation (79% of tool-writing Researchers save under docs/) is dropped; the new run
+   replaces it as the 14B finding.
+2. Methods, Runs: one sentence defines the 14B first-listed run. Statistics: its comparisons are uncorrected
+   and post hoc.
+3. Conclusion: the rule is now "lead every later agent that edits the answer to the stored notes", followed by
+   "Naming the path helped at 32B. At 14B, the file also had to be listed first, and then only the Writer used
+   it." Open question changed to why a 14B Reviewer skips notes listed first and named. Intro rule list
+   changed to "lead every later agent to shared state" to match.
+
+Cuts to stay at 6 pages (meaning kept): "chosen post hoc after we saw the crossed runs" -> "chosen post hoc";
+"(... of the Reviewers), and nearly all the rest" -> "(... of Reviewers), and nearly all others"; "This split"
+-> "The split"; "in two of these runs" -> "in two runs"; "summed prefill and decode time" -> "prefill and decode
+time"; "but, in our runs, little of the time" -> "but little of the time"; "compared with broadcast's" ->
+"against broadcast's"; "Of the reads by B's Writer ... the Writer never opens" -> "Of B's Writer's reads ...
+it never opens"; "whose index names the notes files" -> "whose index names the notes"; "(Table 1, bottom rows)"
+-> "(Table 1)"; "and neither survives the correction" -> "and neither survives correction"; "again a
+descriptive split" -> "a descriptive split"; "in two back-to-back runs on one server" -> "in two back-to-back
+runs"; "removes drift common to both channels" -> "removes common drift"; "which confounds this arm" -> "a
+confound"; "We did not test separate folders at this size" -> "... here"; "raising the budget from 12 to 24
+calls" -> "doubling the budget to 24 calls"; the 33.9-point gap's interval dropped; "against 7.8 originally"
+-> "(7.8 originally)"; "With batching, greedy decoding" -> "Batched greedy decoding"; "the three wording-run
+arms" -> "the wording-run arms"; "We did not measure drift across GPUs or token caps" -> "Drift across GPUs or
+caps is unmeasured." The paper is 6 pages with references, with no undefined references and no overfull boxes.
+
+## p18 meaning-audit fixes (p18_audit.md)
+
+Each fix was checked against the text and data before applying it:
+- Fix 1 (Methods, Runs): `results/p18_first_14b/20261121-191515-8d096a4/config.yaml` runs B, Bt, Bs0, and Bt0
+  with seed 2, `use_tasks` 75 per dataset (150 tasks), and `max_tokens` 4096, the same as `p17_told_14b`, and every
+  `RFirst*` macro compares arms within this run. Now: "A 14B first-listed run, on the same tasks and cap,
+  interleaves tool-written notes, the told notes.md, and the stored reply named 00_notes.md, told and untold."
+- Fix 2 (Statistics): "The told and first-listed runs' comparisons are uncorrected, and the first-listed run's are
+  post hoc."
+- Fix 3 (Conclusion): at 32B the told Writer opens notes.md in 86% (26% untold) and the Reviewer in 63% (6%), so
+  both agents follow the path. At 14B the Writer opens told notes.md in 5% and 00_notes.md in 70%, the Reviewer opens
+  00_notes.md in 15% (`RFirstReviewerOpenFirstTold`), and the draft gain of 17.3 is revised away (-17.3). Now:
+  "Naming the path led both agents to the notes at 32B. At 14B, the Writer followed it only when the file was also
+  listed first, and the Reviewer, which opened it in only \nRFirstReviewerOpenFirstTold{}\% of tasks, undid the
+  Writer's gain."
+- Fix 4 (zero-copy timing): "in our runs" restored ("... but, in our runs, little of the time").
+- Fix 5 (fan-out): `p15_k8_one` and `p15_k8_three` both ran on GPU 4 (port 8204), the second starting when the
+  first ended (16:46:12). "on one server" restored.
+- Fix 6 (fan-out): "removes drift common to both channels" restored (the DiD subtracts the A1 change from the B
+  change on the same tasks).
+- Fix 7 (timing): `RSixDecodeShareAOne` uses vLLM metrics from `p11_alone_*_r2` and `_r3`, two of the three alone
+  runs. Now "in two of these runs".
+
+The fixes pushed the paper to 7 pages (references [31] and [32] spilled). Trims kept to recover 6 pages, each
+needed (reverting any one of them gives 7 pages again):
+1. Channels, A2: "and the Reviewer gets the draft" -> "and the Reviewer the draft".
+2. Results, timing: "Zero-copy's agents generate 1.2x broadcast's output tokens" -> "Zero-copy generates ...".
+3. Table 1 caption: "Copy: broadcast's inputs." -> "Copy: A1's inputs." (A1 is broadcast).
+4. Table 1 caption: "among the 16 effects of rows 1-4, or, for the interaction (row 4 minus row 3), among the
+   8 post hoc tests (Section 3)" -> "among the 16 effects of rows 1-4 or, for the interaction (row 4 minus row 3), the
+   8 post hoc tests" (second "among", one comma, and the section pointer dropped; the families are defined in
+   Statistics).
+Other trims tried and reverted because they were not needed: "with replacement", "(A1)", "its last call", "one
+forced write call", "its tool budget", "supplies", "runtime rules", "on ... on the model", "copying only the
+previous output" -> "the pipe", and several fan-out rewordings. No condition, scope qualifier, interval, sample
+size, or comparison reference was dropped, and numbers.tex was not edited. The paper is 6 pages with references,
+with no undefined references and no overfull boxes. No semicolons were added, and no modified vLLM is mentioned.

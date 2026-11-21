@@ -1510,6 +1510,49 @@ def round13(m: Macros) -> None:
     m.add("RThirteenHiMedAZcMax", f"{max(ratios):.2f}")
 
 
+def round13_first(m: Macros) -> None:
+    """p18 (14B): the stored reply named 00_notes.md so it lists before docs/, untold (Bs0) and told (Bt0), against
+    the told notes.md (Bt) and tool-written notes (B). Draft and final accuracy, and who opens the notes."""
+    from .factpairs import tasks_of
+    from .metrics import correct, parse_answers
+
+    run = latest("p18_first_14b")
+    _, tasks = tasks_of(run)
+    labs = {"B": "Tool", "Bt": "Told", "Bs0": "FirstUntold", "Bt0": "FirstTold"}
+    final = {c: {r["task_id"]: r["acc"] for r in load_rows(run) if r["channel"] == c and not r.get("error")} for c in labs}
+    draft, w_open, r_open = ({c: {} for c in labs} for _ in range(3))
+    for rec in raw_records(run):
+        c = rec["channel"]
+        if c not in labs or "error" in rec:
+            continue
+        qs = tasks[rec["task_id"]].questions
+        preds = parse_answers(rec["stage"].get("draft", ""), len(qs))
+        draft[c][rec["task_id"]] = float(np.mean([correct(p, q.answer) for p, q in zip(preds, qs)]))
+        w_open[c][rec["task_id"]] = writer_opened_notes(rec)
+        r_open[c][rec["task_id"]] = writer_opened_notes(rec, "reviewer")
+    for c, lab in labs.items():
+        m.add(f"RFirstAcc{lab}", pct(np.mean(list(final[c].values()))))
+        m.add(f"RFirstDraft{lab}", pct(np.mean(list(draft[c].values()))))
+        m.add(f"RFirstOpen{lab}", f"{np.mean(list(w_open[c].values())) * 100:.0f}")
+        m.add(f"RFirstReviewerOpen{lab}", f"{np.mean(list(r_open[c].values())) * 100:.0f}")
+
+    def gap(name, x, y):
+        ids = sorted(set(x) & set(y))
+        mean, lo, hi = paired(np.array([x[i] for i in ids], float), np.array([y[i] for i in ids], float))
+        m.add(name, pct(mean)); m.add(f"{name}Lo", pct(lo)); m.add(f"{name}Hi", pct(hi)); m.add(f"{name}N", len(ids))
+
+    gap("RFirstDraftFirstToldOverTold", draft["Bt0"], draft["Bt"])
+    gap("RFirstDraftFirstToldOverTool", draft["Bt0"], draft["B"])
+    gap("RFirstAccFirstToldOverTold", final["Bt0"], final["Bt"])
+    for c, lab in labs.items():
+        gap(f"RFirstRevise{lab}", final[c], draft[c])
+    # Bt0 split by whether the Reviewer opened the notes (observational: the groups are not paired).
+    for flag, lab in ((True, "Opened"), (False, "Skipped")):
+        ids = [i for i, f in r_open["Bt0"].items() if f == flag and i in final["Bt0"]]
+        m.add(f"RFirstReviseFirstTold{lab}", pct(np.mean([final["Bt0"][i] - draft["Bt0"][i] for i in ids])))
+        m.add(f"RFirstReviseFirstTold{lab}N", len(ids))
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -1538,7 +1581,7 @@ def judges(m: Macros) -> None:
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
             fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6, round8, round10, round10_text,
-            round12, round12_fix, round12_told, round13]
+            round12, round12_fix, round12_told, round13, round13_first]
 
 
 def main() -> int:

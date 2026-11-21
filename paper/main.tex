@@ -68,8 +68,8 @@ almost no prefix. Zero-copy broadcast, which puts the shared history first, cuts
 with the tool protocol, the reads, writes, and tool budget that files impose (\S\ref{sec:results}). Our
 third is that, at eight questions, a folder per Researcher recovers what files lose when parallel
 Researchers share one folder (\S\ref{sec:sensitivity}). Our contribution is a measurement, not a new system. From it we draw four
-runtime rules: put the shared history first, give concurrent writers separate folders, tell agents where
-shared state is, and copy rather than share files.
+runtime rules: put the shared history first, give concurrent writers separate folders, lead every later
+agent to shared state, and copy rather than share files.
 
 \section{Channels}
 \label{sec:channels}
@@ -99,7 +99,7 @@ share a prefix, and the engine reuses that prefix's KV instead of computing it a
 still sent, so only their recomputation is saved.
 
 \paragraph{A2, pipe.} Each agent receives only the previous agent's output: the Writer gets the notes, and
-the Reviewer gets the draft.
+the Reviewer the draft.
 
 \paragraph{B, shared files.} The Writer and the Reviewer receive only the questions. The documents, the
 notes, and the draft are files in a workspace that agents access through the \texttt{list\_files},
@@ -160,7 +160,8 @@ channel} with the rescue. We call each combination an \emph{arm}. In the file ch
 is saved as \texttt{notes.md} (the \emph{stored reply}). On the same tasks and cap, an earlier \emph{wording
 run} ran broadcast and every crossed arm but the stored reply, the \emph{reply-output runs} interleave B, copied
 tool-written notes, and a variant of B (Br) whose Writer and Reviewer reply instead of writing files, and the \emph{told runs} (14B and 32B) interleave, in the file channel,
-tool-written notes and the stored reply with and without its path in the later agents' instructions.
+tool-written notes and the stored reply with and without its path in the later agents' instructions. A 14B
+\emph{first-listed run}, on the same tasks and cap, interleaves tool-written notes, the told \texttt{notes.md}, and the stored reply named \texttt{00\_notes.md}, told and untold.
 
 \paragraph{Metrics.} \emph{Accuracy} is the share of questions whose final answer matches the gold answer
 (exact match, F1 $\ge 0.8$, or the gold answer inside a prediction at most four words longer).
@@ -175,9 +176,9 @@ $\kappa$~=~\nAsQKappa).
 that resample tasks with replacement (\nBootN resamples), so a task's questions stay together. Counts of
 significant settings are uncorrected and not independent, as settings with $k=1$, 3, and 5 share questions. For the crossed runs, sign-flip permutation tests are Holm-corrected in two families. The first
 holds the \nRTenHolmTests simple effects of Table~\ref{tab:cross} and was chosen after earlier runs on the
-same tasks. The second, chosen post hoc after we saw the crossed runs, holds per size the interaction and
+same tasks. The second, chosen post hoc, holds per size the interaction and
 the file channel's cost on tool-written notes minus the tool-call write's cost on copied notes
-(\nRTwelveHolmTests tests). The told runs' comparisons are uncorrected. Each task runs once per channel, so
+(\nRTwelveHolmTests tests). The told and first-listed runs' comparisons are uncorrected, and the first-listed run's are post hoc. Each task runs once per channel, so
 decoding noise is part of the intervals. Comparisons across runs, marked cross-run, may include drift
 (\S\ref{sec:sensitivity}).
 
@@ -204,7 +205,7 @@ task, close to the pipe's \nCompATwo and below broadcast's \nCompAOne, because l
 \paragraph{Zero-copy shortened the median task only with many concurrent tasks.} We timed each channel
 alone on one RTX PRO 6000, in three runs of \nRSixAloneN three-question tasks, \nConcWord at a time
 (cross-run). By vLLM's per-request counters in two of these runs, decoding takes
-\nRSixDecodeShareAOne{}\% of broadcast's summed prefill and decode time. Zero-copy's agents generate
+\nRSixDecodeShareAOne{}\% of broadcast's prefill and decode time. Zero-copy generates
 \nRSixGenAZc{}$\times$ broadcast's output tokens. Its run takes \nRSixTimeAZc{}$\times$ broadcast's time, its
 median task \nRTwelveSixMedAZc{}$\times$. In two runs with \nConcHi tasks
 at a time and a \nKvProHi-token cache, zero-copy's median task took \nRThirteenHiMedAZcMin{}$\times$ and
@@ -226,8 +227,8 @@ to \nPipeBrokeMax{}\% of questions in a setting, against at most \nPipeBrokeAOne
 broadcast ranges from \nGapBMin to \nGapBMax points, significant in \nGapBSigWord of six, and C's from
 \nGapCMin to \nGapCMax points, significant in \nGapCSigWord. C is significantly above B in \nCoverBSigWord of
 six settings. B's notes state \nNotesB{}\% of
-the supporting facts, compared with broadcast's \nNotesAOne{}\%. Of the reads by B's Writer, \nDocReadsB{}\% go to source documents, and in \nNoNotesB{}\% of tasks
-the Writer never opens the notes. C's Writer, whose index names the notes files, skips them in only
+the supporting facts, against broadcast's \nNotesAOne{}\%. Of B's Writer's reads, \nDocReadsB{}\% go to source documents, and in \nNoNotesB{}\% of tasks
+it never opens the notes. C's Writer, whose index names the notes, skips them in only
 \nNoNotesC{}\% of tasks, but C also adds the heading rule.
 
 \paragraph{Files lose accuracy even with the documents or with broadcast's notes.} In the documents
@@ -241,17 +242,17 @@ control, the documents in later prompts change B's accuracy by \nScopeBDVsB poin
 \nRTwelveCapB of \nRTwelveCapBN B tasks (broadcast: \nRTwelveCapAOne). The harness rescues an
 agent in \nRThirteenMainRescB{}\% of B's tasks and \nRThirteenMainRescC{}\% of C's. Of B's rescued Writers and
 Reviewers, \nRThirteenMainBudgetShareB{}\% had used up their budget (\nRThirteenMainRevBudgetShareB{}\% of
-the Reviewers), and nearly all the rest had replied without writing. B trails broadcast by about as much on tasks
+Reviewers), and nearly all others had replied without writing. B trails broadcast by about as much on tasks
 with a rescue (\nRThirteenMainRescGapB points, \nRThirteenMainRescGapBLo to \nRThirteenMainRescGapBHi) as on
 the others (\nRThirteenMainKeptGapB, \nRThirteenMainKeptGapBLo to \nRThirteenMainKeptGapBHi), and C by
-\nRThirteenMainRescGapC and \nRThirteenMainKeptGapC. This split is descriptive, as the rescue depends
+\nRThirteenMainRescGapC and \nRThirteenMainKeptGapC. The split is descriptive, as the rescue depends
 on the channel.
 
 \begin{table}[t]
 \caption{On tool-written notes, files cost accuracy at three sizes, and more on the stored reply, which also
 differs in name and place. Paired effects in points (95\% intervals), arm after the arrow minus arm before.
-Copy: broadcast's inputs. Bold\dag: Holm-significant among the \nRTenHolmTests effects of rows 1--4, or, for
-the interaction (row 4 minus row 3), among the \nRTwelveHolmTests post hoc tests (\S\ref{sec:method}). Three
+Copy: A1's inputs. Bold\dag: Holm-significant among the \nRTenHolmTests effects of rows 1--4 or, for
+the interaction (row 4 minus row 3), the \nRTwelveHolmTests post hoc tests. Three
 runs: per-task mean of row 2 over the wording, reply-output, and crossed runs (post hoc). Rescued: \% of
 file-channel tasks with a rescued Writer or Reviewer (stored reply/tool-written). Draft/final: accuracy
 (\%) on tool-written notes.}
@@ -299,16 +300,15 @@ broadcast's by \nRSixFourWording points at 4B (\nRSixFourWordingLo to \nRSixFour
 with intervals within $\pm$\nRSixWordingNullBound points at larger sizes. On tool-written notes, the file
 channel lowers accuracy by \nRTenHolmFileToolAbsMin--\nRTenHolmFileToolAbsMax points at
 \nRTenHolmFileToolSizes, all Holm-significant. The wording and reply-output runs repeat this comparison,
-and at each size the three runs' estimates differ by at most \nRThirteenReadRepSpreadMax points (cross-run). At 8B, both Copy$\to$files effects are smallest, and neither survives the correction. On copied notes, only at
+and at each size the three runs' estimates differ by at most \nRThirteenReadRepSpreadMax points (cross-run). At 8B, both Copy$\to$files effects are smallest and neither survives correction. On copied notes, only at
 \nRTenHolmWriteCopySizes does the tool-call write change accuracy significantly, by \nRTenFourWriteCopy points,
 or by \nRTenFourWriteCopyClean (\nRTenFourWriteCopyCleanLo to \nRTenFourWriteCopyCleanHi) without the
 \nRTenFourWriteCopyCut tasks whose write was cut off or rescued. Fact coverage, a weak measure here, is lower
 for tool-written notes at \nRTenNotesToolLowerSizes (Figure~\ref{fig:split}a). At 14B,
-B's drafts are about as accurate as with copying, and the loss appears at the Reviewer (Table~\ref{tab:cross},
-bottom rows). At 32B, it appears in the drafts, and B's Reviewer recovers part of it. At 4B, every
+B's drafts are about as accurate as with copying, and the loss appears at the Reviewer (Table~\ref{tab:cross}). At 32B, it appears in the drafts, and B's Reviewer recovers part of it. At 4B, every
 file-channel task needed the rescue, so these arms' accuracy rests on it. At 14B and 32B, files trail
 copying by \nRTwelveFourteenFileToolResc and \nRTwelveThirtyTwoFileToolResc points on rescued tasks but by
-\nRTwelveFourteenFileToolKept and \nRTwelveThirtyTwoFileToolKept on the others, again a descriptive split.
+\nRTwelveFourteenFileToolKept and \nRTwelveThirtyTwoFileToolKept on the others, a descriptive split.
 
 \paragraph{Two excluded variants also trail copying.} We keep a handoff channel (D)
 out because it combines a message with files. Its Researcher and Writer each pass a message of at most \nHandoffWords words with each question's key finding and the path of its details. In the main run,
@@ -324,7 +324,7 @@ give outputs. Br's Writer opens the notes in
 \nRThirteenFourBrOpen{}\%, \nRThirteenEightBrOpen{}\%, and \nRThirteenFourteenBrOpen{}\% of tasks at 4B, 8B,
 and 14B, and at 32B it reads no file in \nRThirteenThirtyTwoBrNoRead{}\% of tasks.
 
-\paragraph{At 32B, the stored reply trails tool-written notes largely because agents are not told where it is.} In the file channel, the stored
+\paragraph{The stored reply trails tool-written notes partly because later agents do not find it.} The stored
 reply scores \nRTenFourteenWriteFile and \nRTenThirtyTwoWriteFile points below tool-written notes at 14B and 32B
 (Table~\ref{tab:cross}, both Holm-significant). By the post hoc interaction, files cost more on the stored reply, which also differs in
 name and place. The Writer opens tool-written notes in \nRTenFourteenOpenToolFile{}\% and
@@ -334,14 +334,19 @@ name and place. The Writer opens tool-written notes in \nRTenFourteenOpenToolFil
 (\nRToldThirtyTwoToldOverUntoldLo to \nRToldThirtyTwoToldOverUntoldHi), ending \nRToldThirtyTwoToldOverTool points above
 tool-written notes (\nRToldThirtyTwoToldOverToolLo to \nRToldThirtyTwoToldOverToolHi). Its accuracy minus that of
 copied reply notes is still \nRThirteenToldThirtyTwoVsReplyCopy points (\nRThirteenToldThirtyTwoVsReplyCopyLo to
-\nRThirteenToldThirtyTwoVsReplyCopyHi, cross-run). At 14B, the pointer does not
-help: the Writer opens \texttt{notes.md} in \nRToldFourteenOpenTold{}\% of told tasks, and accuracy moves by
-\nRToldFourteenToldOverUntold points (\nRToldFourteenToldOverUntoldLo to \nRToldFourteenToldOverUntoldHi). There,
-\nRToldFourteenToolNotesUnderDocs{}\% of tool-writing Researchers save notes under \texttt{docs/}, the documents'
-folder that the Writer reads anyway, while \texttt{notes.md} sits at the root. We did not test this
-placement as a cause.
-% TODO p18
-
+\nRThirteenToldThirtyTwoVsReplyCopyHi, cross-run). At 14B, naming the path alone moves accuracy by only
+\nRToldFourteenToldOverUntold points (\nRToldFourteenToldOverUntoldLo to \nRToldFourteenToldOverUntoldHi).
+As \texttt{list\_files} sorts paths, \texttt{notes.md} lists after the documents, so the first-listed run
+names it \texttt{00\_notes.md}. Told this path, the Writer opens it in
+\nRFirstOpenFirstTold{}\% of tasks instead of \nRFirstOpenTold{}\% for told \texttt{notes.md}, and its draft
+gains \nRFirstDraftFirstToldOverTold points (\nRFirstDraftFirstToldOverToldLo to
+\nRFirstDraftFirstToldOverToldHi). The Reviewer opens it in only \nRFirstReviewerOpenFirstTold{}\% of tasks and
+revises the gain away. From draft to final, accuracy moves by \nRFirstReviseFirstTold points
+(\nRFirstReviseFirstToldLo to \nRFirstReviseFirstToldHi), against \nRFirstReviseTold for told
+\texttt{notes.md}, so final accuracy rises only \nRFirstAccFirstToldOverTold points
+(\nRFirstAccFirstToldOverToldLo to \nRFirstAccFirstToldOverToldHi). The \nRFirstReviseFirstToldOpenedN tasks whose Reviewer opened the notes moved
+by \nRFirstReviseFirstToldOpened points from draft to final, the other \nRFirstReviseFirstToldSkippedN by
+\nRFirstReviseFirstToldSkipped (observational).
 
 \section{Sensitivity}
 \label{sec:sensitivity}
@@ -366,7 +371,7 @@ minus broadcast's, a difference in differences that removes drift common to both
 folder, scores \nREightFoldersOverB points (\nREightFoldersOverBLo to \nREightFoldersOverBHi) above
 three-Researcher B and differs from one-Researcher B by \nREightFoldersVsOne points (\nREightFoldersVsOneLo to
 \nREightFoldersVsOneHi, cross-run), an interval that allows a small residual loss. In \nREightClashB{}\% of B's
-three-Researcher tasks, at least two Researchers wrote to the same path. Separate folders also change the paths the Writer sees, which confounds this arm.
+three-Researcher tasks, at least two Researchers wrote to the same path. Separate folders also change the paths the Writer sees, a confound.
 
 \paragraph{At sixteen questions, a write guard or the heading rule recovers about half of B's loss, but
 doubling the tool budget does not.} In one RTX PRO 6000 run on \nRSixKSixteenBGapN tasks, B trails broadcast
@@ -375,10 +380,9 @@ Researcher's write to a file another Researcher wrote, recovers \nRSixKSixteenGu
 \nRTwelveShareGuard{}\% of the gap (\nRTwelveShareGuardLo to \nRTwelveShareGuardHi{}\%). The heading rule
 without C's index recovers \nRSixKSixteenHeadingOverB points, or \nRTwelveShareHeading{}\%
 (\nRTwelveShareHeadingLo to \nRTwelveShareHeadingHi{}\%), on the \nRSixKSixteenHeadingOverBN tasks that
-completed. We did not test separate folders at this size. In two other runs, raising the budget from
-\nTurns to \nTurnsHi calls moves B's accuracy by \nRFourBTwentyFour points (\nRFourBTwentyFourLo to
-\nRFourBTwentyFourHi, cross-run), small next to its \nRFourKSixteenGapB-point gap (\nRFourKSixteenGapBLo to
-\nRFourKSixteenGapBHi).
+completed. We did not test separate folders here. In two other runs, doubling the budget to
+\nTurnsHi calls moves B's accuracy by \nRFourBTwentyFour points (\nRFourBTwentyFourLo to
+\nRFourBTwentyFourHi, cross-run), small next to its \nRFourKSixteenGapB-point gap.
 
 \paragraph{Model size changes which channels lose.} In the size runs, B trails broadcast by
 \nPSizeGapBMin--\nPSizeGapBMax points and C by \nPSizeGapCMin--\nPSizeGapCMax at every size, with 32B's B and
@@ -390,11 +394,11 @@ C from the rerun with stripped paths (cross-run). The pipe loses only at 8B, by 
 by \nPSizeFourGapAZc points (\nPSizeFourGapAZcLo to \nPSizeFourGapAZcHi), and still by \nRFourZcReplayFour
 (\nRFourZcReplayFourLo to \nRFourZcReplayFourHi) with broadcast's notes replayed into both channels.
 
-\paragraph{Run-to-run noise is small next to B's gaps.} With batching, greedy decoding is not
+\paragraph{Run-to-run noise is small next to B's gaps.} Batched greedy decoding is not
 deterministic. Rerunning broadcast and B on \nAAN main-run tasks keeps both channels'
 rerun-minus-original intervals within $\pm$\nAAWorst points, and B's gap to broadcast is \nAAGapRepeat
-points, against \nAAGapMain originally. On the RTX PRO 6000, the three wording-run arms that the crossed runs
-repeat move by at most \nRTenDriftMax points. We did not measure drift across GPUs or token caps.
+points (\nAAGapMain originally). On the RTX PRO 6000, the wording-run arms that the crossed runs
+repeat move by at most \nRTenDriftMax points. Drift across GPUs or caps is unmeasured.
 
 \section{Related Work}
 
@@ -416,15 +420,15 @@ KV~\cite{kvcomm,tokendance,infercept,cacheblend}.
 
 The right channel depends on the cost paid for (tokens sent or prefill), on payload size versus
 KV-cache capacity, and on the model. Much of the files' accuracy cost comes with the tool protocol. Our runs
-support four runtime rules: put the shared history first, give concurrent writers separate folders, tell
-later agents where shared state is (which helped at 32B but not at 14B), and copy rather than share
-files. With 14B or 32B at three questions, or 8B at sixteen, copying only the previous output
+support four runtime rules: put the shared history first, give concurrent writers separate folders, lead
+every later agent that edits the answer to the stored notes, and copy rather than share files. Naming the
+path led both agents to the notes at 32B. At 14B, the Writer followed it only when the file was also listed first, and the Reviewer, which opened it in only \nRFirstReviewerOpenFirstTold{}\% of tasks, undid the Writer's gain. With 14B or 32B at three questions, or 8B at sixteen, copying only the previous output
 stayed within \nRThirteenPipeGapMax points of broadcast (point estimates) at
 \nRThirteenPipeSentMin--\nRThirteenPipeSentMax{}$\times$ its tokens, but with 8B at up to five questions it
 lost up to \nGapATwoMax points. We studied one model family,
 linear pipelines, multi-hop QA, and a minimal file harness, not state larger than the context, such as
 codebases, where files may be the only option. We do not know why a tool-call write lowers fact coverage,
-why a told 14B Writer skips \texttt{notes.md}, or why zero-copy lowers accuracy at 4B.
+why a 14B Reviewer skips notes listed first and named, or why zero-copy lowers accuracy at 4B.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}

@@ -1,0 +1,5 @@
+# Round-13 run on the PRO 6000: KV capacity, read from the vLLM server log ('model', 'num_gpu_blocks_override',
+# 'GPU KV cache size: N tokens', 'Desired GPU memory utilization'). start/end = run start (after the server checks) and end, KST.
+# One fresh server. GPU 5 (RTX PRO 6000).
+# exp	run_id	gpu	model	blocks	kv_tokens	gpu_mem_util	server_log	start	end	prefill_metric_lines
+p18_first_14b	20261121-191515-8d096a4	5	Qwen/Qwen3-14B	6250	100,000	0.92	logs/vllm_gpu5_20261121_191425.log	2026-11-21 19:15:15	2026-11-21 20:21:29	29
