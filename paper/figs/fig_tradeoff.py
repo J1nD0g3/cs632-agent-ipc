@@ -5,7 +5,8 @@ tokens sent (a), broadcast costs a third of the file channels and keeps the best
 tokens actually computed (b), zero-copy broadcast keeps broadcast's accuracy at the cost of a pipe.
 Form: two scatter panels with a shared accuracy axis; message channels are circles (navy family, the
 pipe gray), file channels squares (teal family), zero-copy broadcast the one gold star; vertical bars
-are 95% bootstrap CIs; an arrow in (b) carries the zero-copy saving, and each label in (b) gives the share of
+are 95% bootstrap CIs; an arrow in (b) carries the zero-copy saving with the paired 95% interval of its accuracy
+difference (fig4_scaling.json, k = 3), and each label in (b) gives the share of
 the prompt tokens that the engine reused from its prefix cache (file channels resend their conversation on
 every tool call, and the cache absorbs most of it).
 Data: figs/data/fig2_tradeoff.json (agentipc.figdata from the main run).
@@ -16,6 +17,8 @@ from pathlib import Path
 from archfig import Figure, Rect
 
 DATA = json.loads((Path(__file__).parent / "data" / "fig2_tradeoff.json").read_text())
+ZC = next(r for r in json.loads((Path(__file__).parent / "data" / "fig4_scaling.json").read_text())["rows"]
+          if r["k"] == 3 and r["channel"] == "A1zc")  # paired by task against A1, same main run
 CH = {c["channel"]: c for c in DATA["channels"]}
 STYLE = {  # marker, fill, name
     "A1": ("o", "navy4", "A1 broadcast"),
@@ -31,6 +34,8 @@ LABEL = {
     "comp": {"A1": (-5, -13, "end"), "A1zc": (-6, 0, "end"), "A2": (5, 5, "start"),
              "B": (5, 4, "start"), "C": (5, -4, "start"), "D": (-5, -12, "end")},
 }
+
+pts = lambda v: f"{v * 100:+.1f}".replace("-", "−")
 
 fig = Figure("text")
 strip, body = fig.area.take("top", 12, gap=4)
@@ -60,13 +65,16 @@ for rect, metric, key, xr, title in panels:
     if key == "comp":
         (ax_, ay), (bx, by) = ax.px(CH["A1"][metric], CH["A1"]["acc"]), ax.px(CH["A1zc"][metric], CH["A1zc"]["acc"])
         cut = 1 - CH["A1zc"][metric] / CH["A1"][metric]
-        fig.arrow((ax_ - 5, by + 2), (bx + 6, by + 2), color="good", sw=1.0,
-                  label=f"−{cut * 100:.0f}% prefill, no significant loss", label_side="above", label_color="good")
+        fig.arrow((ax_ - 5, by + 2), (bx + 6, by + 2), color="good", sw=1.0)
+        fig.text(bx + 14, by - 3, f"paired 95% CI {pts(ZC['acc_diff_lo'])} to {pts(ZC['acc_diff_hi'])}", size=6.5,
+                 anchor="start", color="good")
+        fig.text(bx + 14, by - 19, f"−{cut * 100:.0f}% prefill", size=6.5, anchor="start", color="good", weight=700)
+        fig.text(bx + 14, by - 11, f"accuracy {pts(ZC['acc_diff'])}", size=6.5, anchor="start", color="good")
     fig.caption(rect.cx, cap.t + 1, title, size=7.5, weight=600)
 
 fig.legend([("marker", "o:navy4", "Message channels"), ("marker", "s:teal3", "File channels"),
             ("marker", "*:#F2B53A", "Zero-copy broadcast"), ("line", "gray5", "95% CI")],
            fig.width / 2, strip.y)
-# The saving label rides on its arrow, as a dimension label would.
-fig.ignore.add(("text-near-line", "prefill, no significant"))
+# The saving labels ride on their arrow, as a dimension label would.
+fig.ignore.add(("text-near-line", "paired 95% CI"))
 fig.save(str(Path(__file__).parent / "out" / "fig_tradeoff"))

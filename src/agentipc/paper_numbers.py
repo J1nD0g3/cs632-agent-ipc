@@ -1028,7 +1028,40 @@ def round10(m: Macros) -> None:
                 opened[rec["channel"]].append(writer_opened_notes(rec))
         m.add(f"RTen{tag}OpenReplyFile", f"{np.mean(opened['Bs']) * 100:.0f}")
         m.add(f"RTen{tag}OpenToolFile", f"{np.mean(opened['B']) * 100:.0f}")
+        # Harness rescue per file arm: tasks where the Writer or the Reviewer needed the forced write.
+        rescued, bad = {"Bs": [], "B": []}, set()
+        for rec in raw_records(run):
+            if "error" in rec:
+                continue
+            if rec["channel"] in rescued:
+                rescued[rec["channel"]].append(any(c.get("forced_write") for role in ("writer", "reviewer")
+                                                   for c in rec["agents"][role]["calls"]))
+            # A1w tasks whose tool-call write of the notes hit the token cap or was forced by the harness.
+            if rec["channel"] == "A1w" and any(c.get("finish_reason") == "length" or c.get("forced_write")
+                                               for c in rec["agents"]["researcher"]["calls"]):
+                bad.add(rec["task_id"])
+        m.add(f"RTen{tag}RescueReplyFile", f"{np.mean(rescued['Bs']) * 100:.0f}")
+        m.add(f"RTen{tag}RescueToolFile", f"{np.mean(rescued['B']) * 100:.0f}")
+        # Caveats on the copied-notes write effect: exact match, per dataset, and without cut or forced writes.
+        ids = sorted(set(d["A1w"]) & set(d["A1r"]))
+        mean, lo, hi = paired(np.array([d["A1w"][i]["em"] for i in ids], float), np.array([d["A1r"][i]["em"] for i in ids], float))
+        m.add(f"RTen{tag}WriteCopyEm", f"{mean * 100:.1f}"); m.add(f"RTen{tag}WriteCopyEmLo", f"{lo * 100:.1f}"); m.add(f"RTen{tag}WriteCopyEmHi", f"{hi * 100:.1f}")
+        for ds, lab in (("hotpotqa", "Hotpot"), ("2wiki", "TwoWiki")):
+            gap(f"RTen{tag}WriteCopy{lab}", {i: v for i, v in d["A1w"].items() if v["dataset"] == ds}, d["A1r"])
+        gap(f"RTen{tag}WriteCopyClean", {i: v for i, v in d["A1w"].items() if i not in bad}, d["A1r"])
+        m.add(f"RTen{tag}WriteCopyCut", len(bad))
     m.add("RTenN", len(by(load_rows(latest("p16_store_8b")), "A1r")))
+    # PRO 6000 repeat check: the crossed runs (p16) rerun three arms of the wording run (p10) on the same tasks.
+    drift = []
+    for s in sizes.values():
+        old, new = load_rows(latest(f"p10_write_{s}")), load_rows(latest(f"p16_store_{s}"))
+        for c in ("A1r", "A1w", "B"):
+            x, y = by(new, c), by(old, c)
+            ids = sorted(set(x) & set(y))
+            drift.append(paired(np.array([x[i]["acc"] for i in ids], float), np.array([y[i]["acc"] for i in ids], float)))
+    m.add("RTenDriftMax", f"{max(abs(dm) for dm, _, _ in drift) * 100:.1f}")
+    m.add("RTenDriftLo", f"{min(lo for _, lo, _ in drift) * 100:.1f}")
+    m.add("RTenDriftHi", f"{max(hi for _, _, hi in drift) * 100:.1f}")
 
 
 def round10_text(m: Macros) -> None:
@@ -1041,7 +1074,7 @@ def round10_text(m: Macros) -> None:
 
     # Holm over the 2x2 simple effects (4 sizes x 4 effects), paired sign-flip permutation test as in round8.
     rng = np.random.default_rng(0)
-    tests, unc = {}, {}
+    tests, unc, means = {}, {}, {}
     effects = {"WriteCopy": ("A1w", "A1r"), "WriteFile": ("B", "Bs"), "FileReply": ("Bs", "A1r"), "FileTool": ("B", "A1w")}
     for tag, s in (("Four", "4b"), ("Eight", "8b"), ("Fourteen", "14b"), ("ThirtyTwo", "32b")):
         rs = load_rows(latest(f"p16_store_{s}"))
@@ -1050,6 +1083,7 @@ def round10_text(m: Macros) -> None:
             ids = sorted(set(x) & set(y))
             _, lo, hi = paired(np.array([x[i]["acc"] for i in ids], float), np.array([y[i]["acc"] for i in ids], float))
             unc[(tag, eff)] = lo > 0 or hi < 0
+            means[(tag, eff)] = float(np.mean([x[i]["acc"] - y[i]["acc"] for i in ids]))
             d = np.array([x[i]["acc"] - y[i]["acc"] for i in ids], float)
             flips = rng.choice((-1.0, 1.0), size=(20000, d.size))
             null = np.abs((flips * d).mean(axis=1))
@@ -1069,6 +1103,15 @@ def round10_text(m: Macros) -> None:
             m.add(f"RTenHolm{eff}P{t}", f"{tests[(t, eff)]:.3f}")
             # Table mark for an effect that stays significant after the Holm correction.
             m.add(f"RTenMark{eff}{t}", "\\textsuperscript{\\dag}" if (t, eff) in survive else "")
+            # Table cell: the effect, set in bold with a dagger when it survives the Holm correction.
+            v = f"{means[(t, eff)] * 100:.1f}"
+            v = "\\mbox{$-$" + v[1:] + "}" if v.startswith("-") else v
+            m.add(f"RTenCell{eff}{t}", f"\\textbf{{{v}}}\\textsuperscript{{\\dag}}" if (t, eff) in survive else v)
+        # Size of the Holm-significant effects (absolute points), e.g. the delivery effects' range.
+        sig = [abs(means[(t, eff)]) * 100 for t in sizes if (t, eff) in survive]
+        if sig:
+            m.add(f"RTenHolm{eff}AbsMin", f"{min(sig):.0f}")
+            m.add(f"RTenHolm{eff}AbsMax", f"{max(sig):.0f}")
     print("holm2x2", {f"{k[0]}{k[1]}": (round(v, 4), k in survive) for k, v in tests.items()})
 
     # Setup constants.

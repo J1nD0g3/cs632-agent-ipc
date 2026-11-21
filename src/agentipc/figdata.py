@@ -76,6 +76,9 @@ def fig3_split() -> None:
             rs = [r for r in rows if r["channel"] == ch and not r.get("error")]
             notes = [r["as_recall_notes"] for r in rs if "as_recall_notes" in r]
             row[f"notes_{ch}"] = round(float(np.mean(notes)), 4) if notes else None
+            if notes:
+                _, nlo, nhi = ci(notes)
+                row.update({f"notes_{ch}_lo": round(nlo, 4), f"notes_{ch}_hi": round(nhi, 4)})
             mean, lo, hi = ci([r["acc"] for r in rs])
             row.update({f"acc_{ch}": round(mean, 4), f"acc_{ch}_lo": round(lo, 4), f"acc_{ch}_hi": round(hi, 4)})
         table.append(row)

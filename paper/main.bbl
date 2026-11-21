@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{30}
+\begin{thebibliography}{32}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -46,8 +46,7 @@
   \bibinfo{year}{2024}\natexlab{}.
 \newblock \showarticletitle{{InferCept}: Efficient Intercept Support for
   Augmented Large Language Model Inference}. In
-  \bibinfo{booktitle}{\emph{International Conference on Machine Learning
-  (ICML)}}.
+  \bibinfo{booktitle}{\emph{ICML}}.
 \newblock
 
 
@@ -77,8 +76,7 @@
 \bibfield{author}{\bibinfo{person}{Mert Cemri} {et~al\mbox{.}}}
   \bibinfo{year}{2025}\natexlab{}.
 \newblock \showarticletitle{Why Do Multi-Agent {LLM} Systems Fail?}. In
-  \bibinfo{booktitle}{\emph{Advances in Neural Information Processing Systems
-  (NeurIPS)}}.
+  \bibinfo{booktitle}{\emph{NeurIPS}}.
 \newblock
 
 
@@ -87,8 +85,8 @@
 \bibfield{author}{\bibinfo{person}{Weize Chen} {et~al\mbox{.}}}
   \bibinfo{year}{2025}\natexlab{}.
 \newblock \showarticletitle{Optima: Optimizing Effectiveness and Efficiency for
-  {LLM}-Based Multi-Agent System}. In \bibinfo{booktitle}{\emph{Findings of the
-  Association for Computational Linguistics (ACL)}}.
+  {LLM}-Based Multi-Agent System}. In \bibinfo{booktitle}{\emph{Findings of
+  ACL}}.
 \newblock
 
 
@@ -97,8 +95,7 @@
 \bibfield{author}{\bibinfo{person}{In Gim} {et~al\mbox{.}}}
   \bibinfo{year}{2024}\natexlab{}.
 \newblock \showarticletitle{Prompt Cache: Modular Attention Reuse for
-  Low-Latency Inference}. In \bibinfo{booktitle}{\emph{Conference on Machine
-  Learning and Systems (MLSys)}}.
+  Low-Latency Inference}. In \bibinfo{booktitle}{\emph{MLSys}}.
 \newblock
 
 
@@ -119,8 +116,7 @@
   \bibinfo{year}{2020}\natexlab{}.
 \newblock \showarticletitle{Constructing A Multi-hop {QA} Dataset for
   Comprehensive Evaluation of Reasoning Steps}. In
-  \bibinfo{booktitle}{\emph{International Conference on Computational
-  Linguistics (COLING)}}.
+  \bibinfo{booktitle}{\emph{COLING}}.
 \newblock
 
 
@@ -129,8 +125,7 @@
 \bibfield{author}{\bibinfo{person}{Sirui Hong} {et~al\mbox{.}}}
   \bibinfo{year}{2024}\natexlab{}.
 \newblock \showarticletitle{{MetaGPT}: Meta Programming for A Multi-Agent
-  Collaborative Framework}. In \bibinfo{booktitle}{\emph{International
-  Conference on Learning Representations (ICLR)}}.
+  Collaborative Framework}. In \bibinfo{booktitle}{\emph{ICLR}}.
 \newblock
 
 
@@ -150,8 +145,7 @@
 \bibfield{author}{\bibinfo{person}{Woosuk Kwon} {et~al\mbox{.}}}
   \bibinfo{year}{2023}\natexlab{}.
 \newblock \showarticletitle{Efficient Memory Management for Large Language
-  Model Serving with {PagedAttention}}. In \bibinfo{booktitle}{\emph{ACM
-  Symposium on Operating Systems Principles (SOSP)}}.
+  Model Serving with {PagedAttention}}. In \bibinfo{booktitle}{\emph{SOSP}}.
 \newblock
 
 
@@ -160,10 +154,9 @@
 \bibfield{author}{\bibinfo{person}{Hugh~C. Lauer} {and}
   \bibinfo{person}{Roger~M. Needham}.} \bibinfo{year}{1979}\natexlab{}.
 \newblock \showarticletitle{On the Duality of Operating System Structures}.
-\newblock \bibinfo{journal}{\emph{ACM SIGOPS Operating Systems Review}}
+\newblock \bibinfo{journal}{\emph{ACM SIGOPS Oper.\ Syst.\ Rev.}}
   \bibinfo{volume}{13}, \bibinfo{number}{2} (\bibinfo{year}{1979}).
 \newblock
-\href{https://doi.org/10.1145/850657.850658}{doi:\nolinkurl{10.1145/850657.850658}}
 
 
 \bibitem[Liedtke(1993)]%
@@ -171,10 +164,8 @@
 \bibfield{author}{\bibinfo{person}{Jochen Liedtke}.}
   \bibinfo{year}{1993}\natexlab{}.
 \newblock \showarticletitle{Improving {IPC} by Kernel Design}. In
-  \bibinfo{booktitle}{\emph{ACM Symposium on Operating Systems Principles
-  (SOSP)}}.
+  \bibinfo{booktitle}{\emph{SOSP}}.
 \newblock
-\href{https://doi.org/10.1145/168619.168633}{doi:\nolinkurl{10.1145/168619.168633}}
 
 
 \bibitem[Lin et~al\mbox{.}(2024)]%
@@ -182,9 +173,27 @@
 \bibfield{author}{\bibinfo{person}{Chaofan Lin} {et~al\mbox{.}}}
   \bibinfo{year}{2024}\natexlab{}.
 \newblock \showarticletitle{Parrot: Efficient Serving of {LLM}-based
-  Applications with Semantic Variable}. In \bibinfo{booktitle}{\emph{USENIX
-  Symposium on Operating Systems Design and Implementation (OSDI)}}.
+  Applications with Semantic Variable}. In \bibinfo{booktitle}{\emph{OSDI}}.
 \newblock
+
+
+\bibitem[Mei et~al\mbox{.}(2025)]%
+        {aios}
+\bibfield{author}{\bibinfo{person}{K. Mei} {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{{AIOS}: {LLM} Agent Operating System}. In
+  \bibinfo{booktitle}{\emph{COLM}}.
+\newblock
+
+
+\bibitem[Packer et~al\mbox{.}(2023)]%
+        {memgpt}
+\bibfield{author}{\bibinfo{person}{C. Packer} {et~al\mbox{.}}}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \bibinfo{title}{{MemGPT}: Towards {LLMs} as Operating Systems}.
+\newblock
+\newblock
+\shownote{arXiv:2310.08560}.
 
 
 \bibitem[Pan et~al\mbox{.}(2025)]%
@@ -192,8 +201,7 @@
 \bibfield{author}{\bibinfo{person}{Zaifeng Pan} {et~al\mbox{.}}}
   \bibinfo{year}{2025}\natexlab{}.
 \newblock \showarticletitle{{KVFlow}: Efficient Prefix Caching for Accelerating
-  {LLM}-Based Multi-Agent Workflows}. In \bibinfo{booktitle}{\emph{Advances in
-  Neural Information Processing Systems (NeurIPS)}}.
+  {LLM}-Based Multi-Agent Workflows}. In \bibinfo{booktitle}{\emph{NeurIPS}}.
 \newblock
 
 
@@ -202,8 +210,7 @@
 \bibfield{author}{\bibinfo{person}{Chen Qian} {et~al\mbox{.}}}
   \bibinfo{year}{2024}\natexlab{}.
 \newblock \showarticletitle{{ChatDev}: Communicative Agents for Software
-  Development}. In \bibinfo{booktitle}{\emph{Annual Meeting of the Association
-  for Computational Linguistics (ACL)}}.
+  Development}. In \bibinfo{booktitle}{\emph{ACL}}.
 \newblock
 
 
@@ -235,8 +242,7 @@
 \bibfield{author}{\bibinfo{person}{Xingyao Wang} {et~al\mbox{.}}}
   \bibinfo{year}{2025}\natexlab{a}.
 \newblock \showarticletitle{{OpenHands}: An Open Platform for {AI} Software
-  Developers as Generalist Agents}. In \bibinfo{booktitle}{\emph{International
-  Conference on Learning Representations (ICLR)}}.
+  Developers as Generalist Agents}. In \bibinfo{booktitle}{\emph{ICLR}}.
 \newblock
 
 
@@ -246,8 +252,7 @@
   \bibinfo{year}{2025}\natexlab{b}.
 \newblock \showarticletitle{{AgentDropout}: Dynamic Agent Elimination for
   Token-Efficient and High-Performance {LLM}-Based Multi-Agent Collaboration}.
-  In \bibinfo{booktitle}{\emph{Annual Meeting of the Association for
-  Computational Linguistics (ACL)}}.
+  In \bibinfo{booktitle}{\emph{ACL}}.
 \newblock
 
 
@@ -256,8 +261,7 @@
 \bibfield{author}{\bibinfo{person}{Qingyun Wu} {et~al\mbox{.}}}
   \bibinfo{year}{2024}\natexlab{}.
 \newblock \showarticletitle{{AutoGen}: Enabling Next-Gen {LLM} Applications via
-  Multi-Agent Conversation}. In \bibinfo{booktitle}{\emph{Conference on
-  Language Modeling (COLM)}}.
+  Multi-Agent Conversation}. In \bibinfo{booktitle}{\emph{COLM}}.
 \newblock
 
 
@@ -276,8 +280,7 @@
 \bibfield{author}{\bibinfo{person}{John Yang} {et~al\mbox{.}}}
   \bibinfo{year}{2024}\natexlab{}.
 \newblock \showarticletitle{{SWE-agent}: Agent-Computer Interfaces Enable
-  Automated Software Engineering}. In \bibinfo{booktitle}{\emph{Advances in
-  Neural Information Processing Systems (NeurIPS)}}.
+  Automated Software Engineering}. In \bibinfo{booktitle}{\emph{NeurIPS}}.
 \newblock
 
 
@@ -286,8 +289,7 @@
 \bibfield{author}{\bibinfo{person}{Zhilin Yang} {et~al\mbox{.}}}
   \bibinfo{year}{2018}\natexlab{}.
 \newblock \showarticletitle{{HotpotQA}: A Dataset for Diverse, Explainable
-  Multi-hop Question Answering}. In \bibinfo{booktitle}{\emph{Conference on
-  Empirical Methods in Natural Language Processing (EMNLP)}}.
+  Multi-hop Question Answering}. In \bibinfo{booktitle}{\emph{EMNLP}}.
 \newblock
 
 
@@ -296,8 +298,7 @@
 \bibfield{author}{\bibinfo{person}{Jiayi Yao} {et~al\mbox{.}}}
   \bibinfo{year}{2025}\natexlab{}.
 \newblock \showarticletitle{{CacheBlend}: Fast Large Language Model Serving for
-  {RAG} with Cached Knowledge Fusion}. In \bibinfo{booktitle}{\emph{European
-  Conference on Computer Systems (EuroSys)}}.
+  {RAG} with Cached Knowledge Fusion}. In \bibinfo{booktitle}{\emph{EuroSys}}.
 \newblock
 
 
@@ -307,8 +308,7 @@
   \bibinfo{year}{2025}\natexlab{}.
 \newblock \showarticletitle{{KVCOMM}: Online Cross-context {KV}-cache
   Communication for Efficient {LLM}-based Multi-agent Systems}. In
-  \bibinfo{booktitle}{\emph{Advances in Neural Information Processing Systems
-  (NeurIPS)}}.
+  \bibinfo{booktitle}{\emph{NeurIPS}}.
 \newblock
 
 
@@ -318,8 +318,7 @@
   \bibinfo{person}{Ruichen Li}, {and} \bibinfo{person}{Zhiting Hu}.}
   \bibinfo{year}{2023}\natexlab{}.
 \newblock \showarticletitle{{AlignScore}: Evaluating Factual Consistency with A
-  Unified Alignment Function}. In \bibinfo{booktitle}{\emph{Annual Meeting of
-  the Association for Computational Linguistics (ACL)}}.
+  Unified Alignment Function}. In \bibinfo{booktitle}{\emph{ACL}}.
 \newblock
 
 
@@ -328,9 +327,7 @@
 \bibfield{author}{\bibinfo{person}{Guibin Zhang} {et~al\mbox{.}}}
   \bibinfo{year}{2025}\natexlab{a}.
 \newblock \showarticletitle{Cut the Crap: An Economical Communication Pipeline
-  for {LLM}-based Multi-Agent Systems}. In
-  \bibinfo{booktitle}{\emph{International Conference on Learning
-  Representations (ICLR)}}.
+  for {LLM}-based Multi-Agent Systems}. In \bibinfo{booktitle}{\emph{ICLR}}.
 \newblock
 
 
@@ -340,8 +337,7 @@
   \bibinfo{year}{2025}\natexlab{b}.
 \newblock \showarticletitle{{G-Designer}: Architecting Multi-agent
   Communication Topologies via Graph Neural Networks}. In
-  \bibinfo{booktitle}{\emph{International Conference on Machine Learning
-  (ICML)}}.
+  \bibinfo{booktitle}{\emph{ICML}}.
 \newblock
 
 
@@ -350,8 +346,7 @@
 \bibfield{author}{\bibinfo{person}{Lianmin Zheng} {et~al\mbox{.}}}
   \bibinfo{year}{2024}\natexlab{}.
 \newblock \showarticletitle{{SGLang}: Efficient Execution of Structured
-  Language Model Programs}. In \bibinfo{booktitle}{\emph{Advances in Neural
-  Information Processing Systems (NeurIPS)}}.
+  Language Model Programs}. In \bibinfo{booktitle}{\emph{NeurIPS}}.
 \newblock
 
 

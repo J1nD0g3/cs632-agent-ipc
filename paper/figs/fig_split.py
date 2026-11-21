@@ -5,8 +5,8 @@ a tool-call write loses facts and some accuracy when copied (4B, 8B, 32B); once 
 drops, and a reply the harness stores as notes.md does no better than tool-written files (much worse at 14B, 32B).
 Form: two panels with the same layout, one group of four bars per model size, in a fixed order: reply copied,
 tool write copied, reply stored as a file, tool write in files. Navy = copied forward, teal = delivered through
-files; dark = tool-call write, light = reply. (a) share of supporting facts in the Researcher's notes; (b) accuracy
-with 95% intervals.
+files; dark = tool-call write, light = reply. (a) share of supporting facts in the Researcher's notes and (b) accuracy,
+both with 95% intervals.
 Data: figs/data/fig3_split.json (agentipc.figdata from results/p16_store_*).
 """
 import json
@@ -27,7 +27,15 @@ left, right = body.cols([1, 1], gap=18)
 ax = fig.axes(left.take("bottom", 10, gap=2)[0], cats=SIZES, y=(0, 0.6), yticks=[0, 0.2, 0.4, 0.6],
               yfmt=lambda v: f"{v * 100:.0f}%", ylabel="Facts in notes")
 ax.bars({name: [r[f"notes_{ch}"] for r in ROWS] for ch, name, _ in ARMS}, [c for _, _, c in ARMS])
-fig.caption(left.cx, left.b - 9, "(a) Facts in the Researcher's notes", size=7.5, weight=600)
+for ch, name, _ in ARMS:
+    off, bw = ax._bar_geom[name]
+    for i, r in enumerate(ROWS):
+        x = ax.X(i) + off + bw / 2
+        ya, yb = ax.Y(r[f"notes_{ch}_hi"]), ax.Y(r[f"notes_{ch}_lo"])
+        fig.line((x, ya), (x, yb), sw=0.5)
+        fig.line((x - bw * 0.25, ya), (x + bw * 0.25, ya), sw=0.5)
+        fig.line((x - bw * 0.25, yb), (x + bw * 0.25, yb), sw=0.5)
+fig.caption(left.cx, left.b - 9, "(a) Facts in the Researcher's notes (95% intervals)", size=7.5, weight=600)
 
 bx = fig.axes(right.take("bottom", 10, gap=2)[0], cats=SIZES, y=(0.2, 0.85), yticks=[0.2, 0.4, 0.6, 0.8],
               yfmt=lambda v: f"{v * 100:.0f}%", ylabel="Accuracy", grid=True)
