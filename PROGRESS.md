@@ -12,7 +12,7 @@
 | T07 Main experiments: 5 channels x 2 datasets x 3 k | Experiments | Must | Done | 2026-11-19 | results/t07_main/20261118-212337-5d6c70f | 5400 runs, 0 errors, judged |
 | T08 Sensitivity: k = 8, five agents, zero-copy A1, Qwen3-4B | Experiments | Should | In progress | 2026-11-19 | Bb, 24-turn done | k8, chain4, 4B, k16, pressure, fan-out queued |
 | T09 Analysis and figures | Report | Must | In progress | 2026-11-19 | Figs. 1-4 | paper/figs/out |
-| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, round 7: 3/5, 3/5; rounds 6 and 8 runs added | AlignScore is the fact measure; scope controls added |
+| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, round 11: 3/5, 3/5; 2x2 (round 10) added | AlignScore is the fact measure; scope controls added |
 
 ## Key numbers
 | Key | Metric | Result | Source |
@@ -21,7 +21,7 @@
 | tokens | Total tokens per task: A / B / C | k=3 sent / computed: A1 13.3k/12.4k, A1-zc 13.6k/4.8k, A2 5.6k/4.7k, B 38.2k/9.8k, C 37.4k/9.8k, D 17.5k/7.2k | results/t07_main/20261118-212337-5d6c70f |
 | file_io | File reads and writes per task: A / B / C | k=3 file I/O ops: B 13.4-15.3, C 12.1-14.4, D 5.6-5.8 (message channels 0) | results/t07_main/20261118-212337-5d6c70f |
 | info_loss | Key facts lost between stages: A / B / C | k=3 AlignScore, facts in Researcher output / share delivered: A1 45%/100%, A1-zc 50%/100%, A2 45%/100%, B 32%/91%, C 30%/95%, D 25%/51% | results/t07_main/20261118-212337-5d6c70f/alignscore.json |
-| recommendation | Which channel, and when | History fits in context: copy it with the shared prefix first (zero-copy; saves prefill, not serving time). Pipe is cheap but drops the documents. Write long results as plain replies. With parallel writers, give each its own folder (or guard writes / head files with their questions). | paper/main.tex (Conclusion) |
+| recommendation | Which channel, and when | History fits in context: copy it with the shared prefix first (zero-copy; saves prefill, not serving time). Pipe is cheap but drops the documents. Write results as plain replies and copy them forward (a reply stored as a file was seldom opened at 14B/32B). With parallel writers, give each its own folder (or guard writes / head files with their questions). | paper/main.tex (Conclusion) |
 
 ## Log
 - 2026-11-18 T00: Repo created from the proposal. Model Qwen3-8B (thinking off) on vLLM v0.33.0;
@@ -106,3 +106,8 @@
   same-server k=8 fan-out (three Researchers cost B 21.2 points; per-Researcher folders recover 19.8). Paper cut
   to four channels (D, batched reads and the fact-checker removed), retitled "Messages or Files?", Fig. 3 now
   splits writing from the rest of the file channel. Meaning audits after each pass (22 and 19 fixes). 6 pages.
+- 2026-11-21 T10: Rounds 9-11. Round-10 runs (2,400): 2x2 of how notes are written (reply vs tool call) and how they
+  reach the Writer (copied vs files). Moving notes into files costs 20-34 points (Holm-significant at 3 sizes); a
+  reply the system stores as notes.md is opened in 9-24% of tasks at 14B/32B vs 95-99% for the Researcher's own files.
+  Metric bug fixed (notes saved under docs/ were counted as documents). Methodology now introduces every run; results
+  are question-led; style/grammar checklist added. Meaning audits, coverage and style checks each round. 6 pages.
