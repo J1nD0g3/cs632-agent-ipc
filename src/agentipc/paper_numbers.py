@@ -60,6 +60,22 @@ def raw_records(run: Path):
     return map(json.loads, gzip.open(ROOT / "results_raw" / cfg["exp"] / run.name / "records.jsonl.gz", "rt"))
 
 
+def _norm_path(path: str) -> str:
+    path = str(path or "").strip().lstrip("./")
+    return path[len("workspace/"):] if path.startswith("workspace/") else path
+
+
+def writer_opened_notes(rec: dict) -> bool:
+    """Did the Writer read a notes file, i.e. a file a Researcher wrote (or the notes.md the system stored)?
+    Decided by who wrote the file, not by its path: some Researchers save notes under docs/."""
+    notes = {_norm_path(o["path"]) for o in rec["io_ops"]
+             if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o}
+    if rec["channel"] in ("Bs",) or rec.get("replay"):
+        notes.add("notes.md")
+    return any(o["agent"] == "writer" and o["op"] == "read" and "error" not in o and _norm_path(o.get("path")) in notes
+               for o in rec["io_ops"])
+
+
 def main_run(m: Macros) -> None:
     run = latest("t07_main")
     cfg = yaml.safe_load((run / "config.yaml").read_text())
@@ -144,10 +160,13 @@ def main_run(m: Macros) -> None:
             notes[rec["channel"]].append(len(rec["stage"]["notes"]))
         by_task.setdefault(rec["task_id"], {})[rec["channel"]] = rec["agents"]["researcher"]["reply"]
         if rec["k"] == 3 and rec["channel"] in ("B", "C"):
-            reads = [o["path"] for o in rec["io_ops"] if o["agent"] == "writer" and o["op"] == "read" and "error" not in o]
-            doc_reads[rec["channel"]] += sum(r.startswith("docs/") for r in reads)
+            notes_files = {_norm_path(o["path"]) for o in rec["io_ops"]
+                           if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o}
+            reads = [_norm_path(o["path"]) for o in rec["io_ops"] if o["agent"] == "writer" and o["op"] == "read"
+                     and "error" not in o]
+            doc_reads[rec["channel"]] += sum(r.startswith("docs/") and r not in notes_files for r in reads)
             all_reads[rec["channel"]] += len(reads)
-            no_notes[rec["channel"]] += not any(not r.startswith("docs/") for r in reads)
+            no_notes[rec["channel"]] += not writer_opened_notes(rec)
             runs_fc[rec["channel"]] += 1
     for t, d in by_task.items():
         if "A1" in d and "A2" in d:
@@ -217,10 +236,13 @@ def batch_and_budget(m: Macros) -> None:
     m.add("BbAccHi", f"{-lo * 100:.0f}")
     docs = tot = nonotes = n = 0
     for rec in raw_records(latest("t08_batch")):
-        reads = [o["path"] for o in rec["io_ops"] if o["agent"] == "writer" and o["op"] == "read" and "error" not in o]
-        docs += sum(x.startswith("docs/") for x in reads)
+        notes_files = {_norm_path(o["path"]) for o in rec["io_ops"]
+                       if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o}
+        reads = [_norm_path(o["path"]) for o in rec["io_ops"] if o["agent"] == "writer" and o["op"] == "read"
+                 and "error" not in o]
+        docs += sum(x.startswith("docs/") and x not in notes_files for x in reads)
         tot += len(reads)
-        nonotes += not any(not x.startswith("docs/") for x in reads)
+        nonotes += not writer_opened_notes(rec)
         n += 1
     m.add("BbDocReads", f"{docs / tot * 100:.0f}")
     m.add("BbNoNotes", f"{nonotes / n * 100:.0f}")
@@ -919,8 +941,7 @@ def round8(m: Macros) -> None:
         opened = {"Br": [], "B": []}
         for rec in raw_records(latest(f"p14_read_{s}")):
             if rec["channel"] in opened and "error" not in rec:
-                opened[rec["channel"]].append(any(o["agent"] == "writer" and o["op"] == "read" and "error" not in o
-                                                  and not o.get("path", "").startswith("docs") for o in rec["io_ops"]))
+                opened[rec["channel"]].append(writer_opened_notes(rec))
         m.add(f"REightReply{tag}Open", f"{np.mean(opened['Br']) * 100:.0f}")
         m.add(f"REightFile{tag}Open", f"{np.mean(opened['B']) * 100:.0f}")
         r = rows(f"p14_read_{s}")
@@ -1004,8 +1025,7 @@ def round10(m: Macros) -> None:
         opened = {"Bs": [], "B": []}
         for rec in raw_records(run):
             if rec["channel"] in opened and "error" not in rec:
-                opened[rec["channel"]].append(any(o["agent"] == "writer" and o["op"] == "read" and "error" not in o
-                                                  and not o.get("path", "").startswith("docs") for o in rec["io_ops"]))
+                opened[rec["channel"]].append(writer_opened_notes(rec))
         m.add(f"RTen{tag}OpenReplyFile", f"{np.mean(opened['Bs']) * 100:.0f}")
         m.add(f"RTen{tag}OpenToolFile", f"{np.mean(opened['B']) * 100:.0f}")
     m.add("RTenN", len(by(load_rows(latest("p16_store_8b")), "A1r")))
