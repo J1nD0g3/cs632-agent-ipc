@@ -159,7 +159,7 @@ with a \nCapSplit-token cap, vary two factors: how the Researcher writes its not
 \texttt{write\_file} calls (\emph{tool-written notes}), and how later agents get inputs, by \emph{copying} as in broadcast or through B's \emph{file channel} with the rescue. We call each
 combination an \emph{arm}. In the file channel, a Researcher's reply is saved as \texttt{notes.md}, which we call the
 \emph{stored reply}. An earlier \emph{wording run} on these tasks and cap ran broadcast and
-every crossed arm but the stored reply.
+every crossed arm but the stored reply. The \emph{told runs} (14B and 32B, same tasks and cap) interleave, in the file channel, tool-written notes and the stored reply with and without its path in the Writer's and Reviewer's instructions.
 
 \paragraph{Metrics.} \emph{Accuracy} is the share of questions whose final answer matches the gold answer
 (exact match, F1 $\ge 0.8$, or the gold answer inside a prediction at most four words longer).
@@ -172,7 +172,7 @@ real notes, its labels match a Qwen3-8B judge's only weakly (Cohen's $\kappa$~=~
 \paragraph{Statistics.} We report paired differences against broadcast (A1) with 95\% bootstrap intervals. Counts of significant settings are uncorrected, and settings with $k=1$, 3, and 5 share questions, so they are not independent. For the crossed runs, sign-flip permutation tests are
 Holm-corrected in two families. The first holds the \nRTenHolmTests simple effects of Table~\ref{tab:cross}
 and was chosen after earlier runs on the same tasks. The second holds \nRTwelveHolmTests further tests
-(\S\ref{sec:results}), chosen after we saw the crossed runs, so these are post hoc. Each task runs once
+(\S\ref{sec:results}), chosen after we saw the crossed runs, so these are post hoc. The told runs' comparisons are uncorrected. Each task runs once
 per channel, so decoding noise is part of the intervals. Comparisons across runs, marked cross-run, may include drift (\S\ref{sec:sensitivity}).
 
 \section{Results}
@@ -239,15 +239,15 @@ tasks and \nRTwelveBudgetC{}\% of C's, and a Researcher call reaches the token c
 about as accurate as the others (\nRTwelveMainRescAccB{}\% against \nRTwelveMainKeptAccB{}\% for B,
 \nRTwelveMainRescAccC{}\% against \nRTwelveMainKeptAccC{}\% for C).
 
-\paragraph{Files lose accuracy even with the documents or with broadcast's notes.} In the documents control, the documents in later prompts change B's accuracy by only \nScopeBDVsB points
-(\nScopeBDVsBLo to \nScopeBDVsBHi, cross-run), so B still trails broadcast. In the replay control, with broadcast's notes in every channel, B and C each trail broadcast by \nRepFileGap points
+\paragraph{Files lose accuracy even with the documents or with broadcast's notes.} In the documents control, the documents in later prompts change B's accuracy by \nScopeBDVsB points
+(\nScopeBDVsBLo to \nScopeBDVsBHi, cross-run), so B still trails broadcast. In the replay control (broadcast's notes in every channel), B and C each trail broadcast by \nRepFileGap points
 (\nRepFileGapLo to \nRepFileGapHi), and the pipe by \nRepATwoGap.
 
 \begin{table}[t]
 \caption{On tool-written notes, the file channel costs accuracy at three sizes, and the cost depends on how notes are written. Paired effects in points (95\% intervals below), arm after the arrow minus arm
-before. Copy: broadcast's inputs for later agents. All arms use B's Researcher instructions. Bold\dag: Holm-significant among the \nRTenHolmTests effects of rows 1--4, or
+before. Copy: broadcast's inputs for later agents. Bold\dag: Holm-significant among the \nRTenHolmTests effects of rows 1--4, or
 among the \nRTwelveHolmTests further tests (\S\ref{sec:method}) for the interaction (row 4 minus row 3).
-Rescued: \% of file-channel tasks with a rescued Writer or Reviewer, stored reply/tool-written.}
+Rescued: \% of file-channel tasks with a rescued Writer or Reviewer (stored reply/tool-written).}
 \label{tab:cross}
 \footnotesize
 \setlength{\tabcolsep}{2pt}
@@ -273,7 +273,7 @@ Rescued (\%) & \nRTenFourRescueReplyFile/\nRTenFourRescueToolFile & \nRTenEightR
 \end{table}
 
 \paragraph{Files cost accuracy even when the notes are written the same way.} B changes both how the
-Researcher writes its notes and how later agents get inputs and give outputs, and a stepwise split would
+Researcher writes its notes and how later agents get inputs and give outputs. A stepwise split would
 make each change's share depend on the order, so the crossed runs vary both at once
 (Figure~\ref{fig:split}, Table~\ref{tab:cross}). All four arms give the Researcher B's instructions, whose wording alone raised
 accuracy over broadcast's by \nRSixFourWording points at 4B (\nRSixFourWordingLo to \nRSixFourWordingHi) in
@@ -289,18 +289,24 @@ accuracy rests on it. At 14B and 32B, most of the cost sits in rescued tasks, wh
 by \nRTwelveFourteenFileToolResc and \nRTwelveThirtyTwoFileToolResc points, compared with
 \nRTwelveFourteenFileToolKept and \nRTwelveThirtyTwoFileToolKept on the others.
 
-\paragraph{The stored reply's extra loss is specific to that arm.} In the file channel, the stored-reply
-arm scores \nRTenFourteenWriteFile and \nRTenThirtyTwoWriteFile points below the tool-written arm at 14B and
-32B, both Holm-significant. The interaction of the two factors is significant at \nRTwelveHolmInterSizes, so
-the file channel's cost depends on how the notes are written, and the stored reply's loss beyond that of
-tool-written notes is specific to it, not a general cost of the file channel. At 14B and 32B,
-the Writer opens tool-written notes in \nRTenFourteenOpenToolFile{}\% and \nRTenThirtyTwoOpenToolFile{}\% of
-tasks but the stored \texttt{notes.md} in \nRTenFourteenOpenReplyFile{}\% and
-\nRTenThirtyTwoOpenReplyFile{}\%. The Reviewer is told the draft's name, but the Writer is not told the stored file's name. We did not test this naming gap as a cause, because the stored reply also changes the file's name, location, and number of notes files. At 8B, the Writer opens \texttt{notes.md} more often than tool-written notes (\nRTenEightOpenReplyFile{}\% against \nRTenEightOpenToolFile{}\%), and at 4B seldom opens either.
-% TODO p17: result of the stored-reply arm with the Writer told the notes path (14B, 32B) goes here.
+\paragraph{At 32B, the stored reply loses because later agents are not told where it is.} In the file channel, the stored
+reply scores \nRTenFourteenWriteFile and \nRTenThirtyTwoWriteFile points below tool-written notes at 14B and 32B
+(Table~\ref{tab:cross}, both Holm-significant), and the significant interaction makes this loss specific to the stored reply. The Writer opens tool-written notes in \nRTenFourteenOpenToolFile{}\% and
+\nRTenThirtyTwoOpenToolFile{}\% of tasks at 14B and 32B but the stored \texttt{notes.md} in
+\nRTenFourteenOpenReplyFile{}\% and \nRTenThirtyTwoOpenReplyFile{}\% (at 8B, \nRTenEightOpenReplyFile{}\% for \texttt{notes.md} against
+\nRTenEightOpenToolFile{}\% for tool-written notes). Neither later agent is told this file's
+name, so the told runs add ``The Researcher's notes are in \texttt{notes.md}.'' to both agents' instructions. At 32B, the Writer then opens \texttt{notes.md} in \nRToldThirtyTwoOpenTold{}\% of tasks instead of
+\nRToldThirtyTwoOpenUntold{}\%, and the Reviewer in \nRToldThirtyTwoReviewerOpenTold{}\% instead of \nRToldThirtyTwoReviewerOpenUntold{}\%. Accuracy rises by \nRToldThirtyTwoToldOverUntold points
+(\nRToldThirtyTwoToldOverUntoldLo to \nRToldThirtyTwoToldOverUntoldHi), ending \nRToldThirtyTwoToldOverTool points above
+tool-written notes (\nRToldThirtyTwoToldOverToolLo to \nRToldThirtyTwoToldOverToolHi). At 14B, the pointer does not
+help: the Writer opens \texttt{notes.md} in \nRToldFourteenOpenTold{}\% of told tasks, and accuracy moves by
+\nRToldFourteenToldOverUntold points (\nRToldFourteenToldOverUntoldLo to \nRToldFourteenToldOverUntoldHi). There,
+\nRToldFourteenToolNotesUnderDocs{}\% of tool-writing Researchers save notes under \texttt{docs/}, the documents'
+folder that the Writer reads anyway, while \texttt{notes.md} sits at the root. We did not test this
+placement as a cause.
 
 \paragraph{On copied notes, the tool-call write lowers accuracy significantly only at {\nRTenHolmWriteCopySizes}\@.}
-The tool-call write lowers accuracy at 4B, 8B, and 32B, but only the 4B loss survives Holm correction. Dropping
+The 8B and 32B losses do not survive Holm correction. Dropping
 the \nRTenFourWriteCopyCut tasks at 4B whose tool-call write was cut off at the token cap or rescued shrinks
 the 4B effect from \nRTenFourWriteCopy to \nRTenFourWriteCopyClean points (\nRTenFourWriteCopyCleanLo to
 \nRTenFourWriteCopyCleanHi). Fact coverage falls at the same sizes, from \nRTenEightNotesReplyCopy{}\% to
@@ -395,17 +401,19 @@ services~\cite{memgpt,aios}, whereas we compare channels.
 \section{Conclusion}
 \label{sec:conclusion}
 
-The right channel depends on which cost a deployment pays for, tokens sent or prefill, on payload size
-relative to KV-cache capacity, and on the model. With Qwen3-8B at $k=3$, zero-copy broadcast cuts prefill by
-\nZcCut{}\%, with a 95\% interval for its accuracy difference of \nZcPooledDiffLo to \nZcPooledDiffHi points,
+The right channel depends on the cost a deployment pays for, tokens sent or prefill, on payload size
+versus KV-cache capacity, and on the model. With Qwen3-8B at $k=3$, zero-copy cuts prefill by
+\nZcCut{}\% at an accuracy difference of \nZcPooledDiffLo to \nZcPooledDiffHi points
 but does not finish a batch sooner. Moving later agents from copying to files costs
 \nRTenHolmFileToolAbsMin--\nRTenHolmFileToolAbsMax accuracy points on tool-written notes at
-\nRTenHolmFileToolSigWord of four sizes, and the cost depends on how the notes are written. Per-Researcher
+\nRTenHolmFileToolSigWord of four sizes, and the cost depends on how notes are written. Per-Researcher
 folders recover most of B's fan-out loss at eight questions with Qwen3-8B. For Qwen3 agents whose state
 fits in the context, copying the conversation forward is better, given this harness's tool budget
-and rescue. We studied one model family, linear pipelines, and multi-hop QA, and did not test state larger
-than the context, such as codebases, where files may be the only option. We have not studied why a tool-call write
-lowers fact coverage, why the Writer skips a stored reply, or why zero-copy lowers accuracy at 4B.
+and rescue. Later agents may need to be told where a stored reply is: naming its path sufficed
+at 32B but not at 14B. We studied one model family, linear pipelines, and multi-hop QA, not state
+larger than the context, such as codebases, where files may be the only option. We do not know why a
+tool-call write lowers fact coverage, why a told 14B Writer skips \texttt{notes.md}, or why zero-copy
+lowers accuracy at 4B.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}

@@ -111,3 +111,52 @@ Also: `RTwelveHolm{Inter,Dvw}Sizes` produces a serial-comma list ("4B, 14B, and 
   absolute intervals of the two k=16 repairs (`RSixKSixteen{Guard,Heading}OverB{Lo,Hi}`; the share intervals
   replace them), the 32B harness-bug count (`PRescueThirtyTwoBMoved`), the 2Wiki/HotpotQA split
   (`RTenEightWriteCopy{TwoWiki,Hotpot}`), and the notes-length ratio (`NotesShorter`).
+
+## p17: stored reply with the notes path told (`round12_told()`)
+
+Runs `p17_told_14b` and `p17_told_32b` (one interleaved run per size, crossed-run tasks and cap) compare the
+stored reply with the Writer not told the notes path (Bs), the same arm with the Writer and Reviewer told
+"The Researcher's notes are in notes.md." (Bt), and tool-written files (B). Snapshot before editing:
+`cs632-store/main_pre_told.tex`.
+
+- Stored-reply paragraph (Results) rewritten. New heading: "At 32B, the stored reply loses because the Writer
+  does not find it." At 32B, telling the path raises the Writer's opening of `notes.md` (`RToldThirtyTwoOpen*`)
+  and accuracy (`RToldThirtyTwoToldOverUntold*`), ending above tool-written notes
+  (`RToldThirtyTwoToldOverTool*`). At 14B the pointer does not help (`RToldFourteenOpenTold`,
+  `RToldFourteenToldOverUntold*`). The docs/ placement of 14B's tool-written notes
+  (`RToldFourteenToolNotesUnderDocs`) is stated as an observation, with "We did not test this placement as a
+  cause." The `% TODO p17` comment is gone. The old untested-naming-gap caveat is replaced by the test.
+- Methodology: one sentence adds the told runs to "Runs", and Statistics says their comparisons are uncorrected
+  (they are in neither Holm family).
+- Conclusion: adds "Readers must be led to stored files: naming the path sufficed at 32B but not at 14B." The open
+  question now reads "why a told 14B Writer skips notes.md". Abstract and intro do not mention the stored reply
+  and are unchanged.
+- Trims to stay at 6 pages: the stored-reply paragraph cites Table 1 for Holm significance instead of restating
+  it, the 4B "seldom opens either" clause is dropped, the conclusion is tightened (same claims and scope), the
+  Table 1 caption drops "All arms use B's Researcher instructions" (stated in the text), and a few words elsewhere
+  ("only", "the"). The copied-notes paragraph now says the 8B and 32B losses "do not survive Holm correction".
+- Build: 6 pages including references, no undefined references. `numbers.tex` was not edited.
+
+## Told-run meaning audit fixes (`told_audit.md`)
+
+Checked first against `results_raw/p17_told_{14b,32b}/*/records.jsonl.gz`. At 32B, the Reviewer reads `notes.md` in
+63% of Bt tasks against 6% of Bs, and the Writer in 86% against 26%, as the audit says. The 14B and 32B copy-to-files
+effects on the stored reply are both Holm-significant in the current `numbers.tex`.
+
+1. Heading now reads "At 32B, the stored reply loses because later agents are not told where it is." The optional
+   Reviewer clause is in: `round12_told` adds `RTold{Fourteen,ThirtyTwo}ReviewerOpen{Untold,Told,Tool}` (share of
+   tasks whose Reviewer read a Researcher-written file or `notes.md`, via `writer_opened_notes(rec, "reviewer")`, which
+   now takes the agent as an optional argument with the Writer as default). The text adds "and the Reviewer in 63%
+   instead of 6%", and accuracy moves to its own sentence. Regenerating `numbers.tex` only added the six new macros.
+   With both agents now named in the heading, "Unlike the Reviewer, who is told the draft's name, the Writer is not
+   told this file's name" became "Neither later agent is told this file's name" (also true of the Bs instructions).
+2. "(Table 1, both Holm-significant)" restored in the stored-reply paragraph.
+3. The 8B parenthesis now names both arms: "78% for notes.md against 59% for tool-written notes".
+4. Methods: "interleave, in the file channel, tool-written notes and the stored reply with and without its path ...".
+5. Conclusion: "Later agents may need to be told where a stored reply is: naming its path sufficed at 32B but not at 14B."
+
+Trims to stay at 6 pages: the copied-notes paragraph's "The write also lowers accuracy at 8B and 32B, but these losses
+do not survive Holm correction." became "The 8B and 32B losses do not survive Holm correction." (both effects are
+negative in Table 1), and the conclusion drops "(95% interval)" after the zero-copy accuracy interval (Statistics
+defines the intervals). Build: 6 pages including references, no undefined references, no semicolons in the body.
+`numbers.tex` was not edited by hand.

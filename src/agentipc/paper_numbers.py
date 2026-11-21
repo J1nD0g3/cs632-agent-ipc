@@ -75,14 +75,14 @@ def _norm_path(path: str) -> str:
     return path[len("workspace/"):] if path.startswith("workspace/") else path
 
 
-def writer_opened_notes(rec: dict) -> bool:
-    """Did the Writer read a notes file, i.e. a file a Researcher wrote (or the notes.md the system stored)?
+def writer_opened_notes(rec: dict, agent: str = "writer") -> bool:
+    """Did the Writer (or `agent`) read a notes file, i.e. a file a Researcher wrote (or the notes.md the system stored)?
     Decided by who wrote the file, not by its path: some Researchers save notes under docs/."""
     notes = {_norm_path(o["path"]) for o in rec["io_ops"]
              if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o}
     if rec["channel"] in ("Bs", "Bt") or rec.get("replay"):
         notes.add("notes.md")
-    return any(o["agent"] == "writer" and o["op"] == "read" and "error" not in o and _norm_path(o.get("path")) in notes
+    return any(o["agent"] == agent and o["op"] == "read" and "error" not in o and _norm_path(o.get("path")) in notes
                for o in rec["io_ops"])
 
 
@@ -1346,6 +1346,37 @@ def round12_fix(m: Macros) -> None:
     m.add("RTenNotesToolLowerSizes", size_list(lower))
 
 
+def round12_told(m: Macros) -> None:
+    """p17: the stored reply with the Writer and Reviewer told the notes path (Bt), against the untold stored reply
+    (Bs) and tool-written files (B), in one run per size (14B, 32B)."""
+    for tag, size in (("Fourteen", "14b"), ("ThirtyTwo", "32b")):
+        run = latest(f"p17_told_{size}")
+        rs = load_rows(run)
+        d = {c: {r["task_id"]: r for r in rs if r["channel"] == c and not r.get("error")} for c in ("Bs", "Bt", "B")}
+        for c, lab in (("Bs", "Untold"), ("Bt", "Told"), ("B", "Tool")):
+            m.add(f"RTold{tag}Acc{lab}", pct(np.mean([v["acc"] for v in d[c].values()])))
+        for name, x, y in (("ToldOverUntold", "Bt", "Bs"), ("ToldOverTool", "Bt", "B")):
+            ids = sorted(set(d[x]) & set(d[y]))
+            mean, lo, hi = paired(np.array([d[x][i]["acc"] for i in ids], float), np.array([d[y][i]["acc"] for i in ids], float))
+            m.add(f"RTold{tag}{name}", f"{mean * 100:.1f}"); m.add(f"RTold{tag}{name}Lo", f"{lo * 100:.1f}")
+            m.add(f"RTold{tag}{name}Hi", f"{hi * 100:.1f}"); m.add(f"RTold{tag}{name}N", len(ids))
+        opened = {c: [] for c in d}
+        rev_opened = {c: [] for c in d}
+        under_docs = []
+        for rec in raw_records(run):
+            if rec["channel"] in opened and "error" not in rec:
+                opened[rec["channel"]].append(writer_opened_notes(rec))
+                rev_opened[rec["channel"]].append(writer_opened_notes(rec, "reviewer"))
+                if rec["channel"] == "B":
+                    w = [_norm_path(o["path"]) for o in rec["io_ops"]
+                         if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o]
+                    under_docs.append(any(x.startswith("docs/") for x in w))
+        for c, lab in (("Bs", "Untold"), ("Bt", "Told"), ("B", "Tool")):
+            m.add(f"RTold{tag}Open{lab}", f"{np.mean(opened[c]) * 100:.0f}")
+            m.add(f"RTold{tag}ReviewerOpen{lab}", f"{np.mean(rev_opened[c]) * 100:.0f}")
+        m.add(f"RTold{tag}ToolNotesUnderDocs", f"{np.mean(under_docs) * 100:.0f}")
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -1374,7 +1405,7 @@ def judges(m: Macros) -> None:
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
             fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6, round8, round10, round10_text,
-            round12, round12_fix]
+            round12, round12_fix, round12_told]
 
 
 def main() -> int:

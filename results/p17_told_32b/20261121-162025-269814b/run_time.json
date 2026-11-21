@@ -1,0 +1,19 @@
+{
+ "start": "2026-11-21T16:20:26",
+ "end": "2026-11-21T17:44:53",
+ "elapsed_s": 5067.8,
+ "vllm_metrics": {
+  "vllm:prefix_cache_queries_total": 8762066.0,
+  "vllm:prefix_cache_hits_total": 5404480.0,
+  "vllm:num_preemptions_total": 0.0,
+  "vllm:prompt_tokens_total": 8762066.0,
+  "vllm:prompt_tokens_cached_total": 5404480.0,
+  "vllm:generation_tokens_total": 542929.0,
+  "vllm:e2e_request_latency_seconds_count": 5053.0,
+  "vllm:e2e_request_latency_seconds_sum": 30150.504,
+  "vllm:request_queue_time_seconds_sum": 1.734,
+  "vllm:request_prefill_time_seconds_sum": 1100.255,
+  "vllm:request_decode_time_seconds_sum": 28804.09,
+  "vllm:request_prefill_kv_computed_tokens_sum": 3357586.0
+ }
+}
