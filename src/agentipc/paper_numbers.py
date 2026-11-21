@@ -47,6 +47,16 @@ def word(n: int) -> str:
     return WORDS[n] if 0 <= n < len(WORDS) else str(n)
 
 
+SIZE_LABEL = {"Four": "4B", "Eight": "8B", "Fourteen": "14B", "ThirtyTwo": "32B"}
+
+
+def size_list(names: list[str]) -> str:
+    """'4B', '4B and 14B', or '4B, 14B, and 32B'."""
+    if len(names) > 2:
+        return ", ".join(names[:-1]) + ", and " + names[-1]
+    return " and ".join(names) if names else "no size"
+
+
 def pct(x: float) -> str:
     return f"{x * 100:.1f}"
 
@@ -538,16 +548,23 @@ def replay(m: Macros) -> None:
     a1 = {r["task_id"]: r for r in rows if r["channel"] == "A1"}
     m.add("RepN", len(a1))
     m.add("RepAccAOne", pct(np.mean([r["acc"] for r in a1.values()])))
+    shown = {}
     for ch in ("A2", "B", "C"):
         rs = [r for r in rows if r["channel"] == ch]
         mean, lo, hi = paired(np.array([r["acc"] for r in rs], dtype=float),
                               np.array([a1[r["task_id"]]["acc"] for r in rs], dtype=float))
         n = NAME[ch]
+        shown[ch] = (f"{-mean * 100:.1f}", f"{-hi * 100:.1f}", f"{-lo * 100:.1f}")
         m.add(f"Rep{n}Acc", pct(np.mean([r["acc"] for r in rs])))
-        m.add(f"Rep{n}Gap", f"{-mean * 100:.1f}")
-        m.add(f"Rep{n}GapLo", f"{-hi * 100:.1f}")
-        m.add(f"Rep{n}GapHi", f"{-lo * 100:.1f}")
+        m.add(f"Rep{n}Gap", shown[ch][0])
+        m.add(f"Rep{n}GapLo", shown[ch][1])
+        m.add(f"Rep{n}GapHi", shown[ch][2])
         m.add(f"Rep{n}Deliv", f"{np.mean([r['as_kept_writer_input'] for r in rs if 'as_kept_writer_input' in r]) * 100:.0f}")
+    # The text gives one gap and interval for B and C ("each"), which holds only while both print the same.
+    if shown["B"] != shown["C"]:
+        raise ValueError(f"replay gaps of B and C differ: {shown}")
+    for suffix, v in zip(("", "Lo", "Hi"), shown["B"]):
+        m.add(f"RepFileGap{suffix}", v)
     opened, index = {"B": [], "C": []}, []
     for rec in raw_records(latest("t09_replay")):
         if rec["channel"] in opened and "error" not in rec:
@@ -1107,6 +1124,7 @@ def round10_text(m: Macros) -> None:
             v = f"{means[(t, eff)] * 100:.1f}"
             v = "\\mbox{$-$" + v[1:] + "}" if v.startswith("-") else v
             m.add(f"RTenCell{eff}{t}", f"\\textbf{{{v}}}\\textsuperscript{{\\dag}}" if (t, eff) in survive else v)
+        m.add(f"RTenHolm{eff}Sizes", size_list([SIZE_LABEL[t] for t in sizes if (t, eff) in survive]))
         # Size of the Holm-significant effects (absolute points), e.g. the delivery effects' range.
         sig = [abs(means[(t, eff)]) * 100 for t in sizes if (t, eff) in survive]
         if sig:
@@ -1141,6 +1159,193 @@ def round10_text(m: Macros) -> None:
     m.add("RTenMedAZc", f"{np.mean([med(f'p11_alone_A1zc_r{i}') / med(f'p11_alone_A1_r{i}') for i in (2, 3)]):.2f}")
 
 
+def round12(m: Macros) -> None:
+    """Round-12 review: tests of the 2x2 interaction and of 'the file channel costs more than the write', rescued
+    vs non-rescued accuracy, the final-from-reply fallback, tool-budget and token-cap hits at k=3, the
+    six-at-a-time median task ratio, zero-copy's 90% interval, and intervals of the recovered shares at k=16."""
+    from .stats import ci as _ci
+
+    def by(rs, ch):
+        return {r["task_id"]: r for r in rs if r["channel"] == ch and not r.get("error")}
+
+    def perm_p(d, rng):
+        flips = rng.choice((-1.0, 1.0), size=(20000, d.size))
+        null = np.abs((flips * d).mean(axis=1))
+        return (np.sum(null >= abs(d.mean()) - 1e-12) + 1) / (null.size + 1)
+
+    # A separate Holm family, fixed after the round-12 review: per size, the interaction of the 2x2 and the
+    # difference between the file channel's cost on tool-written notes and the tool-call write's cost on copied
+    # notes, (A1w - B) - (A1r - A1w).
+    rng = np.random.default_rng(0)
+    sizes = {"Four": "4b", "Eight": "8b", "Fourteen": "14b", "ThirtyTwo": "32b"}
+    label = {"Four": "4B", "Eight": "8B", "Fourteen": "14B", "ThirtyTwo": "32B"}
+    tests, means = {}, {}
+    for tag, s in sizes.items():
+        rs = load_rows(latest(f"p16_store_{s}"))
+        d = {c: by(rs, c) for c in ("A1r", "A1w", "Bs", "B")}
+        ids = sorted(set.intersection(*(set(x) for x in d.values())))
+        a = lambda c: np.array([d[c][i]["acc"] for i in ids], float)
+        contrasts = {"Inter": (a("B") - a("Bs")) - (a("A1w") - a("A1r")), "Dvw": 2 * a("A1w") - a("B") - a("A1r")}
+        for eff, v in contrasts.items():
+            tests[(tag, eff)] = perm_p(v, rng)
+            mean, lo, hi = _ci(v)
+            m.add(f"RTwelve{tag}{eff}", f"{mean * 100:.1f}")
+            means[(tag, eff)] = f"{mean * 100:.1f}"
+            m.add(f"RTwelve{tag}{eff}Lo", f"{lo * 100:.1f}")
+            m.add(f"RTwelve{tag}{eff}Hi", f"{hi * 100:.1f}")
+            m.add(f"RTwelve{tag}{eff}P", f"{tests[(tag, eff)]:.3f}")
+    order = sorted(tests, key=tests.get)
+    survive, prev = set(), True
+    for j, key in enumerate(order):
+        prev = prev and tests[key] <= 0.05 / (len(order) - j)
+        if prev:
+            survive.add(key)
+    m.add("RTwelveHolmTests", len(tests))
+    for eff in ("Inter", "Dvw"):
+        sig = [t for t in sizes if (t, eff) in survive]
+        m.add(f"RTwelveHolm{eff}SigWord", word(len(sig)))
+        names = [label[t] for t in sig]
+        m.add(f"RTwelveHolm{eff}Sizes", (" and ".join(names) if len(names) == 2 else
+                                          ", ".join(names[:-1]) + ", and " + names[-1] if len(names) > 2 else
+                                          (names[0] if names else "no size")))
+        m.add(f"RTwelveHolm{eff}PMax", f"{max(tests[(t, eff)] for t in sig):.3f}" if sig else "--")
+        for t in sizes:
+            m.add(f"RTwelveMark{eff}{t}", "\\textsuperscript{\\dag}" if (t, eff) in survive else "")
+            # Table cell, bold with a dagger when the test survives this family's Holm correction.
+            v = means[(t, eff)]
+            v = "\\mbox{$-$" + v[1:] + "}" if v.startswith("-") else v
+            m.add(f"RTwelveCell{eff}{t}", f"\\textbf{{{v}}}\\textsuperscript{{\\dag}}" if (t, eff) in survive else v)
+    print("holm12", {f"{k[0]}{k[1]}": (round(v, 4), k in survive) for k, v in tests.items()})
+
+    def rescued(rec):
+        return any(c.get("forced_write") for role in ("writer", "reviewer") for c in rec["agents"][role]["calls"])
+
+    # Accuracy of rescued and non-rescued tasks: main run (8B, k=3) B and C, crossed runs B and Bs per size.
+    split = {}
+    for rec in raw_records(latest("t07_main")):
+        if "error" not in rec and rec["k"] == 3 and rec["channel"] in ("B", "C"):
+            split.setdefault(("Main", rec["channel"]), {True: [], False: []})[rescued(rec)].append(rec["score"]["acc"])
+    for tag, s in sizes.items():
+        for rec in raw_records(latest(f"p16_store_{s}")):
+            if "error" not in rec and rec["channel"] in ("B", "Bs"):
+                split.setdefault((tag, rec["channel"]), {True: [], False: []})[rescued(rec)].append(rec["score"]["acc"])
+    for (tag, ch), v in split.items():
+        for flag, name in ((True, "Resc"), (False, "Kept")):
+            m.add(f"RTwelve{tag}{name}Acc{ch}", pct(np.mean(v[flag])) if v[flag] else "--")
+            m.add(f"RTwelve{tag}{name}N{ch}", len(v[flag]))
+
+    # Final answer taken from the Reviewer's reply when final.md is still missing, in the reported file channels
+    # (B, C, Bs): most tasks per channel and k at k=3, and at any k (with that cell's task count).
+    ffr = []
+    for exp in ["t07_main"] + [f"p16_store_{s}" for s in sizes.values()]:
+        n, tot = {}, {}
+        for rec in raw_records(latest(exp)):
+            if "error" not in rec and rec["channel"] in ("B", "C", "Bs"):
+                key = (rec["channel"], rec["k"])
+                tot[key] = tot.get(key, 0) + 1
+                n[key] = n.get(key, 0) + (rec["stage"].get("final_from_reply") == "1")
+        ffr += [(v, tot[key], key[1]) for key, v in n.items()]
+    m.add("RTwelveFinalReplyKThreeMax", word(max(v for v, _, k in ffr if k == 3)))
+    top = max(ffr)
+    m.add("RTwelveFinalReplyMax", word(top[0]))
+    m.add("RTwelveFinalReplyMaxN", top[1])
+
+    # Main run, k=3: tasks where any agent used all its tool calls, and Researcher calls cut at the token cap.
+    budget, cap = {}, {}
+    for rec in raw_records(latest("t07_main")):
+        if "error" in rec or rec["k"] != 3:
+            continue
+        ch = rec["channel"]
+        budget.setdefault(ch, []).append(any(a["hit_turn_limit"] for a in rec["agents"].values()))
+        cap.setdefault(ch, []).append(any(c.get("finish_reason") == "length" for role, a in rec["agents"].items()
+                                          if role.startswith("researcher") for c in a["calls"]))
+    for ch in ("B", "C"):
+        m.add(f"RTwelveBudget{ch}", f"{np.mean(budget[ch]) * 100:.0f}")
+    for ch in ("A1", "B"):
+        m.add(f"RTwelveCap{NAME[ch]}", int(np.sum(cap[ch])))
+        m.add(f"RTwelveCap{NAME[ch]}N", len(cap[ch]))
+
+    # Median task time of zero-copy over broadcast, six tasks at a time, in the three serving-time runs.
+    def med(run):
+        return np.median([r["wall_s"] for r in load_rows(run)])
+    ratios = [med(latest("p06_alone_A1zc")) / med(latest("p06_alone_A1"))]
+    ratios += [med(latest(f"p11_alone_A1zc_r{i}")) / med(latest(f"p11_alone_A1_r{i}")) for i in (2, 3)]
+    m.add("RTwelveSixMedAZc", f"{np.mean(ratios):.2f}")
+    m.add("RTwelveSixMedAZcMin", f"{min(ratios):.2f}")
+    m.add("RTwelveSixMedAZcMax", f"{max(ratios):.2f}")
+
+    # Zero-copy minus broadcast at k=3 (main run, pooled): 90% interval, for two one-sided tests at +/-3 points.
+    rows = load_rows(latest("t07_main"))
+    a1 = {(r["dataset"], r["task_id"]): r["acc"] for r in rows if r["channel"] == "A1" and r["k"] == 3}
+    zc = {(r["dataset"], r["task_id"]): r["acc"] for r in rows if r["channel"] == "A1zc" and r["k"] == 3}
+    ids = sorted(set(a1) & set(zc))
+    d = np.array([zc[i] - a1[i] for i in ids], float)
+    boots = d[np.random.default_rng(0).integers(0, d.size, size=(2000, d.size))].mean(axis=1)
+    lo, hi = np.percentile(boots, 5), np.percentile(boots, 95)
+    m.add("RTwelveZcNinetyLo", f"{lo * 100:.1f}")
+    m.add("RTwelveZcNinetyHi", f"{hi * 100:.1f}")
+    m.add("RTwelveZcMargin", "3")
+    m.add("RTwelveZcEquiv", "inside" if -0.03 < lo and hi < 0.03 else "not inside")
+
+    # k=16 repairs: bootstrap interval of the share of B's gap each repair recovers (same run, p12_k16_clobber).
+    k = load_rows(latest("p12_k16_clobber"))
+    a, b = by(k, "A1"), by(k, "B")
+    for ch, lab in (("Bn", "Guard"), ("Bh", "Heading")):
+        r = by(k, ch)
+        ids = sorted(set(a) & set(b) & set(r))
+        acc = {c: np.array([x[i]["acc"] for i in ids], float) for c, x in (("a", a), ("b", b), ("r", r))}
+        idx = np.random.default_rng(0).integers(0, len(ids), size=(2000, len(ids)))
+        share = (acc["r"][idx].mean(1) - acc["b"][idx].mean(1)) / (acc["a"][idx].mean(1) - acc["b"][idx].mean(1))
+        point = (acc["r"].mean() - acc["b"].mean()) / (acc["a"].mean() - acc["b"].mean())
+        m.add(f"RTwelveShare{lab}", f"{point * 100:.0f}")
+        m.add(f"RTwelveShare{lab}Lo", f"{np.percentile(share, 2.5) * 100:.0f}")
+        m.add(f"RTwelveShare{lab}Hi", f"{np.percentile(share, 97.5) * 100:.0f}")
+        m.add(f"RTwelveShare{lab}N", len(ids))
+
+
+def round12_fix(m: Macros) -> None:
+    """Round-12 text fixes: the handoff limit, 4B note length, sizes where
+    tool-written notes cover fewer facts, and the file channel's cost on tool-written notes split by rescue."""
+    import re
+
+    from .pipeline import HANDOFF_RULE
+
+    def by(rs, ch):
+        return {r["task_id"]: r for r in rs if r["channel"] == ch and not r.get("error")}
+
+    m.add("HandoffWords", int(re.search(r"at most (\d+)", HANDOFF_RULE).group(1)))
+
+    # Researcher note length at 4B (size run): zero-copy against broadcast.
+    notes = {"A1": [], "A1zc": []}
+    for rec in raw_records(latest("p02_size_4b")):
+        if "error" not in rec and rec["channel"] in notes:
+            notes[rec["channel"]].append(len(rec["stage"]["notes"]))
+    m.add("PSizeFourNotesCharsAOne", f"{np.mean(notes['A1']):,.0f}")
+    m.add("PSizeFourNotesCharsAZc", f"{np.mean(notes['A1zc']):,.0f}")
+
+    sizes = {"Four": "4b", "Eight": "8b", "Fourteen": "14b", "ThirtyTwo": "32b"}
+    lower = []
+    for tag, s in sizes.items():
+        run = latest(f"p16_store_{s}")
+        rs = load_rows(run)
+        d = {c: by(rs, c) for c in ("A1r", "A1w", "B")}
+        cover = {c: np.mean([v["as_recall_notes"] for v in d[c].values() if "as_recall_notes" in v]) for c in ("A1r", "A1w")}
+        if cover["A1w"] < cover["A1r"]:
+            lower.append(SIZE_LABEL[tag])
+        # File channel's cost on tool-written notes (A1w minus B, points) on tasks where B's Writer or Reviewer
+        # needed the rescue and on the others.
+        rescued = {rec["task_id"]: any(c.get("forced_write") for role in ("writer", "reviewer")
+                                       for c in rec["agents"][role]["calls"])
+                   for rec in raw_records(run) if "error" not in rec and rec["channel"] == "B"}
+        for flag, name in ((True, "Resc"), (False, "Kept")):
+            ids = [i for i, f in rescued.items() if f == flag and i in d["A1w"] and i in d["B"]]
+            if ids:
+                gap = np.mean([d["A1w"][i]["acc"] - d["B"][i]["acc"] for i in ids])
+                m.add(f"RTwelve{tag}FileTool{name}", f"{gap * 100:.1f}")
+                m.add(f"RTwelve{tag}FileTool{name}N", len(ids))
+    m.add("RTenNotesToolLowerSizes", size_list(lower))
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -1168,7 +1373,8 @@ def judges(m: Macros) -> None:
 
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
-            fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6, round8, round10, round10_text]
+            fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6, round8, round10, round10_text,
+            round12, round12_fix]
 
 
 def main() -> int:

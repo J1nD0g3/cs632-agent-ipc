@@ -50,7 +50,7 @@ def broken(axes, ch, ys, dx=0.0, **kw):
 
 for ch, (col, mk, name) in STYLE.items():
     broken(ax, ch, series(ch, "comp_rel"), color=col, marker=mk, label=name)
-fig.caption(left.cx, ca.t + 1, "(a) Prefill on a 35k-token cache: savings fade as payloads grow", size=7.3, weight=600)
+fig.caption(left.cx, ca.t + 1, "(a) Prefill: savings fade as payloads grow", size=7.3, weight=600)
 
 pb, cb = right.take("bottom", 10, gap=2)
 bx = fig.axes(pb, cats=CATS, y=(-0.4, 0.06), yticks=[-0.4, -0.3, -0.2, -0.1, 0], yfmt=lambda v: f"{v * 100:+.0f}" if v else "0",
@@ -63,7 +63,7 @@ for ch, (col, mk, name) in STYLE.items():
             (px, ya), (_, yb) = bx.px(x + dx, hi), bx.px(x + dx, lo)
             fig.line((px, ya), (px, yb), sw=0.5, color="gray5")
     broken(bx, ch, series(ch, "acc_diff"), dx, color=col, marker=mk, label=name)
-fig.caption(right.cx - 1.5, cb.t + 1, "(b) Accuracy: B drops at k=16, where both payload and writers change", size=7.3, weight=600)
+fig.caption(right.cx - 1.5, cb.t + 1, "(b) Accuracy: B drops at k=16, as payload and Researchers change", size=7.3, weight=600)
 
 fig.legend(ax.legend_items + [("line", "gray5", "Paired 95% CI")], fig.width / 2, strip.y)
 fig.save(str(Path(__file__).parent / "out" / "fig_scaling"))

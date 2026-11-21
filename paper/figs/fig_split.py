@@ -1,12 +1,14 @@
-"""Fig. 3: how notes are written and how they reach the Writer, per model size (one interleaved run per size).
+"""Fig. 3: how the Researcher writes its notes and how later agents get their inputs, per model size (one
+interleaved run per size).
 
-Claim at a glance: copied replies are the most accurate arm at every size (tied with copied tool writes at 14B);
-a tool-call write loses facts and some accuracy when copied (4B, 8B, 32B); once notes go through files, accuracy
-drops, and a reply the harness stores as notes.md does no better than tool-written files (much worse at 14B, 32B).
+Claim at a glance: on tool-written notes, the file channel lowers accuracy at 4B, 14B, and 32B (b); tool-written
+notes cover fewer facts than replies except at 14B (a); a reply the harness stores as notes.md does no better than
+tool-written notes in the file channel (much worse at 14B, 32B).
 Form: two panels with the same layout, one group of four bars per model size, in a fixed order: reply copied,
-tool write copied, reply stored as a file, tool write in files. Navy = copied forward, teal = delivered through
-files; dark = tool-call write, light = reply. (a) share of supporting facts in the Researcher's notes and (b) accuracy,
-both with 95% intervals.
+tool write copied, reply in the file channel (stored as notes.md), tool write in the file channel. Navy = copying
+(broadcast: inputs in the prompt, answers by reply), teal = the file channel (B: inputs and outputs through tool
+calls); dark = tool-call write, light = reply. (a) share of supporting facts in the Researcher's notes and
+(b) accuracy, both with 95% intervals.
 Data: figs/data/fig3_split.json (agentipc.figdata from results/p16_store_*).
 """
 import json
@@ -16,8 +18,8 @@ from archfig import Figure, Rect
 
 ROWS = json.loads((Path(__file__).parent / "data" / "fig3_split.json").read_text())["rows"]
 SIZES = [r["size"] for r in ROWS]
-ARMS = [("A1r", "Reply, copied", "navy2"), ("A1w", "Tool write, copied", "navy4"),
-        ("Bs", "Reply, stored as file", "teal2"), ("B", "Tool write, files (B)", "teal4")]
+ARMS = [("A1r", "Reply, copied", "navy2"), ("A1w", "Tool-written, copied", "navy4"),
+        ("Bs", "Reply, file channel", "teal2"), ("B", "Tool-written, file channel", "teal4")]
 
 fig = Figure("text")
 strip, body = fig.area.take("top", 12, gap=4)
