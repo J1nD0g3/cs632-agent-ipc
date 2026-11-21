@@ -12,7 +12,7 @@
 | T07 Main experiments: 5 channels x 2 datasets x 3 k | Experiments | Must | Done | 2026-11-19 | results/t07_main/20261118-212337-5d6c70f | 5400 runs, 0 errors, judged |
 | T08 Sensitivity: k = 8, five agents, zero-copy A1, Qwen3-4B | Experiments | Should | In progress | 2026-11-19 | Bb, 24-turn done | k8, chain4, 4B, k16, pressure, fan-out queued |
 | T09 Analysis and figures | Report | Must | In progress | 2026-11-19 | Figs. 1-4 | paper/figs/out |
-| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, round 13: 3/5, 3/5; first-listed test added | AlignScore is the fact measure; scope controls added |
+| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, final text (round 14: 3/5, 3/5); awaiting Jin's review | AlignScore is the fact measure; scope controls added |
 
 ## Key numbers
 | Key | Metric | Result | Source |
@@ -21,7 +21,7 @@
 | tokens | Total tokens per task: A / B / C | k=3 sent / computed: A1 13.3k/12.4k, A1-zc 13.6k/4.8k, A2 5.6k/4.7k, B 38.2k/9.8k, C 37.4k/9.8k, D 17.5k/7.2k | results/t07_main/20261118-212337-5d6c70f |
 | file_io | File reads and writes per task: A / B / C | k=3 file I/O ops: B 13.4-15.3, C 12.1-14.4, D 5.6-5.8 (message channels 0) | results/t07_main/20261118-212337-5d6c70f |
 | info_loss | Key facts lost between stages: A / B / C | k=3 AlignScore, facts in Researcher output / share delivered: A1 45%/100%, A1-zc 50%/100%, A2 45%/100%, B 32%/91%, C 30%/95%, D 25%/51% | results/t07_main/20261118-212337-5d6c70f/alignscore.json |
-| recommendation | Which channel, and when | History fits in context: copy it with the shared prefix first (zero-copy; saves prefill, not serving time). Pipe is cheap but drops the documents. Copy results forward rather than share files; if a system stores them as files, lead every later agent that edits the answer to them (naming the path worked at 32B; at 14B the Writer also needed the file listed first, and the Reviewer still skipped it). With parallel writers, give each its own folder (or guard writes / head files with their questions). | paper/main.tex (Conclusion) |
+| recommendation | Which channel, and when | History fits in context: copy it with the shared prefix first (zero-copy; saves prefill, not serving time). Pipe is cheap but drops the documents. In this harness, copy results forward rather than share files (single harness fixes recovered 14-20 points, so a better file harness may close the gap). If results are stored as files, tell later agents where they are (helped at 32B, not at 14B, where the Reviewer rarely reads the draft). With parallel writers, give each its own folder (or guard writes / head files with their questions). | paper/main.tex (Conclusion) |
 
 ## Log
 - 2026-11-18 T00: Repo created from the proposal. Model Qwen3-8B (thinking off) on vLLM v0.33.0;
@@ -119,3 +119,7 @@
   Round-13 run (600, 14B): notes named 00_notes.md and the path told make the Writer open them (70% vs 5%) and
   its draft gain 17.3 points, but the Reviewer (15% open) revises the gain away. Rescue split, D and Br, three-run
   replication, in-run fan-out DiD, and pipe scope added. Meaning audits applied.
+- 2026-11-21 T10: Round 14, final text pass; experiments closed. The 14B Reviewer reads draft.md in 1-8% of tasks
+  (71-100% at other sizes) and answers again from docs/, stated as an observation. Rules scoped to this harness;
+  8B write vs file costs as point estimates; zero-copy timing, 4B layout cost and the pipe's 8B loss in the abstract;
+  cross-GPU drift computed from existing runs. Meaning audit applied. Next: Jin reads; appendix after approval.
