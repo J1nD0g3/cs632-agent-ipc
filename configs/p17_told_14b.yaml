@@ -1,0 +1,28 @@
+exp: p17_told_14b
+datasets:
+  hotpotqa: data/raw/hotpot_distractor_validation.parquet
+  2wiki: data/raw/2wiki_dev.json
+model: Qwen/Qwen3-14B
+server:
+  base_url: http://localhost:8200
+  base_urls:
+  - http://localhost:8200
+  served_name: qwen3-14b
+  gpu: 0
+  vllm_src: ''
+  flags: see scripts/queue_pro6000.sh
+channels:
+- Bs
+- Bt
+- B
+k:
+- 3
+seeds:
+- 2
+n_tasks: 150
+max_tokens: 4096
+max_turns: 12
+concurrency: 6
+use_tasks: 75
+normalize_paths: true
+scrape_metrics: true

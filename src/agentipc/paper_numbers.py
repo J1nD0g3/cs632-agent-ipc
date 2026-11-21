@@ -70,7 +70,7 @@ def writer_opened_notes(rec: dict) -> bool:
     Decided by who wrote the file, not by its path: some Researchers save notes under docs/."""
     notes = {_norm_path(o["path"]) for o in rec["io_ops"]
              if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o}
-    if rec["channel"] in ("Bs",) or rec.get("replay"):
+    if rec["channel"] in ("Bs", "Bt") or rec.get("replay"):
         notes.add("notes.md")
     return any(o["agent"] == "writer" and o["op"] == "read" and "error" not in o and _norm_path(o.get("path")) in notes
                for o in rec["io_ops"])
