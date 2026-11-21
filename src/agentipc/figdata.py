@@ -65,22 +65,19 @@ def fig3(rows: list[dict], src: Path, k: int = 3) -> None:
 
 
 def fig3_split() -> None:
-    """Writing control in one run per model size (p10): facts in the Researcher's output per arm, and the
-    paired accuracy effects of wording (A1r-A1), writing through a tool call (A1w-A1r) and reading files (B-A1w)."""
-    from .analyze import paired
+    """2x2 per model size in one run (p16): notes written as a reply or through a tool call, then copied forward
+    or delivered through files. Facts in the Researcher's notes and accuracy per arm, with 95% intervals."""
     table = []
     for size in ("4b", "8b", "14b", "32b"):
-        run = latest(f"p10_write_{size}")
+        run = latest(f"p16_store_{size}")
         rows = load_rows(run)
-        by = {ch: {r["task_id"]: r for r in rows if r["channel"] == ch} for ch in ("A1", "A1r", "A1w", "B")}
         row = {"size": size.upper(), "source": str(run.relative_to(ROOT))}
-        for ch, d in by.items():
-            row[f"notes_{ch}"] = round(float(np.mean([r["as_recall_notes"] for r in d.values() if "as_recall_notes" in r])), 4)
-            row[f"acc_{ch}"] = round(float(np.mean([r["acc"] for r in d.values()])), 4)
-        for name, x, y in (("wording", "A1r", "A1"), ("tool_write", "A1w", "A1r"), ("read_files", "B", "A1w")):
-            ids = sorted(set(by[x]) & set(by[y]))
-            mean, lo, hi = paired(np.array([by[x][i]["acc"] for i in ids], float), np.array([by[y][i]["acc"] for i in ids], float))
-            row.update({name: round(mean, 4), f"{name}_lo": round(lo, 4), f"{name}_hi": round(hi, 4), f"{name}_n": len(ids)})
+        for ch in ("A1r", "A1w", "Bs", "B"):
+            rs = [r for r in rows if r["channel"] == ch and not r.get("error")]
+            notes = [r["as_recall_notes"] for r in rs if "as_recall_notes" in r]
+            row[f"notes_{ch}"] = round(float(np.mean(notes)), 4) if notes else None
+            mean, lo, hi = ci([r["acc"] for r in rs])
+            row.update({f"acc_{ch}": round(mean, 4), f"acc_{ch}_lo": round(lo, 4), f"acc_{ch}_hi": round(hi, 4)})
         table.append(row)
     write("fig3_split", {"rows": table}, table)
 

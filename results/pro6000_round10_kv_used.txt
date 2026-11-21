@@ -1,0 +1,8 @@
+# Round-10 runs on the PRO 6000: KV capacity per run, read from each vLLM server log ('model', 'num_gpu_blocks_override',
+# 'GPU KV cache size: N tokens', 'Desired GPU memory utilization'). start/end = run start (after the server checks) and end, KST.
+# One fresh server per run. GPU indices as of 2026-11-20 (after the 14:36 reboot): 0, 4, 5 are RTX PRO 6000.
+# exp	run_id	gpu	model	blocks	kv_tokens	gpu_mem_util	server_log	start	end	prefill_metric_lines
+p16_store_8b	20261120-191938-1930c2f	5	Qwen/Qwen3-8B	6250	100,000	0.92	logs/vllm_gpu5_20261120_191848.log	2026-11-20 19:19:38	2026-11-20 19:54:48	29
+p16_store_14b	20261120-191936-1930c2f	4	Qwen/Qwen3-14B	6250	100,000	0.92	logs/vllm_gpu4_20261120_191846.log	2026-11-20 19:19:36	2026-11-20 20:17:26	29
+p16_store_4b	20261120-195534-1930c2f	5	Qwen/Qwen3-4B	6250	100,000	0.92	logs/vllm_gpu5_20261120_195453.log	2026-11-20 19:55:33	2026-11-20 20:20:31	29
+p16_store_32b	20261120-191954-1930c2f	0	Qwen/Qwen3-32B	6250	100,000	0.95	logs/vllm_gpu0_20261120_191844.log	2026-11-20 19:19:54	2026-11-20 21:05:34	29

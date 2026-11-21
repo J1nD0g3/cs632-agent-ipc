@@ -1,12 +1,13 @@
-"""Fig. 3: where the file channel's loss comes from, per model size (one interleaved run per size).
+"""Fig. 3: how notes are written and how they reach the Writer, per model size (one interleaved run per size).
 
-Claim at a glance: writing notes through a tool call drops facts and accuracy (4B, 8B, 32B; not 14B), while
-the wording of the instruction changes nothing; the rest of the file channel costs more on top at 4B, 14B and 32B.
-Form: (a) grouped bars per model size: share of supporting facts in the Researcher's output for broadcast,
-the reply with B's wording, the tool-call write, and files; the tool-written arms share the files' teal;
-(b) grouped bars per size of the three paired accuracy effects (wording, tool write, rest of file channel) with
-95% intervals drawn exactly; the tool-write effect is the dark bar.
-Data: figs/data/fig3_split.json (agentipc.figdata from results/p10_write_*).
+Claim at a glance: copying notes forward keeps accuracy high whichever way they were written, though a tool-call
+write loses facts and some accuracy (4B, 8B, 32B); once notes go through files, accuracy drops, and most at 14B and
+32B when the system stores a reply under a generic name the Writer seldom opens.
+Form: two panels with the same layout, one group of four bars per model size, in a fixed order: reply copied,
+tool write copied, reply stored as a file, tool write in files. Navy = copied forward, teal = delivered through
+files; dark = tool-call write, light = reply. (a) share of supporting facts in the Researcher's notes; (b) accuracy
+with 95% intervals.
+Data: figs/data/fig3_split.json (agentipc.figdata from results/p16_store_*).
 """
 import json
 from pathlib import Path
@@ -15,40 +16,34 @@ from archfig import Figure, Rect
 
 ROWS = json.loads((Path(__file__).parent / "data" / "fig3_split.json").read_text())["rows"]
 SIZES = [r["size"] for r in ROWS]
+ARMS = [("A1r", "Reply, copied", "navy2"), ("A1w", "Tool write, copied", "navy4"),
+        ("Bs", "Reply, stored as file", "teal2"), ("B", "Tool write, files (B)", "teal4")]
 
 fig = Figure("text")
 strip, body = fig.area.take("top", 12, gap=4)
 body = Rect(body.x, body.y, body.w, 104)
-left, right = body.cols([1, 1.1], gap=18)
+left, right = body.cols([1, 1], gap=18)
 
 ax = fig.axes(left.take("bottom", 10, gap=2)[0], cats=SIZES, y=(0, 0.6), yticks=[0, 0.2, 0.4, 0.6],
               yfmt=lambda v: f"{v * 100:.0f}%", ylabel="Facts in notes")
-ax.bars({"Broadcast": [r["notes_A1"] for r in ROWS],
-         "Reply, files' wording": [r["notes_A1r"] for r in ROWS],
-         "Tool-call write": [r["notes_A1w"] for r in ROWS],
-         "Files (B)": [r["notes_B"] for r in ROWS]},
-        ["navy4", "navy2", "teal5", "teal2"])
+ax.bars({name: [r[f"notes_{ch}"] for r in ROWS] for ch, name, _ in ARMS}, [c for _, _, c in ARMS])
 fig.caption(left.cx, left.b - 9, "(a) Facts in the Researcher's notes", size=7.5, weight=600)
 
-EFFECTS = [("wording", "Wording", "gray2"), ("tool_write", "Tool-call write", "teal4"),
-           ("read_files", "Rest of file channel", "gold3")]
-bx = fig.axes(right.take("bottom", 10, gap=2)[0], cats=SIZES, y=(-0.3, 0.1), yticks=[-0.3, -0.2, -0.1, 0, 0.1],
-              yfmt=lambda v: f"{v * 100:+.0f}" if v else "0", ylabel="Accuracy effect (points)", grid=True)
-bx.bars({name: [r[key] for r in ROWS] for key, name, _ in EFFECTS}, [c for _, _, c in EFFECTS], base=0)
-# Exact asymmetric 95% intervals at each bar's center (bars() records each series' offset and width).
-for key, name, _ in EFFECTS:
+bx = fig.axes(right.take("bottom", 10, gap=2)[0], cats=SIZES, y=(0.2, 0.85), yticks=[0.2, 0.4, 0.6, 0.8],
+              yfmt=lambda v: f"{v * 100:.0f}%", ylabel="Accuracy", grid=True)
+bx.bars({name: [r[f"acc_{ch}"] for r in ROWS] for ch, name, _ in ARMS}, [c for _, _, c in ARMS], legend=False)
+for ch, name, _ in ARMS:
     off, bw = bx._bar_geom[name]
     for i, r in enumerate(ROWS):
         x = bx.X(i) + off + bw / 2
-        ya, yb = bx.Y(r[f"{key}_hi"]), bx.Y(r[f"{key}_lo"])
+        ya, yb = bx.Y(r[f"acc_{ch}_hi"]), bx.Y(r[f"acc_{ch}_lo"])
         fig.line((x, ya), (x, yb), sw=0.5)
         fig.line((x - bw * 0.25, ya), (x + bw * 0.25, ya), sw=0.5)
         fig.line((x - bw * 0.25, yb), (x + bw * 0.25, yb), sw=0.5)
-fig.caption(right.cx, right.b - 9, "(b) Accuracy cost of each step vs the step before", size=7.5, weight=600)
+fig.caption(right.cx, right.b - 9, "(b) Accuracy (95% intervals)", size=7.5, weight=600)
 
-fig.legend(ax.legend_items, left.cx, strip.y)
-fig.legend(bx.legend_items, right.cx, strip.y)
-# Hue encodes how the notes were written (navy: reply, teal: tool call); bars keep a fixed order within
-# each group, so the grayscale pairs are still told apart by position and legend order.
+fig.legend(ax.legend_items, fig.area.cx, strip.y, ncols=4)
+# Hue encodes delivery (navy copied, teal files) and tone encodes writing (dark tool call, light reply); bars keep
+# a fixed order in every group, so the grayscale-near pairs are still told apart by position and legend order.
 fig.ignore.add("grayscale")
 fig.save(str(Path(__file__).parent / "out" / "fig_split"))
