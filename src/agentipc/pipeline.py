@@ -15,9 +15,9 @@ from .data import Task
 from .llm import ContextOverflow, SaltedClient
 from .workspace import Workspace
 
-CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d", "B", "Bb", "Bd", "Bf", "Bh", "Bn", "Br", "Bs", "Bt", "C", "D", "Dn")
+CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d", "B", "Bb", "Bd", "Bf", "Bh", "Bn", "Br", "Bs", "Bs0", "Bt", "Bt0", "C", "D", "Dn")
 MESSAGE_CHANNELS = ("A1", "A1zc", "A1w", "A1r", "A2", "A2d")
-FILE_CHANNELS = ("B", "Bb", "Bd", "Bh", "Br", "Bs", "Bt", "C", "D")
+FILE_CHANNELS = ("B", "Bb", "Bd", "Bh", "Br", "Bs", "Bs0", "Bt", "Bt0", "C", "D")
 
 TEAM = ("You are one agent in a team that answers a set of questions together. The agents work in this "
         "order: {chain}.")
@@ -159,8 +159,8 @@ def instruction(role: str, channel: str, chain: tuple[str, ...]) -> str:
             parts.append(INDEX_RULE["researcher" if role == "researcher" else "other"])
         if channel == "Bh" and role == "researcher":
             parts.append(HEADING_RULE)
-        if channel == "Bt" and role != "researcher":
-            parts.append(NOTES_PATH_RULE)
+        if channel in ("Bt", "Bt0") and role != "researcher":
+            parts.append(NOTES_PATH_RULE.replace("notes.md", STORED_NOTES[channel]))
         if channel == "D" and role != "researcher":
             parts.append(HANDOFF_READ)
     return "\n\n".join(parts)
@@ -189,6 +189,8 @@ OUTPUT_REPLY_STORED = ("The documents are in this message, so you do not need to
                        "parts (choose the headings and how to split them).")
 # Bt: Bs whose Writer and Reviewer are also told where the stored notes are (tests whether finding them matters).
 NOTES_PATH_RULE = "The Researcher's notes are in notes.md."
+# Bs0 / Bt0: Bs / Bt with the stored notes named to sort first in list_files (before docs/).
+STORED_NOTES = {"Bs": "notes.md", "Bt": "notes.md", "Bs0": "00_notes.md", "Bt0": "00_notes.md"}
 # Bb: B plus a batched read, the agent analogue of readv(): several files in one round trip.
 READ_MANY = {"type": "function", "function": {
     "name": "read_files", "description": "Read several workspace files in one call.",
@@ -310,9 +312,10 @@ def build_messages(role: str, channel: str, chain: tuple[str, ...], task: Task, 
             channel = "B"
         if channel in ("A2d", "Bd"):
             channel = {"A2d": "A2", "Bd": "B"}[channel]
-        if channel in ("A1r", "Bs", "Bt"):
+        if channel in ("A1r", "Bs", "Bt", "Bs0", "Bt0"):
             return [{"role": "system", "content": team_text(chain) + "\n\n" + ROLE_TEXT["researcher"] + "\n\n" +
-                     (OUTPUT_REPLY_MATCHED if channel == "A1r" else OUTPUT_REPLY_STORED)},
+                     (OUTPUT_REPLY_MATCHED if channel == "A1r"
+                      else OUTPUT_REPLY_STORED.replace("notes.md", STORED_NOTES[channel]))},
                     {"role": "user", "content": f"{qs}\n\n{docs}"}]
         if channel == "A1zc":
             return [{"role": "system", "content": team_text(chain)},
@@ -415,7 +418,7 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
                 ws.refresh_index()
         stage["notes"] = fixed_notes
     else:
-        rws = None if channel in ("Bs", "Bt") else ws  # the Bs Researcher has no tools; it replies once
+        rws = None if channel in STORED_NOTES else ws  # the Bs Researcher has no tools; it replies once
         res = await asyncio.gather(*(run_agent(client, rws, r, build_messages(r, channel, shown, task, replies, flat, sub),
                                                max_turns if rws is not None else 1, None, tools)
                                      for r, sub in zip(rroles, parts)))
@@ -425,11 +428,11 @@ async def run_task(task: Task, channel: str, client, workdir: Path, max_turns: i
             # The notes the Researcher wrote to its file are what A1w copies forward.
             for r in rroles:
                 replies[r] = ws.written_by(r)
-        if channel in ("Bs", "Bt"):
+        if channel in STORED_NOTES:
             # The system, not the agent, stores the reply as the notes file.
-            ws.seed("notes.md", "\n\n".join(replies[r] for r in rroles))
-            ws.authors["notes.md"] = rroles[0]
-    if fixed_notes is None and channel in ("Bs", "Bt"):
+            ws.seed(STORED_NOTES[channel], "\n\n".join(replies[r] for r in rroles))
+            ws.authors[STORED_NOTES[channel]] = rroles[0]
+    if fixed_notes is None and channel in STORED_NOTES:
         stage["notes"] = "\n".join(replies[r] for r in rroles)
     elif fixed_notes is None and files:
         stage["notes"] = "\n".join(ws.written_by(r) for r in rroles)

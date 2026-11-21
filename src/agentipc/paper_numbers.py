@@ -82,6 +82,8 @@ def writer_opened_notes(rec: dict, agent: str = "writer") -> bool:
              if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o}
     if rec["channel"] in ("Bs", "Bt") or rec.get("replay"):
         notes.add("notes.md")
+    if rec["channel"] in ("Bs0", "Bt0"):
+        notes.add("00_notes.md")
     return any(o["agent"] == agent and o["op"] == "read" and "error" not in o and _norm_path(o.get("path")) in notes
                for o in rec["io_ops"])
 
