@@ -1553,6 +1553,125 @@ def round13_first(m: Macros) -> None:
         m.add(f"RFirstReviseFirstTold{lab}N", len(ids))
 
 
+def _macro(m: Macros, name: str) -> float:
+    """Numeric value of a macro already added (signed numbers are wrapped in \\mbox{$-$...})."""
+    head = f"\\newcommand{{\\n{name}}}{{"
+    line = next(x for x in m.lines if x.startswith(head))
+    text = line[len(head):-len("\\xspace}")].replace("\\mbox{$-$", "-").replace("\\mbox{$+$", "")
+    return float(text.rstrip("}").replace(",", ""))
+
+
+def round14(m: Macros) -> None:
+    """Round-14 reviews: whether the Reviewer reads draft.md per size and arm, where 14B Researchers save notes and
+    whether the 14B Reviewer reads them or the documents, draft and final accuracy of p18's stored-reply arms, the
+    8B write cost as a size, the range of single harness fixes, Br's range, cross-GPU drift at 8B (main run on
+    RTX 3090s against the 8B size run on an RTX PRO 6000, same tasks and cap), and how rescued agents had stopped."""
+    file_arms = ("B", "Bs", "Bt", "Bs0", "Bt0")
+
+    def read_path(rec, agent, test):
+        return any(o["agent"] == agent and o["op"] == "read" and "error" not in o and test(_norm_path(o.get("path")))
+                   for o in rec["io_ops"])
+
+    def rates(exp):
+        draft, docs, notes, under = {}, {}, {}, []
+        for rec in raw_records(latest(exp)):
+            c = rec["channel"]
+            if "error" in rec or c not in file_arms:
+                continue
+            draft.setdefault(c, []).append(read_path(rec, "reviewer", lambda p: p == "draft.md"))
+            docs.setdefault(c, []).append(read_path(rec, "reviewer", lambda p: p.startswith("docs/")))
+            notes.setdefault(c, []).append(writer_opened_notes(rec, "reviewer"))
+            if c == "B":
+                under.append(any(_norm_path(o["path"]).startswith("docs/") for o in rec["io_ops"]
+                                 if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o))
+        return draft, docs, notes, under
+
+    pc = lambda v: f"{np.mean(v) * 100:.0f}"
+    sizes = {"Four": "4b", "Eight": "8b", "Fourteen": "14b", "ThirtyTwo": "32b"}
+    runs = {tag: [f"p16_store_{s}"] + ([f"p17_told_{s}"] if s in ("14b", "32b") else []) +
+            (["p18_first_14b"] if s == "14b" else []) for tag, s in sizes.items()}
+    fourteen = {}
+    for tag, exps in runs.items():
+        every = []
+        for exp in exps:
+            draft, docs, notes, under = rates(exp)
+            every += [np.mean(v) for v in draft.values()]
+            if exp.startswith("p16"):
+                m.add(f"RFourteenRevDraft{tag}", pc(draft["B"]))
+            if tag == "Fourteen":
+                fourteen[exp] = (draft, docs, notes, under)
+        m.add(f"RFourteenRevDraft{tag}Min", f"{min(every) * 100:.0f}")
+        m.add(f"RFourteenRevDraft{tag}Max", f"{max(every) * 100:.0f}")
+    labs = {"B": "Tool", "Bt": "Told", "Bs0": "FirstUntold", "Bt0": "FirstTold"}
+    draft18 = fourteen["p18_first_14b"][0]
+    for c, lab in labs.items():
+        m.add(f"RFirstRevDraft{lab}", pc(draft18[c]))
+    # 14B, tool-written notes (B) in the crossed, told, and first-listed runs: notes saved under docs/, and the
+    # Reviewer opening them. Every 14B file arm: the Reviewer reading any document under docs/. Stored-reply arms:
+    # the Reviewer opening the stored notes.
+    under = [np.mean(v[3]) for v in fourteen.values()]
+    rev_notes = [np.mean(v[2]["B"]) for v in fourteen.values()]
+    rev_docs = [np.mean(x) for v in fourteen.values() for x in v[1].values()]
+    stored_notes = [np.mean(x) for v in fourteen.values() for c, x in v[2].items() if c != "B"]
+    for name, vals in (("NotesUnderDocs", under), ("RevNotesTool", rev_notes), ("RevDocs", rev_docs),
+                       ("RevNotesStored", stored_notes)):
+        m.add(f"RFourteen{name}Min", f"{min(vals) * 100:.0f}")
+        m.add(f"RFourteen{name}Max", f"{max(vals) * 100:.0f}")
+    # p18 stored-reply arms (Bt, Bs0, Bt0): range of final and of draft accuracy.
+    fin = [_macro(m, f"RFirstAcc{labs[c]}") for c in ("Bt", "Bs0", "Bt0")]
+    dra = [_macro(m, f"RFirstDraft{labs[c]}") for c in ("Bt", "Bs0", "Bt0")]
+    m.add("RFirstStoredFinalMin", f"{min(fin):.1f}")
+    m.add("RFirstStoredFinalMax", f"{max(fin):.1f}")
+    m.add("RFirstStoredDraftMin", f"{min(dra):.1f}")
+    m.add("RFirstStoredDraftMax", f"{max(dra):.1f}")
+
+    m.add("RFourteenEightWriteCopyAbs", f"{abs(_macro(m, 'RTenEightWriteCopy')):.1f}")
+    # Single harness changes and what each recovered (points): told path at 32B (k=3), write guard and heading
+    # rule (k=16), separate folders (k=8).
+    fixes = [_macro(m, x) for x in ("RToldThirtyTwoToldOverUntold", "RSixKSixteenGuardOverB",
+                                    "RSixKSixteenHeadingOverB", "REightFoldersOverB")]
+    m.add("RFourteenFixMin", f"{min(fixes):.0f}")
+    m.add("RFourteenFixMax", f"{max(fixes):.0f}")
+    br = [abs(_macro(m, f"RThirteen{t}BrVsToolCopy")) for t in sizes]
+    m.add("RFourteenBrGapMin", f"{min(br):.1f}")
+    m.add("RFourteenBrGapMax", f"{max(br):.1f}")
+
+    # Cross-GPU drift: 8B size run (RTX PRO 6000, 100k-token cache) minus main run (RTX 3090s, k=3), same tasks,
+    # same token cap and tool budget, per channel.
+    key = lambda r: (r["dataset"], r["task_id"])
+    main = [r for r in load_rows(latest("t07_main")) if r["k"] == 3 and not r.get("error")]
+    size = [r for r in load_rows(latest("p02_size_8b")) if not r.get("error")]
+    pts, los, his, ns = [], [], [], []
+    for ch in ("A1", "A1zc", "A2", "B", "C"):
+        a = {key(r): r["acc"] for r in main if r["channel"] == ch}
+        b = {key(r): r["acc"] for r in size if r["channel"] == ch}
+        ids = sorted(set(a) & set(b))
+        mean, lo, hi = paired(np.array([b[i] for i in ids], float), np.array([a[i] for i in ids], float))
+        pts.append(mean); los.append(lo); his.append(hi); ns.append(len(ids))
+    m.add("RFourteenGpuDriftMin", f"{min(pts) * 100:.1f}")
+    m.add("RFourteenGpuDriftMax", f"{max(pts) * 100:.1f}")
+    m.add("RFourteenGpuDriftLo", f"{min(los) * 100:.1f}")
+    m.add("RFourteenGpuDriftHi", f"{max(his) * 100:.1f}")
+    m.add("RFourteenGpuDriftN", min(ns))
+
+    # Main run, k=3: B's rescued Writers and Reviewers that had not used up their budget, by how they stopped.
+    replied, repeated = 0, 0
+    for rec in raw_records(latest("t07_main")):
+        if "error" in rec or rec["k"] != 3 or rec["channel"] != "B":
+            continue
+        for role in ("writer", "reviewer"):
+            a = rec["agents"][role]
+            if a["hit_turn_limit"] or not any(c.get("forced_write") for c in a["calls"]):
+                continue
+            if any(c.get("repeat_stop") for c in a["calls"]):
+                repeated += 1
+            else:
+                replied += 1
+    m.add("RFourteenRescReplied", replied)
+    m.add("RFourteenRescRepeated", repeated)
+    m.add("RFourteenRescRepliedShare", f"{replied / (replied + repeated) * 100:.0f}")
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -1581,7 +1700,7 @@ def judges(m: Macros) -> None:
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
             fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6, round8, round10, round10_text,
-            round12, round12_fix, round12_told, round13, round13_first]
+            round12, round12_fix, round12_told, round13, round13_first, round14]
 
 
 def main() -> int:
