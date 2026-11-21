@@ -1379,6 +1379,137 @@ def round12_told(m: Macros) -> None:
         m.add(f"RTold{tag}ToolNotesUnderDocs", f"{np.mean(under_docs) * 100:.0f}")
 
 
+def round13(m: Macros) -> None:
+    """Round-13 reviews: the main run's rescue split (any agent, paired against broadcast, and its two triggers),
+    draft against final accuracy in the crossed runs, the reply-output variant Br and the three runs that repeat
+    B - A1w, the pipe's tokens where it matches broadcast, the told 32B stored reply against copying (cross-run),
+    per-run median ratios at 32 tasks at a time, and the bootstrap size."""
+    import inspect
+
+    from .factpairs import tasks_of
+    from .metrics import correct, parse_answers
+    from .stats import ci as _ci
+
+    def by(rs, ch):
+        return {r["task_id"]: r for r in rs if r["channel"] == ch and not r.get("error")}
+
+    def gap(name, x, y, sign=1):
+        ids = sorted(set(x) & set(y))
+        mean, lo, hi = paired(np.array([x[i]["acc"] for i in ids], float), np.array([y[i]["acc"] for i in ids], float))
+        m.add(name, f"{sign * mean * 100:.1f}")
+        m.add(f"{name}Lo", f"{min(sign * lo, sign * hi) * 100:.1f}")
+        m.add(f"{name}Hi", f"{max(sign * lo, sign * hi) * 100:.1f}")
+        m.add(f"{name}N", len(ids))
+        return mean
+
+    m.add("BootN", f"{inspect.signature(paired).parameters['n_boot'].default:,}")
+
+    # Main run, k=3: tasks in which the harness rescued any agent, and broadcast's lead on rescued and other tasks.
+    run = latest("t07_main")
+    rows = {(r["task_id"], r["channel"]): r for r in load_rows(run) if r["k"] == 3 and not r.get("error")}
+    resc, trig = {}, {"writer": [], "reviewer": []}
+    for rec in raw_records(run):
+        if "error" in rec or rec["k"] != 3 or rec["channel"] not in ("B", "C"):
+            continue
+        resc[(rec["task_id"], rec["channel"])] = any(c.get("forced_write") for a in rec["agents"].values() for c in a["calls"])
+        if rec["channel"] == "B":
+            for role in trig:
+                a = rec["agents"][role]
+                if any(c.get("forced_write") for c in a["calls"]):
+                    trig[role].append(a["hit_turn_limit"])
+    for ch in ("B", "C"):
+        keys = [k for k in resc if k[1] == ch]
+        m.add(f"RThirteenMainResc{ch}", f"{np.mean([resc[k] for k in keys]) * 100:.0f}")
+        for flag, lab in ((True, "Resc"), (False, "Kept")):
+            ids = [t for t, c in keys if resc[(t, c)] == flag and (t, "A1") in rows and (t, ch) in rows]
+            gap(f"RThirteenMain{lab}Gap{ch}", {t: rows[(t, ch)] for t in ids}, {t: rows[(t, "A1")] for t in ids}, sign=-1)
+    both = trig["writer"] + trig["reviewer"]
+    m.add("RThirteenMainBudgetShareB", f"{np.mean(both) * 100:.0f}")
+    m.add("RThirteenMainRevBudgetShareB", f"{np.mean(trig['reviewer']) * 100:.0f}")
+    m.add("RThirteenMainWriterBudgetShareB", f"{np.mean(trig['writer']) * 100:.0f}")
+
+    sizes = {"Four": "4b", "Eight": "8b", "Fourteen": "14b", "ThirtyTwo": "32b"}
+    spread = []
+    for tag, s in sizes.items():
+        # Crossed runs: accuracy of the Writer's draft, scored like the final answers.
+        run = latest(f"p16_store_{s}")
+        _, tasks = tasks_of(run)
+        draft = {}
+        for rec in raw_records(run):
+            if "error" in rec:
+                continue
+            qs = tasks[rec["task_id"]].questions
+            preds = parse_answers(rec["stage"].get("draft", ""), len(qs))
+            draft.setdefault(rec["channel"], []).append(np.mean([correct(p, q.answer) for p, q in zip(preds, qs)]))
+        for c, lab in (("A1r", "ReplyCopy"), ("A1w", "ToolCopy"), ("Bs", "ReplyFile"), ("B", "ToolFile")):
+            m.add(f"RThirteen{tag}Draft{lab}", pct(np.mean(draft[c])))
+        p16 = load_rows(run)
+        m.add(f"RThirteen{tag}FileToolAbs",
+              f"{abs(np.mean([by(p16, 'B')[i]['acc'] - by(p16, 'A1w')[i]['acc'] for i in sorted(set(by(p16, 'B')) & set(by(p16, 'A1w')))])) * 100:.1f}")
+        # Reply-output variant (p14): Br - A1w, B - A1w, and whether Br's Writer reads the notes or any file.
+        p14, p10 = load_rows(latest(f"p14_read_{s}")), load_rows(latest(f"p10_write_{s}"))
+        gap(f"RThirteen{tag}BrVsToolCopy", by(p14, "Br"), by(p14, "A1w"))
+        gap(f"RThirteen{tag}ReadPFourteen", by(p14, "B"), by(p14, "A1w"))
+        opened, read_any = [], []
+        for rec in raw_records(latest(f"p14_read_{s}")):
+            if rec["channel"] == "Br" and "error" not in rec:
+                opened.append(writer_opened_notes(rec))
+                read_any.append(any(o["agent"] == "writer" and o["op"] == "read" and "error" not in o for o in rec["io_ops"]))
+        m.add(f"RThirteen{tag}BrOpen", f"{np.mean(opened) * 100:.0f}")
+        m.add(f"RThirteen{tag}BrNoRead", f"{(1 - np.mean(read_any)) * 100:.0f}")
+        # B - A1w in the three runs that hold both arms (p10, p14, p16, same tasks): range and per-task mean.
+        pairs = [(by(x, "B"), by(x, "A1w")) for x in (p10, p14, p16)]
+        effects = [np.mean([b[i]["acc"] - a[i]["acc"] for i in sorted(set(b) & set(a))]) for b, a in pairs]
+        m.add(f"RThirteen{tag}ReadRepMin", f"{min(abs(e) for e in effects) * 100:.1f}")
+        m.add(f"RThirteen{tag}ReadRepMax", f"{max(abs(e) for e in effects) * 100:.1f}")
+        spread.append(max(effects) - min(effects))
+        ids = sorted(set.intersection(*(set(b) & set(a) for b, a in pairs)))
+        mean, lo, hi = _ci([np.mean([b[i]["acc"] - a[i]["acc"] for b, a in pairs]) for i in ids])
+        m.add(f"RThirteen{tag}ReadPooled", f"{mean * 100:.1f}")
+        m.add(f"RThirteen{tag}ReadPooledLo", f"{lo * 100:.1f}")
+        m.add(f"RThirteen{tag}ReadPooledHi", f"{hi * 100:.1f}")
+        m.add(f"RThirteen{tag}ReadPooledN", len(ids))
+
+    m.add("RThirteenReadRepSpreadMax", f"{max(spread) * 100:.1f}")
+    # The k=8 fan-out difference in differences (round8) as a size, for "lowers B's accuracy by ... more".
+    one, three = load_rows(latest("p15_k8_one")), load_rows(latest("p15_k8_three"))
+    a3, a1, b3, b1 = by(three, "A1"), by(one, "A1"), by(three, "B"), by(one, "B")
+    ids = sorted(set(a3) & set(a1) & set(b3) & set(b1))
+    m.add("REightFanDiDAbs", f"{abs(np.mean([(b3[i]['acc'] - b1[i]['acc']) - (a3[i]['acc'] - a1[i]['acc']) for i in ids])) * 100:.1f}")
+    # The pipe's tokens sent relative to broadcast where its accuracy matches: size runs at 14B and 32B, k=16 runs.
+    sent = []
+    for exp in ("p02_size_14b", "p02_size_32b", "t08_large"):
+        rs = load_rows(latest(exp))
+        sent.append(np.mean([r["total_tokens"] for r in rs if r["channel"] == "A2"]) /
+                    np.mean([r["total_tokens"] for r in rs if r["channel"] == "A1"]))
+        m.add(f"RThirteenPipeSent{ {'p02_size_14b': 'Fourteen', 'p02_size_32b': 'ThirtyTwo', 't08_large': 'KSixteen'}[exp]}",
+              f"{sent[-1]:.2f}")
+    m.add("RThirteenPipeSentMin", f"{min(sent):.2f}")
+    m.add("RThirteenPipeSentMax", f"{max(sent):.2f}")
+    fig4 = json.loads((ROOT / "paper/figs/data/fig4_scaling.json").read_text())["rows"]
+    k16 = next(r for r in fig4 if r["k"] == 16 and r["channel"] == "A2")
+    m.add("RThirteenPipeKSixteenLo", f"{-k16['acc_diff_hi'] * 100:.1f}")
+    m.add("RThirteenPipeKSixteenHi", f"{-k16['acc_diff_lo'] * 100:.1f}")
+    # Largest of the pipe's point gaps to broadcast in those three settings (size runs 14B, 32B; k=16).
+    gaps = []
+    for exp in ("p02_size_14b", "p02_size_32b"):
+        rs = load_rows(latest(exp))
+        a1, a2 = by(rs, "A1"), by(rs, "A2")
+        gaps.append(np.mean([a1[i]["acc"] - a2[i]["acc"] for i in sorted(set(a1) & set(a2))]))
+    gaps.append(-k16["acc_diff"])
+    m.add("RThirteenPipeGapMax", f"{max(gaps) * 100:.1f}")
+
+    # Told stored reply (p17) against copied reply notes (p16) at 32B, paired by task across the two runs.
+    gap("RThirteenToldThirtyTwoVsReplyCopy", by(load_rows(latest("p17_told_32b")), "Bt"),
+        by(load_rows(latest("p16_store_32b")), "A1r"))
+
+    # Zero-copy's median task over broadcast's, per run, at 32 tasks at a time.
+    med = lambda exp: np.median([r["wall_s"] for r in load_rows(latest(exp))])
+    ratios = [med(f"p11_c32_A1zc_r{i}") / med(f"p11_c32_A1_r{i}") for i in (1, 2)]
+    m.add("RThirteenHiMedAZcMin", f"{min(ratios):.2f}")
+    m.add("RThirteenHiMedAZcMax", f"{max(ratios):.2f}")
+
+
 def judges(m: Macros) -> None:
     syn = json.loads((latest("t07_main") / "judge_synthetic.json").read_text())
     for key, n in (("qwen3-8b", "Q"), ("llama3-8b", "L"), ("lexical", "X")):
@@ -1407,7 +1538,7 @@ def judges(m: Macros) -> None:
 
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
             fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6, round8, round10, round10_text,
-            round12, round12_fix, round12_told]
+            round12, round12_fix, round12_told, round13]
 
 
 def main() -> int:

@@ -2,7 +2,7 @@
 
 Claim at a glance: the cache savings belong to small payloads. Once the agents' prompts no longer fit
 the KV cache together, zero-copy broadcast computes as much as broadcast and the file channels compute
-more than it (a); the file channels lose accuracy at every k, and B drops sharply only at k=16, where the
+more than it, while the pipe stays near 0.4x (a); the file channels lose accuracy at every k, and B drops sharply only at k=16, where the
 payload grows and the work fans out to three parallel Researchers at once, so the figure cannot separate the two (b).
 Form: two line panels over k on a categorical axis (1, 3, 5, 8 with one Researcher; 16 with three
 parallel Researchers, set apart by a dashed separator, with no line across it); broadcast is the dashed
@@ -50,7 +50,7 @@ def broken(axes, ch, ys, dx=0.0, **kw):
 
 for ch, (col, mk, name) in STYLE.items():
     broken(ax, ch, series(ch, "comp_rel"), color=col, marker=mk, label=name)
-fig.caption(left.cx, ca.t + 1, "(a) Prefill: savings fade as payloads grow", size=7.3, weight=600)
+fig.caption(left.cx, ca.t + 1, "(a) Prefill: savings fade as payloads grow, except the pipe's", size=7.3, weight=600)
 
 pb, cb = right.take("bottom", 10, gap=2)
 bx = fig.axes(pb, cats=CATS, y=(-0.4, 0.06), yticks=[-0.4, -0.3, -0.2, -0.1, 0], yfmt=lambda v: f"{v * 100:+.0f}" if v else "0",
