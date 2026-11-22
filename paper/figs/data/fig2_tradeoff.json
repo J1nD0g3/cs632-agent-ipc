@@ -99,5 +99,104 @@
    "prompt_tokens_lo": 15458.8917,
    "prompt_tokens_hi": 17022.3867
   }
+ ],
+ "gap_vs_a1": {
+  "A1zc": {
+   "acc_diff": -0.0078,
+   "acc_diff_lo": -0.0289,
+   "acc_diff_hi": 0.0144
+  },
+  "A2": {
+   "acc_diff": -0.1022,
+   "acc_diff_lo": -0.1311,
+   "acc_diff_hi": -0.0756
+  },
+  "B": {
+   "acc_diff": -0.0956,
+   "acc_diff_lo": -0.1267,
+   "acc_diff_hi": -0.0678
+  },
+  "C": {
+   "acc_diff": -0.06,
+   "acc_diff_lo": -0.0856,
+   "acc_diff_hi": -0.0344
+  },
+  "D": {
+   "acc_diff": -0.0722,
+   "acc_diff_lo": -0.1,
+   "acc_diff_hi": -0.0444
+  }
+ },
+ "zc_time": [
+  {
+   "row": "six_run_time",
+   "value": 1.0874,
+   "lo": 1.0818,
+   "hi": 1.0972,
+   "per_run": [
+    1.0972,
+    1.083,
+    1.0818
+   ],
+   "runs": [
+    "results/p06_alone_A1zc/20261120-001454-732346b",
+    "results/p11_alone_A1zc_r2/20261120-110202-f9cd71b",
+    "results/p11_alone_A1zc_r3/20261120-113737-f9cd71b",
+    "results/p06_alone_A1/20261120-000951-b3208a0",
+    "results/p11_alone_A1_r2/20261120-104149-f9cd71b",
+    "results/p11_alone_A1_r3/20261120-112029-f9cd71b"
+   ]
+  },
+  {
+   "row": "six_median_task",
+   "value": 0.991,
+   "lo": 0.9866,
+   "hi": 0.9959,
+   "per_run": [
+    0.9959,
+    0.9866,
+    0.9906
+   ],
+   "runs": [
+    "results/p06_alone_A1zc/20261120-001454-732346b",
+    "results/p11_alone_A1zc_r2/20261120-110202-f9cd71b",
+    "results/p11_alone_A1zc_r3/20261120-113737-f9cd71b",
+    "results/p06_alone_A1/20261120-000951-b3208a0",
+    "results/p11_alone_A1_r2/20261120-104149-f9cd71b",
+    "results/p11_alone_A1_r3/20261120-112029-f9cd71b"
+   ]
+  },
+  {
+   "row": "thirty_two_run_time",
+   "value": 1.0024,
+   "lo": 0.996,
+   "hi": 1.0088,
+   "per_run": [
+    1.0088,
+    0.996
+   ],
+   "runs": [
+    "results/p11_c32_A1zc_r1/20261120-125457-f9cd71b",
+    "results/p11_c32_A1zc_r2/20261120-124022-f9cd71b",
+    "results/p11_c32_A1_r1/20261120-124313-f9cd71b",
+    "results/p11_c32_A1_r2/20261120-123721-f9cd71b"
+   ]
+  },
+  {
+   "row": "thirty_two_median_task",
+   "value": 0.8232,
+   "lo": 0.8146,
+   "hi": 0.8318,
+   "per_run": [
+    0.8318,
+    0.8146
+   ],
+   "runs": [
+    "results/p11_c32_A1zc_r1/20261120-125457-f9cd71b",
+    "results/p11_c32_A1zc_r2/20261120-124022-f9cd71b",
+    "results/p11_c32_A1_r1/20261120-124313-f9cd71b",
+    "results/p11_c32_A1_r2/20261120-123721-f9cd71b"
+   ]
+  }
  ]
 }

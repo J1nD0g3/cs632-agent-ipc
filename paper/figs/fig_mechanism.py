@@ -2,15 +2,23 @@
 
 Claim at a glance: message channels copy content into the next prompt (broadcast all of it, zero-copy
 the same but served from the cache, the pipe only the last output); file channels leave results in a
-shared workspace that later agents must find and read (plus an index in C).
+shared workspace that later agents must find and read (plus an index in C), and B's Writer never opens
+the notes in 42% of tasks (C's in 8%).
 Plan: a 3 x 2 grid of panels with one identical layout: three robots (Researcher, Writer, Reviewer) in
 a row. Message panels show, under each hop, what the receiver's prompt holds as a strip of colored
-segments; file panels show the shared folder with its files and the write/read arrows. Same colors for
+segments; file panels show the shared folder with its files and the write/read arrows. The Writer's read of
+the notes enters it from the left, where a message would, and carries the measured skip rate (red dashed
+in B, muted in C). Data: figs/data/fig1_mechanism.json (agentipc.figdata, main run). Same colors for
 the same content everywhere (question, documents, notes, draft); hatched = served from the prefix cache.
 """
+import json
+from pathlib import Path
+
 from archfig import Figure, Rect
 from archfig.palette import color
 
+DATA = json.loads((Path(__file__).parent / "data" / "fig1_mechanism.json").read_text())
+SKIP = {c["channel"]: c["writer_skipped_notes"] for c in DATA["channels"]}  # Writer never opens the notes (k=3)
 ROLE_FILL = {"Researcher": "#D9E2F3", "Writer": "#DCEBEC", "Reviewer": "#E6EEDC"}
 SEG = {"Q": "white", "Docs": "teal3", "Notes": "navy3", "Draft": "gold2", "Instr": "white"}
 
@@ -59,8 +67,8 @@ def strip(x, y, w, parts, cached=()):
 
 cols = fig.area.cols(3, gap=5)
 cols2 = fig.area.cols(2, gap=5)  # the file channels take the bottom row in two wider panels
-PANEL_H = 59
-rows = [Rect(fig.area.x, fig.area.y + 14, W, PANEL_H), Rect(fig.area.x, fig.area.y + 14 + PANEL_H + 5, W, PANEL_H)]
+ROW_H = (51, 59)  # message panels have slack under their strips; file panels need the folder's height
+rows = [Rect(fig.area.x, fig.area.y + 13, W, ROW_H[0]), Rect(fig.area.x, fig.area.y + 13 + ROW_H[0] + 5, W, ROW_H[1])]
 PANELS = [("A1", "Broadcast", ""), ("A1zc", "Zero-copy broadcast", ""), ("A2", "Pipe", ""),
           ("B", "Shared files", ""), ("C", "Files + index", "")]
 LABEL = {"A1": "A1", "A1zc": "A1-zc", "A2": "A2", "B": "B", "C": "C", "D": "D"}
@@ -71,10 +79,11 @@ fig.legend([("box", "white", "Questions"), ("box", "teal3", "Documents"), ("box"
 
 for i, (ch, name, sub) in enumerate(PANELS):
     c = cols[i] if i < 3 else cols2[i - 3]
-    pr = Rect(c.x, rows[i // 3].y, c.w, PANEL_H)
+    pr = Rect(c.x, rows[i // 3].y, c.w, rows[i // 3].h)
     fig.panel(pr, f"{LABEL[ch]}  {name}", fill="gray1")
     body = pr.inset(5, t=11, b=3)
-    xs = [body.x + body.w * f for f in (1 / 6, 3 / 6, 5 / 6)]
+    # File panels move the Writer right so the skip-rate label fits between its read and the Writer's name.
+    xs = [body.x + body.w * f for f in ((1 / 6, 3 / 6, 5 / 6) if ch.startswith("A") else (1 / 6, 0.54, 5 / 6))]
     faces = []
     for x, role in zip(xs, ("Researcher", "Writer", "Reviewer")):
         face, bottom = robot(x, body.y, role)
@@ -99,27 +108,37 @@ for i, (ch, name, sub) in enumerate(PANELS):
     else:
         folder = Rect(low.x + 4, low.y + 6, low.w - 8, low.h - 6)
         fig.box(folder, None, fill="white", sw=0.6, r=1.5, dash="dash")
-        files = [("notes", "navy3"), ("d01..d30", "teal3"), ("draft", "gold2")]
+        # Each doc sits where its arrows can land on it vertically without passing a robot's name.
+        files = [("notes", "navy3", xs[0] + 22), ("d01..d30", "teal3", xs[1]), ("draft", "gold2", xs[2] - 18)]
         if ch == "C":
-            files = [("index", "navy5")] + files
-        slots = folder.inset(4, y=2).cols(len(files), gap=4)
+            files = [("index", "navy5", xs[0] - 14)] + files
         boxes = {}
-        for (name, fill), sl in zip(files, slots):
+        for name, fill, cx in files:
             fw, _ = fig.fit(name, size=6, shape="doc")
-            r = sl.sized(min(sl.w, fw + 3), sl.h - 2.4, anchor="s")
+            r = Rect(cx - (fw + 3) / 2, folder.y + 4.4, fw + 3, folder.h - 6.4)
             boxes[name] = fig.box(r, name, fill=fill, shape="doc", size=6, sw=0.6, stack=1 if name.startswith("d0") else 0)
         y0 = bottom + 0.5
         mid = (y0 + folder.y) / 2
-        fig.arrow((xs[0], y0), (xs[0], folder.y), sw=0.8)
-        fig.text(xs[0] + 3, mid, "write", size=6, anchor="start")
-        fig.arrow((xs[1] - 3, folder.y), (xs[1] - 3, y0), sw=0.8)
-        fig.arrow((xs[1] + 3, y0), (xs[1] + 3, folder.y), sw=0.8)
-        fig.text(xs[1] + 6, mid - 0.8, "read, write", size=6, anchor="start")
-        fig.arrow((xs[2], folder.y), (xs[2], y0), sw=0.8)
-        fig.text(xs[2] + 3, mid, "read", size=6, anchor="start")
+        top_of = lambda n: boxes[n].rect.t
+        fig.arrow((xs[0] + 14, y0), (xs[0] + 14, top_of("notes")), sw=0.8)
+        fig.text(xs[0] + 11, mid, "write", size=6, anchor="end")
+        # The Writer's read of the notes, the one the skip rate measures, enters it from the left like a message.
+        skip = SKIP[ch]
+        tone = "bad" if ch == "B" else "navy4"
+        fig.arrow((xs[0] + 26, top_of("notes")), (xs[0] + 26, faces[1].cy), (faces[1].l - 4, faces[1].cy),
+                  sw=1.0, color=tone, dash="dash" if ch == "B" else None)
+        label = f"unread in\n{skip * 100:.0f}% of tasks"
+        fig.text(xs[0] + 28.5, faces[1].cy + 2, f"**{label}**" if ch == "B" else label, size=6.5, anchor="start",
+                 valign="top", color=tone if ch == "B" else "gray5")
+        fig.arrow((xs[1], top_of("d01..d30")), (xs[1], y0), sw=0.8)
+        fig.text(xs[1] + 3, mid, "read", size=6, anchor="start")
+        fig.arrow((faces[1].r + 4, faces[1].cy), (xs[2] - 25, faces[1].cy), (xs[2] - 25, top_of("draft")), sw=0.8)
+        fig.text(xs[2] - 28, mid, "write", size=6, anchor="end")
+        fig.arrow((xs[2] - 11, top_of("draft")), (xs[2] - 11, y0), sw=0.8)
+        fig.text(xs[2] - 8, mid, "read", size=6, anchor="start")
         if ch == "D":
             for j in (0, 1):
                 a, b = faces[j], faces[j + 1]
                 fig.arrow((a.r + 4, a.cy), (b.l - 4, b.cy), sw=1.0, color="navy5", label="handoff", label_size=6)
 
-fig.save(str(__import__("pathlib").Path(__file__).parent / "out" / "fig_mechanism"))
+fig.save(str(Path(__file__).parent / "out" / "fig_mechanism"))

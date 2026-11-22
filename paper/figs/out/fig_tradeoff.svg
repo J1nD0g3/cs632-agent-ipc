@@ -1,54 +1,79 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="506pt" height="134.03pt" viewBox="0 0 506 134.03">
-<line x1="29.22" y1="96.63" x2="245" y2="96.63" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<line x1="29.22" y1="75.31" x2="245" y2="75.31" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<line x1="29.22" y1="53.98" x2="245" y2="53.98" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<line x1="29.22" y1="32.66" x2="245" y2="32.66" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<path d="M97.32,56.37 L97.32,32.19" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<circle cx="97.32" cy="44.05" r="2.1" fill="#4A6390" stroke="#000000" stroke-width="0.5"/>
-<text font-family="Inter"><tspan x="102.32" y="41.41" font-size="6.5" font-weight="500" fill="#000000">A1</tspan><tspan x="111.1" y="41.41" font-size="6.5" font-weight="500" fill="#000000">broadcast</tspan></text>
-<path d="M99.33,60.64 L99.33,35.05" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<polygon points="99.33,43.43 100.3,46 103.04,46.12 100.9,47.84 101.62,50.49 99.33,48.98 97.03,50.49 97.76,47.84 95.62,46.12 98.36,46" fill="#F2B53A" stroke="#000000" stroke-width="0.5"/>
-<text font-family="Inter"><tspan x="104.33" y="54.69" font-size="6.5" font-weight="700" fill="#000000">A1-zc</tspan><tspan x="123.65" y="54.69" font-size="6.5" font-weight="700" fill="#000000">zero-copy</tspan></text>
-<path d="M57.84,101.37 L57.84,73.9" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<circle cx="57.84" cy="87.63" r="2.1" fill="#BFBFBF" stroke="#000000" stroke-width="0.5"/>
-<text font-family="Inter"><tspan x="62.84" y="90" font-size="6.5" font-weight="500" fill="#000000">A2</tspan><tspan x="73.18" y="90" font-size="6.5" font-weight="500" fill="#000000">pipe</tspan></text>
-<path d="M225.4,98.51 L225.4,70.1" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<rect x="223.51" y="82.89" width="3.78" height="3.78" fill="#C0D8DA" stroke="#000000" stroke-width="0.5"/>
-<text font-family="Inter"><tspan x="201.32" y="91.14" font-size="6.5" font-weight="500" fill="#000000">B</tspan><tspan x="207.32" y="91.14" font-size="6.5" font-weight="500" fill="#000000">files</tspan></text>
-<path d="M221.22,82.9 L221.22,56.8" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<rect x="219.33" y="67.75" width="3.78" height="3.78" fill="#6A9096" stroke="#000000" stroke-width="0.5"/>
-<text font-family="Inter"><tspan x="175.43" y="68" font-size="6.5" font-weight="500" fill="#000000">C</tspan><tspan x="181.93" y="68" font-size="6.5" font-weight="500" fill="#000000">files+index</tspan></text>
-<text font-family="Inter"><tspan x="17.41" y="131.46" font-size="7.5" font-weight="600" fill="#000000">(a)</tspan><tspan x="29.21" y="131.46" font-size="7.5" font-weight="600" fill="#000000">Tokens</tspan><tspan x="57.27" y="131.46" font-size="7.5" font-weight="600" fill="#000000">sent</tspan><tspan x="74.95" y="131.46" font-size="7.5" font-weight="600" fill="#000000">per</tspan><tspan x="88.94" y="131.46" font-size="7.5" font-weight="600" fill="#000000">task</tspan><tspan x="106.21" y="131.46" font-size="7.5" font-weight="600" fill="#000000">(billed</tspan><tspan x="130.67" y="131.46" font-size="7.5" font-weight="600" fill="#000000">tokens,</tspan><tspan x="159.18" y="131.46" font-size="7.5" font-weight="600" fill="#000000">no</tspan><tspan x="170.23" y="131.46" font-size="7.5" font-weight="600" fill="#000000">cache</tspan><tspan x="194.26" y="131.46" font-size="7.5" font-weight="600" fill="#000000">discount)</tspan></text>
-<line x1="279.35" y1="96.63" x2="499.7" y2="96.63" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<line x1="279.35" y1="75.31" x2="499.7" y2="75.31" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<line x1="279.35" y1="53.98" x2="499.7" y2="53.98" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<line x1="279.35" y1="32.66" x2="499.7" y2="32.66" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
-<path d="M473.82,56.37 L473.82,32.19" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<circle cx="473.82" cy="44.05" r="2.1" fill="#4A6390" stroke="#000000" stroke-width="0.5"/>
-<text font-family="Inter"><tspan x="428.71" y="33.41" font-size="6.5" font-weight="500" fill="#000000">A1</tspan><tspan x="437.5" y="33.41" font-size="6.5" font-weight="500" fill="#000000">broadcast</tspan></text>
-<text font-family="Inter"><tspan x="437.54" y="40.03" font-size="6" font-weight="500" fill="#404040">1%</tspan><tspan x="447.59" y="40.03" font-size="6" font-weight="500" fill="#404040">cached</tspan></text>
-<path d="M354.66,60.64 L354.66,35.05" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<polygon points="354.66,43.43 355.63,46 358.37,46.12 356.23,47.84 356.95,50.49 354.66,48.98 352.37,50.49 353.09,47.84 350.95,46.12 353.69,46" fill="#F2B53A" stroke="#000000" stroke-width="0.5"/>
-<text font-family="Inter"><tspan x="296.65" y="49.69" font-size="6.5" font-weight="700" fill="#000000">A1-zc</tspan><tspan x="315.98" y="49.69" font-size="6.5" font-weight="700" fill="#000000">zero-copy</tspan></text>
-<text font-family="Inter"><tspan x="312.39" y="56.31" font-size="6" font-weight="500" fill="#404040">62%</tspan><tspan x="327.43" y="56.31" font-size="6" font-weight="500" fill="#404040">cached</tspan></text>
-<path d="M353.56,101.37 L353.56,73.9" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<circle cx="353.56" cy="87.63" r="2.1" fill="#BFBFBF" stroke="#000000" stroke-width="0.5"/>
-<text font-family="Inter"><tspan x="358.56" y="95" font-size="6.5" font-weight="500" fill="#000000">A2</tspan><tspan x="368.91" y="95" font-size="6.5" font-weight="500" fill="#000000">pipe</tspan></text>
-<text font-family="Inter"><tspan x="358.56" y="101.62" font-size="6" font-weight="500" fill="#404040">1%</tspan><tspan x="368.61" y="101.62" font-size="6" font-weight="500" fill="#404040">cached</tspan></text>
-<path d="M433.12,98.51 L433.12,70.1" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<rect x="431.23" y="82.89" width="3.78" height="3.78" fill="#C0D8DA" stroke="#000000" stroke-width="0.5"/>
-<text font-family="Inter"><tspan x="438.12" y="91.14" font-size="6.5" font-weight="500" fill="#000000">B</tspan><tspan x="444.12" y="91.14" font-size="6.5" font-weight="500" fill="#000000">files</tspan></text>
-<text font-family="Inter"><tspan x="438.12" y="97.76" font-size="6" font-weight="500" fill="#404040">73%</tspan><tspan x="452.77" y="97.76" font-size="6" font-weight="500" fill="#404040">cached</tspan></text>
-<path d="M433.18,82.9 L433.18,56.8" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
-<rect x="431.29" y="67.75" width="3.78" height="3.78" fill="#6A9096" stroke="#000000" stroke-width="0.5"/>
-<text font-family="Inter"><tspan x="438.18" y="68" font-size="6.5" font-weight="500" fill="#000000">C</tspan><tspan x="444.68" y="68" font-size="6.5" font-weight="500" fill="#000000">files+index</tspan></text>
-<text font-family="Inter"><tspan x="438.18" y="74.62" font-size="6" font-weight="500" fill="#404040">73%</tspan><tspan x="452.83" y="74.62" font-size="6" font-weight="500" fill="#404040">cached</tspan></text>
-<path d="M468.82,49.33 L364.46,49.33" fill="none" stroke="#3D6B34" stroke-width="1" stroke-linejoin="miter" stroke-linecap="butt"/>
-<polygon points="360.66,49.33 365.13,47.31 365.13,51.35" fill="#3D6B34"/>
-<text font-family="Inter"><tspan x="368.66" y="46.69" font-size="6.5" font-weight="500" fill="#3D6B34">paired</tspan><tspan x="390.03" y="46.69" font-size="6.5" font-weight="500" fill="#3D6B34">95%</tspan><tspan x="406.23" y="46.69" font-size="6.5" font-weight="500" fill="#3D6B34">CI</tspan><tspan x="414.5" y="46.69" font-size="6.5" font-weight="500" fill="#3D6B34">−2.9</tspan><tspan x="430.39" y="46.69" font-size="6.5" font-weight="500" fill="#3D6B34">to</tspan><tspan x="438.2" y="46.69" font-size="6.5" font-weight="500" fill="#3D6B34">+1.4</tspan></text>
-<text font-family="Inter"><tspan x="368.66" y="30.69" font-size="6.5" font-weight="700" fill="#3D6B34">−61%</tspan><tspan x="388.24" y="30.69" font-size="6.5" font-weight="700" fill="#3D6B34">prefill</tspan></text>
-<text font-family="Inter"><tspan x="368.66" y="38.69" font-size="6.5" font-weight="500" fill="#3D6B34">accuracy</tspan><tspan x="399.04" y="38.69" font-size="6.5" font-weight="500" fill="#3D6B34">−0.8</tspan></text>
-<text font-family="Inter"><tspan x="304.29" y="131.46" font-size="7.5" font-weight="600" fill="#000000">(b)</tspan><tspan x="316.45" y="131.46" font-size="7.5" font-weight="600" fill="#000000">Tokens</tspan><tspan x="344.52" y="131.46" font-size="7.5" font-weight="600" fill="#000000">computed</tspan><tspan x="383.06" y="131.46" font-size="7.5" font-weight="600" fill="#000000">per</tspan><tspan x="397.04" y="131.46" font-size="7.5" font-weight="600" fill="#000000">task</tspan><tspan x="414.31" y="131.46" font-size="7.5" font-weight="600" fill="#000000">(self-hosted)</tspan></text>
+<line x1="29.22" y1="96.63" x2="165.78" y2="96.63" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="29.22" y1="75.31" x2="165.78" y2="75.31" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="29.22" y1="53.98" x2="165.78" y2="53.98" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="29.22" y1="32.66" x2="165.78" y2="32.66" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<path d="M72.32,56.37 L72.32,32.19" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<circle cx="72.32" cy="44.05" r="2.1" fill="#4A6390" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="77.32" y="41.41" font-size="6.5" font-weight="500" fill="#000000">A1</tspan><tspan x="86.1" y="41.41" font-size="6.5" font-weight="500" fill="#000000">broadcast</tspan></text>
+<path d="M73.59,60.64 L73.59,35.05" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<polygon points="73.59,43.43 74.56,46 77.3,46.12 75.16,47.84 75.88,50.49 73.59,48.98 71.29,50.49 72.02,47.84 69.88,46.12 72.62,46" fill="#F2B53A" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="78.59" y="54.69" font-size="6.5" font-weight="700" fill="#000000">A1-zc</tspan><tspan x="97.92" y="54.69" font-size="6.5" font-weight="700" fill="#000000">zero-copy</tspan></text>
+<path d="M47.33,101.37 L47.33,73.9" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<circle cx="47.33" cy="87.63" r="2.1" fill="#BFBFBF" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="52.33" y="90" font-size="6.5" font-weight="500" fill="#000000">A2</tspan><tspan x="62.68" y="90" font-size="6.5" font-weight="500" fill="#000000">pipe</tspan></text>
+<text font-family="Inter"><tspan x="52.33" y="96.62" font-size="6" font-weight="500" fill="#404040">−10.2</tspan><tspan x="69.65" y="96.62" font-size="6" font-weight="500" fill="#404040">vs</tspan><tspan x="77.93" y="96.62" font-size="6" font-weight="500" fill="#404040">A1</tspan></text>
+<path d="M153.37,98.51 L153.37,70.1" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<rect x="151.48" y="82.89" width="3.78" height="3.78" fill="#C0D8DA" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="129.29" y="91.14" font-size="6.5" font-weight="500" fill="#000000">B</tspan><tspan x="135.29" y="91.14" font-size="6.5" font-weight="500" fill="#000000">files</tspan></text>
+<text font-family="Inter"><tspan x="118.92" y="97.76" font-size="6" font-weight="500" fill="#404040">−9.6</tspan><tspan x="133.58" y="97.76" font-size="6" font-weight="500" fill="#404040">vs</tspan><tspan x="141.86" y="97.76" font-size="6" font-weight="500" fill="#404040">A1</tspan></text>
+<path d="M150.73,82.9 L150.73,56.8" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<rect x="148.84" y="67.75" width="3.78" height="3.78" fill="#6A9096" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="104.94" y="68" font-size="6.5" font-weight="500" fill="#000000">C</tspan><tspan x="111.44" y="68" font-size="6.5" font-weight="500" fill="#000000">files+index</tspan></text>
+<text font-family="Inter"><tspan x="116.21" y="74.62" font-size="6" font-weight="500" fill="#404040">−6.0</tspan><tspan x="130.94" y="74.62" font-size="6" font-weight="500" fill="#404040">vs</tspan><tspan x="139.22" y="74.62" font-size="6" font-weight="500" fill="#404040">A1</tspan></text>
+<text font-family="Inter"><tspan x="39.94" y="131.46" font-size="7.5" font-weight="600" fill="#000000">(a)</tspan><tspan x="51.73" y="131.46" font-size="7.5" font-weight="600" fill="#000000">Tokens</tspan><tspan x="79.8" y="131.46" font-size="7.5" font-weight="600" fill="#000000">sent</tspan><tspan x="97.48" y="131.46" font-size="7.5" font-weight="600" fill="#000000">per</tspan><tspan x="111.46" y="131.46" font-size="7.5" font-weight="600" fill="#000000">task</tspan></text>
+<line x1="196.12" y1="96.63" x2="369.49" y2="96.63" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="196.12" y1="75.31" x2="369.49" y2="75.31" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="196.12" y1="53.98" x2="369.49" y2="53.98" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<line x1="196.12" y1="32.66" x2="369.49" y2="32.66" stroke="#BFBFBF" stroke-width="0.4" stroke-dasharray="2.4 1.6"/>
+<path d="M349.13,56.37 L349.13,32.19" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<circle cx="349.13" cy="44.05" r="2.1" fill="#4A6390" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="304.02" y="33.41" font-size="6.5" font-weight="500" fill="#000000">A1</tspan><tspan x="312.8" y="33.41" font-size="6.5" font-weight="500" fill="#000000">broadcast</tspan></text>
+<text font-family="Inter"><tspan x="312.85" y="40.03" font-size="6" font-weight="500" fill="#404040">1%</tspan><tspan x="322.9" y="40.03" font-size="6" font-weight="500" fill="#404040">cached</tspan></text>
+<path d="M255.38,60.64 L255.38,35.05" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<polygon points="255.38,43.43 256.35,46 259.09,46.12 256.95,47.84 257.67,50.49 255.38,48.98 253.09,50.49 253.81,47.84 251.67,46.12 254.41,46" fill="#F2B53A" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="197.36" y="49.69" font-size="6.5" font-weight="700" fill="#000000">A1-zc</tspan><tspan x="216.69" y="49.69" font-size="6.5" font-weight="700" fill="#000000">zero-copy</tspan></text>
+<text font-family="Inter"><tspan x="213.11" y="56.31" font-size="6" font-weight="500" fill="#404040">62%</tspan><tspan x="228.14" y="56.31" font-size="6" font-weight="500" fill="#404040">cached</tspan></text>
+<path d="M254.51,101.37 L254.51,73.9" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<circle cx="254.51" cy="87.63" r="2.1" fill="#BFBFBF" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="259.51" y="95" font-size="6.5" font-weight="500" fill="#000000">A2</tspan><tspan x="269.86" y="95" font-size="6.5" font-weight="500" fill="#000000">pipe</tspan></text>
+<text font-family="Inter"><tspan x="259.51" y="101.62" font-size="6" font-weight="500" fill="#404040">1%</tspan><tspan x="269.56" y="101.62" font-size="6" font-weight="500" fill="#404040">cached</tspan></text>
+<path d="M317.11,98.51 L317.11,70.1" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<rect x="315.22" y="82.89" width="3.78" height="3.78" fill="#C0D8DA" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="322.11" y="91.14" font-size="6.5" font-weight="500" fill="#000000">B</tspan><tspan x="328.11" y="91.14" font-size="6.5" font-weight="500" fill="#000000">files</tspan></text>
+<text font-family="Inter"><tspan x="322.11" y="97.76" font-size="6" font-weight="500" fill="#404040">73%</tspan><tspan x="336.76" y="97.76" font-size="6" font-weight="500" fill="#404040">cached</tspan></text>
+<path d="M317.15,82.9 L317.15,56.8" fill="none" stroke="#404040" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<rect x="315.26" y="67.75" width="3.78" height="3.78" fill="#6A9096" stroke="#000000" stroke-width="0.5"/>
+<text font-family="Inter"><tspan x="322.15" y="68" font-size="6.5" font-weight="500" fill="#000000">C</tspan><tspan x="328.65" y="68" font-size="6.5" font-weight="500" fill="#000000">files+index</tspan></text>
+<text font-family="Inter"><tspan x="322.15" y="74.62" font-size="6" font-weight="500" fill="#404040">73%</tspan><tspan x="336.8" y="74.62" font-size="6" font-weight="500" fill="#404040">cached</tspan></text>
+<path d="M344.13,49.33 L265.18,49.33" fill="none" stroke="#3D6B34" stroke-width="1" stroke-linejoin="miter" stroke-linecap="butt"/>
+<polygon points="261.38,49.33 265.85,47.31 265.85,51.35" fill="#3D6B34"/>
+<text font-family="Inter"><tspan x="263.38" y="58.19" font-size="6.5" font-weight="700" fill="#3D6B34">−61%</tspan><tspan x="282.95" y="58.19" font-size="6.5" font-weight="700" fill="#3D6B34">prefill</tspan></text>
+<text font-family="Inter"><tspan x="263.38" y="65.19" font-size="6.5" font-weight="500" fill="#3D6B34">accuracy</tspan><tspan x="293.76" y="65.19" font-size="6.5" font-weight="500" fill="#3D6B34">−0.8</tspan></text>
+<text font-family="Inter"><tspan x="263.38" y="72.19" font-size="6.5" font-weight="500" fill="#3D6B34">(−2.9</tspan><tspan x="281.67" y="72.19" font-size="6.5" font-weight="500" fill="#3D6B34">to</tspan><tspan x="289.47" y="72.19" font-size="6.5" font-weight="500" fill="#3D6B34">+1.4)</tspan></text>
+<text font-family="Inter"><tspan x="207.99" y="131.46" font-size="7.5" font-weight="600" fill="#000000">(b)</tspan><tspan x="220.16" y="131.46" font-size="7.5" font-weight="600" fill="#000000">Tokens</tspan><tspan x="248.23" y="131.46" font-size="7.5" font-weight="600" fill="#000000">computed</tspan><tspan x="286.77" y="131.46" font-size="7.5" font-weight="600" fill="#000000">(prefill)</tspan><tspan x="315.21" y="131.46" font-size="7.5" font-weight="600" fill="#000000">per</tspan><tspan x="329.19" y="131.46" font-size="7.5" font-weight="600" fill="#000000">task</tspan></text>
+<rect x="472.76" y="38.47" width="9.39" height="9.7" rx="0" fill="#F2B53A" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<path d="M481.55,43.32 L483.21,43.32" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M481.55,41.72 L481.55,44.92" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M483.21,41.72 L483.21,44.92" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="485.71" y="45.69" font-size="6.5" font-weight="700" fill="#000000">1.09×</tspan></text>
+<rect x="471.79" y="54.11" width="0.97" height="9.7" rx="0" fill="#D9D9D9" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<path d="M471.32,58.96 L472.32,58.96" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M471.32,57.36 L471.32,60.56" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M472.32,57.36 L472.32,60.56" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="450.36" y="61.32" font-size="6.5" font-weight="500" fill="#000000">0.99×</tspan></text>
+<path d="M472.33,90.23 L473.71,90.23" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M472.33,88.63 L472.33,91.83" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M473.71,88.63 L473.71,91.83" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="476.21" y="92.6" font-size="6.5" font-weight="500" fill="#000000">1.00×</tspan></text>
+<rect x="453.76" y="101.02" width="19" height="9.7" rx="0" fill="#3D6B34" stroke="#000000" stroke-width="0.5" stroke-linejoin="round"/>
+<path d="M452.84,105.87 L454.69,105.87" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M452.84,104.27 L452.84,107.47" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<path d="M454.69,104.27 L454.69,107.47" fill="none" stroke="#000000" stroke-width="0.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="431.42" y="108.24" font-size="6.5" font-weight="700" fill="#3D6B34">0.82×</tspan></text>
+<path d="M472.76,19.86 L472.76,113.69" fill="none" stroke="#404040" stroke-width="0.6" stroke-dasharray="2.4 1.6" stroke-linejoin="miter" stroke-linecap="butt"/>
+<text font-family="Inter"><tspan x="474.26" y="25.73" font-size="6" font-weight="500" fill="#404040">A1</tspan><tspan x="482.37" y="25.73" font-size="6" font-weight="500" fill="#404040">=</tspan><tspan x="487.97" y="25.73" font-size="6" font-weight="500" fill="#404040">1</tspan></text>
+<text font-family="Inter"><tspan x="401.86" y="131.46" font-size="7.5" font-weight="600" fill="#000000">(c)</tspan><tspan x="413.56" y="131.46" font-size="7.5" font-weight="600" fill="#000000">Zero-copy</tspan><tspan x="453.54" y="131.46" font-size="7.5" font-weight="600" fill="#000000">time</tspan><tspan x="471.23" y="131.46" font-size="7.5" font-weight="600" fill="#000000">vs</tspan><tspan x="481.64" y="131.46" font-size="7.5" font-weight="600" fill="#000000">A1</tspan></text>
 <rect x="128.77" y="1" width="248.45" height="11.6" fill="white" stroke="#000" stroke-width="0.5"/>
 <circle cx="134.57" cy="6.8" r="1.7" fill="#4A6390" stroke="#000000" stroke-width="0.45"/>
 <text font-family="Inter"><tspan x="139.57" y="9.16" font-size="6.5" font-weight="500" fill="#000000">Message</tspan><tspan x="169.6" y="9.16" font-size="6.5" font-weight="500" fill="#000000">channels</tspan></text>
@@ -58,7 +83,7 @@
 <text font-family="Inter"><tspan x="265.51" y="9.16" font-size="6.5" font-weight="500" fill="#000000">Zero-copy</tspan><tspan x="299.86" y="9.16" font-size="6.5" font-weight="500" fill="#000000">broadcast</tspan></text>
 <line x1="336.69" y1="6.8" x2="349.69" y2="6.8" stroke="#404040" stroke-width="1.2"/>
 <text font-family="Inter"><tspan x="351.69" y="9.16" font-size="6.5" font-weight="500" fill="#000000">95%</tspan><tspan x="367.89" y="9.16" font-size="6.5" font-weight="500" fill="#000000">CI</tspan></text>
-<rect x="29.22" y="19.86" width="215.78" height="93.83" fill="none" stroke="#000" stroke-width="0.75"/>
+<rect x="29.22" y="19.86" width="136.56" height="93.83" fill="none" stroke="#000" stroke-width="0.75"/>
 <line x1="27.22" y1="96.63" x2="29.22" y2="96.63" stroke="#000" stroke-width="0.6"/>
 <text font-family="Inter"><tspan x="10.88" y="99" font-size="6.5" font-weight="500" fill="#000000">60%</tspan></text>
 <line x1="27.22" y1="75.31" x2="29.22" y2="75.31" stroke="#000" stroke-width="0.6"/>
@@ -70,37 +95,52 @@
 <text font-family="Inter" transform="rotate(-90 4.75 66.78)"><tspan x="-12.52" y="69.51" font-size="7.5" font-weight="600" fill="#000000">Accuracy</tspan></text>
 <line x1="29.22" y1="113.69" x2="29.22" y2="115.69" stroke="#000" stroke-width="0.6"/>
 <text font-family="Inter"><tspan x="25.31" y="122.22" font-size="6.5" font-weight="500" fill="#000000">0k</tspan></text>
-<line x1="80.6" y1="113.69" x2="80.6" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="75.33" y="122.22" font-size="6.5" font-weight="500" fill="#000000">10k</tspan></text>
-<line x1="131.97" y1="113.69" x2="131.97" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="126.06" y="122.22" font-size="6.5" font-weight="500" fill="#000000">20k</tspan></text>
-<line x1="183.35" y1="113.69" x2="183.35" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="177.4" y="122.22" font-size="6.5" font-weight="500" fill="#000000">30k</tspan></text>
-<line x1="234.72" y1="113.69" x2="234.72" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="228.68" y="122.22" font-size="6.5" font-weight="500" fill="#000000">40k</tspan></text>
-<rect x="279.35" y="19.86" width="220.36" height="93.83" fill="none" stroke="#000" stroke-width="0.75"/>
-<line x1="277.35" y1="96.63" x2="279.35" y2="96.63" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="261" y="99" font-size="6.5" font-weight="500" fill="#000000">60%</tspan></text>
-<line x1="277.35" y1="75.31" x2="279.35" y2="75.31" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="261.28" y="77.67" font-size="6.5" font-weight="500" fill="#000000">65%</tspan></text>
-<line x1="277.35" y1="53.98" x2="279.35" y2="53.98" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="261.48" y="56.35" font-size="6.5" font-weight="500" fill="#000000">70%</tspan></text>
-<line x1="277.35" y1="32.66" x2="279.35" y2="32.66" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="261.72" y="35.02" font-size="6.5" font-weight="500" fill="#000000">75%</tspan></text>
-<line x1="279.35" y1="113.69" x2="279.35" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="275.43" y="122.22" font-size="6.5" font-weight="500" fill="#000000">0k</tspan></text>
-<line x1="310.82" y1="113.69" x2="310.82" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="307.01" y="122.22" font-size="6.5" font-weight="500" fill="#000000">2k</tspan></text>
-<line x1="342.3" y1="113.69" x2="342.3" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="338.35" y="122.22" font-size="6.5" font-weight="500" fill="#000000">4k</tspan></text>
-<line x1="373.78" y1="113.69" x2="373.78" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="369.92" y="122.22" font-size="6.5" font-weight="500" fill="#000000">6k</tspan></text>
-<line x1="405.26" y1="113.69" x2="405.26" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="401.4" y="122.22" font-size="6.5" font-weight="500" fill="#000000">8k</tspan></text>
-<line x1="436.74" y1="113.69" x2="436.74" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="431.48" y="122.22" font-size="6.5" font-weight="500" fill="#000000">10k</tspan></text>
-<line x1="468.22" y1="113.69" x2="468.22" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="463.05" y="122.22" font-size="6.5" font-weight="500" fill="#000000">12k</tspan></text>
-<line x1="499.7" y1="113.69" x2="499.7" y2="115.69" stroke="#000" stroke-width="0.6"/>
-<text font-family="Inter"><tspan x="494.4" y="122.22" font-size="6.5" font-weight="500" fill="#000000">14k</tspan></text>
+<line x1="61.73" y1="113.69" x2="61.73" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="56.47" y="122.22" font-size="6.5" font-weight="500" fill="#000000">10k</tspan></text>
+<line x1="94.25" y1="113.69" x2="94.25" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="88.33" y="122.22" font-size="6.5" font-weight="500" fill="#000000">20k</tspan></text>
+<line x1="126.76" y1="113.69" x2="126.76" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="120.81" y="122.22" font-size="6.5" font-weight="500" fill="#000000">30k</tspan></text>
+<line x1="159.27" y1="113.69" x2="159.27" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="153.23" y="122.22" font-size="6.5" font-weight="500" fill="#000000">40k</tspan></text>
+<rect x="196.12" y="19.86" width="173.37" height="93.83" fill="none" stroke="#000" stroke-width="0.75"/>
+<line x1="194.12" y1="96.63" x2="196.12" y2="96.63" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="177.78" y="99" font-size="6.5" font-weight="500" fill="#000000">60%</tspan></text>
+<line x1="194.12" y1="75.31" x2="196.12" y2="75.31" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="178.05" y="77.67" font-size="6.5" font-weight="500" fill="#000000">65%</tspan></text>
+<line x1="194.12" y1="53.98" x2="196.12" y2="53.98" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="178.26" y="56.35" font-size="6.5" font-weight="500" fill="#000000">70%</tspan></text>
+<line x1="194.12" y1="32.66" x2="196.12" y2="32.66" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="178.5" y="35.02" font-size="6.5" font-weight="500" fill="#000000">75%</tspan></text>
+<line x1="196.12" y1="113.69" x2="196.12" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="192.21" y="122.22" font-size="6.5" font-weight="500" fill="#000000">0k</tspan></text>
+<line x1="220.89" y1="113.69" x2="220.89" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="217.07" y="122.22" font-size="6.5" font-weight="500" fill="#000000">2k</tspan></text>
+<line x1="245.66" y1="113.69" x2="245.66" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="241.71" y="122.22" font-size="6.5" font-weight="500" fill="#000000">4k</tspan></text>
+<line x1="270.42" y1="113.69" x2="270.42" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="266.56" y="122.22" font-size="6.5" font-weight="500" fill="#000000">6k</tspan></text>
+<line x1="295.19" y1="113.69" x2="295.19" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="291.33" y="122.22" font-size="6.5" font-weight="500" fill="#000000">8k</tspan></text>
+<line x1="319.96" y1="113.69" x2="319.96" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="314.69" y="122.22" font-size="6.5" font-weight="500" fill="#000000">10k</tspan></text>
+<line x1="344.73" y1="113.69" x2="344.73" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="339.56" y="122.22" font-size="6.5" font-weight="500" fill="#000000">12k</tspan></text>
+<line x1="369.49" y1="113.69" x2="369.49" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="364.19" y="122.22" font-size="6.5" font-weight="500" fill="#000000">14k</tspan></text>
+<rect x="429.78" y="19.86" width="75.22" height="93.83" fill="none" stroke="#000" stroke-width="0.75"/>
+<text font-family="Inter"><tspan x="393.46" y="30.05" font-size="6.5" font-weight="700" fill="#000000">6</tspan><tspan x="399.22" y="30.05" font-size="6.5" font-weight="700" fill="#000000">at</tspan><tspan x="406.92" y="30.05" font-size="6.5" font-weight="700" fill="#000000">a</tspan><tspan x="412.23" y="30.05" font-size="6.5" font-weight="700" fill="#000000">time</tspan></text>
+<text font-family="Inter"><tspan x="400.67" y="45.69" font-size="6.5" font-weight="500" fill="#000000">run</tspan><tspan x="412.73" y="45.69" font-size="6.5" font-weight="500" fill="#000000">time</tspan></text>
+<text font-family="Inter"><tspan x="388.52" y="61.32" font-size="6.5" font-weight="500" fill="#000000">median</tspan><tspan x="413.11" y="61.32" font-size="6.5" font-weight="500" fill="#000000">task</tspan></text>
+<text font-family="Inter"><tspan x="389.39" y="76.96" font-size="6.5" font-weight="700" fill="#000000">32</tspan><tspan x="399.22" y="76.96" font-size="6.5" font-weight="700" fill="#000000">at</tspan><tspan x="406.92" y="76.96" font-size="6.5" font-weight="700" fill="#000000">a</tspan><tspan x="412.23" y="76.96" font-size="6.5" font-weight="700" fill="#000000">time</tspan></text>
+<text font-family="Inter"><tspan x="398.93" y="92.6" font-size="6.5" font-weight="500" fill="#000000">run</tspan><tspan x="411" y="92.6" font-size="6.5" font-weight="500" fill="#000000">time</tspan></text>
+<text font-family="Inter"><tspan x="386.79" y="108.24" font-size="6.5" font-weight="500" fill="#000000">median</tspan><tspan x="411.37" y="108.24" font-size="6.5" font-weight="500" fill="#000000">task</tspan></text>
+<line x1="429.78" y1="113.69" x2="429.78" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="422.65" y="122.22" font-size="6.5" font-weight="500" fill="#000000">0.6×</tspan></text>
+<line x1="451.27" y1="113.69" x2="451.27" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="444.14" y="122.22" font-size="6.5" font-weight="500" fill="#000000">0.8×</tspan></text>
+<line x1="472.76" y1="113.69" x2="472.76" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="466.25" y="122.22" font-size="6.5" font-weight="500" fill="#000000">1.0×</tspan></text>
+<line x1="494.25" y1="113.69" x2="494.25" y2="115.69" stroke="#000" stroke-width="0.6"/>
+<text font-family="Inter"><tspan x="487.75" y="122.22" font-size="6.5" font-weight="500" fill="#000000">1.2×</tspan></text>
 </svg>

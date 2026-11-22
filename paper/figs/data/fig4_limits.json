@@ -1,0 +1,121 @@
+{
+ "cache_ctrl": [
+  {
+   "panel": "a",
+   "group": "k8",
+   "series": "35k",
+   "y": 0.8539,
+   "lo": null,
+   "hi": null,
+   "n": 100,
+   "source": "results/p01_cache_35k/20261119-123811-4c8ded9"
+  },
+  {
+   "panel": "a",
+   "group": "k8",
+   "series": "100k",
+   "y": 0.363,
+   "lo": null,
+   "hi": null,
+   "n": 100,
+   "source": "results/p01_cache_100k/20261119-123813-4c8ded9"
+  },
+  {
+   "panel": "a",
+   "group": "k8",
+   "series": "400k",
+   "y": 0.3623,
+   "lo": null,
+   "hi": null,
+   "n": 100,
+   "source": "results/p01_cache_400k/20261119-123815-4c8ded9"
+  }
+ ],
+ "writers": [
+  {
+   "panel": "b",
+   "group": "k8",
+   "series": "one",
+   "y": -7.8,
+   "lo": -11.8,
+   "hi": -4.0,
+   "n": 100,
+   "source": "results/p15_k8_one/20261120-162056-574056f"
+  },
+  {
+   "panel": "b",
+   "group": "k8",
+   "series": "shared",
+   "y": -28.1,
+   "lo": -32.6,
+   "hi": -23.8,
+   "n": 100,
+   "source": "results/p15_k8_three/20261120-164612-574056f"
+  },
+  {
+   "panel": "b",
+   "group": "k8",
+   "series": "folders",
+   "y": -8.4,
+   "lo": -12.0,
+   "hi": -5.0,
+   "n": 100,
+   "source": "results/p15_k8_three/20261120-164612-574056f"
+  },
+  {
+   "panel": "b",
+   "group": "k16",
+   "series": "shared",
+   "y": -30.4,
+   "lo": -35.1,
+   "hi": -25.7,
+   "n": 60,
+   "source": "results/p12_k16_clobber/20261120-114319-f9cd71b"
+  },
+  {
+   "panel": "b",
+   "group": "k16",
+   "series": "guard",
+   "y": -15.3,
+   "lo": -20.3,
+   "hi": -10.3,
+   "n": 60,
+   "source": "results/p12_k16_clobber/20261120-114319-f9cd71b"
+  },
+  {
+   "panel": "b",
+   "group": "k16",
+   "series": "heading",
+   "y": -12.6,
+   "lo": -18.2,
+   "hi": -7.2,
+   "n": 59,
+   "source": "results/p12_k16_clobber/20261120-114319-f9cd71b"
+  }
+ ],
+ "gains": {
+  "folders_over_b": [
+   19.8,
+   15.6,
+   23.6
+  ],
+  "guard_over_b": [
+   15.1,
+   9.8,
+   20.4
+  ],
+  "heading_over_b": [
+   18.1,
+   14.0,
+   22.5
+  ],
+  "share_guard": 50.0,
+  "share_heading": 59.0,
+  "clash_b": 99.0,
+  "fan_did_b": [
+   -20.4,
+   -26.0,
+   -14.6
+  ]
+ }
+}
