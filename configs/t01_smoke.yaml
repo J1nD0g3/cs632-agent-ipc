@@ -7,7 +7,6 @@ server:
   base_urls: [http://localhost:8100, http://localhost:8101, http://localhost:8102]
   served_name: qwen3-8b
   gpu: 5
-  vllm_src: /mnt/sda/heojin/cs506-store/vllm
   flags: --max-model-len 32768 --gpu-memory-utilization 0.90 --enable-prefix-caching --enable-prompt-tokens-details --enable-auto-tool-choice --tool-call-parser hermes --seed 0
 channels: [A1, A1zc, A2, B, C, D]
 k: [1, 3]

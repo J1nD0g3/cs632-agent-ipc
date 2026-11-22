@@ -216,7 +216,6 @@ docs/                       data dictionary, experiment list, RTX PRO 6000 setup
 paper/                      main.tex, main.pdf, refs.bib, Makefile; generated numbers.tex and appendix_tables.tex
 paper/appendix/             verbatim listings for the appendix (generated)
 paper/figs/                 figure scripts; data/ holds the plotted values, out/ the rendered figures
-paper/reviews/              review rounds and revision logs from writing the paper
 paper/related_work.md       annotated related-work notes
 tests/                      unit and smoke tests (pytest)
 ```

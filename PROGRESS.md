@@ -46,7 +46,7 @@
   instruction last, so the prefix cache is reused), and Qwen3-4B as a second size of the same model
   family. 150 tasks per condition, the same tasks for every channel, bootstrap 95% CIs. GPU 5 only.
 - 2026-11-18 T01: vLLM v0.33.0 with Qwen3-8B on GPU 5 (KV pool 34,864 tokens), later also GPUs 1
-  and 2 (lent by the cs506 runs). Smoke runs showed file-channel agents looping on tools until the
+  and 2 (lent by another project). Smoke runs showed file-channel agents looping on tools until the
   12-turn limit; fixes: the Researcher only writes, repeated identical calls end the loop, a write
   result tells the agent it may stop, an agent that ends without its output gets one forced
   write_file turn, and C's index.md is kept by the workspace (author, size, first line per file).
@@ -90,7 +90,7 @@
   comes from six concurrent runs per server. Round-2 reviews (3/5, 3/5) asked whether only the channel varies;
   scope controls answer it: a pipe that also passes the documents (A2d) gains 6.8 points at 0.96x broadcast's
   compute, while files with the documents in the prompt (Bd) gain 0.5 (n.s.), so files lose through their notes.
-  Since 11:49 only GPU 5 is used (GPUs 1, 2, 6 returned to cs506).
+  Since 11:49 only GPU 5 is used (GPUs 1, 2, 6 returned to another project).
 - 2026-11-19 T10: Style pass in the voice of the style guide, with meaning audits after each step (round 3):
   detector 6/10 -> 4/10 machine-like; body semicolons 35 -> 0; three meaning audits found 8, 6 and 7 issues
   (dropped scopes and intervals, overclaims), all fixed. Still 6 pages.

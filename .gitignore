@@ -32,3 +32,6 @@ paper/*.blg
 paper/*.fls
 paper/*.fdb_latexmk
 paper/*.out
+
+# Review-round notes (kept locally)
+paper/reviews/
