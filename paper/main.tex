@@ -6,6 +6,7 @@
 \acmISBN{}
 
 \usepackage{booktabs}
+\usepackage{array}
 \usepackage{xspace}
 \usepackage{multirow}
 \usepackage{fvextra}
@@ -566,7 +567,7 @@ user messages hold the inputs of Table~\ref{tab:app-channels}, which also define
 appendix uses for the arms of later runs. Tools are OpenAI-style function definitions
 (Listing~\ref{lst:tools}).
 
-\applisting{Every instruction, verbatim from \texttt{pipeline.py}. Lines starting with \texttt{>>} are our
+\applisting{Every instruction, verbatim from \texttt{pipeline.py}. Lines starting with \texttt{>{}>} are our
 labels, and [...] stands for the answer format, shown once.}{lst:prompts}
 \VerbatimInput{appendix/prompts.txt}
 
@@ -582,12 +583,12 @@ has \texttt{read\_files}.}{lst:tools}
 in message channels make one call without tools. Every input part is a separate user message.}
 \label{tab:app-channels}
 \footnotesize
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lp{2.9cm}p{4.3cm}p{5.6cm}p{2.0cm}@{}}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}p{5.6cm}>{\raggedright\arraybackslash}p{2.0cm}@{}}
 \toprule
 Code & Name in the paper & Researcher & Writer and Reviewer & Their outputs \\
 \midrule
 A1 & broadcast & task, replies with notes & task, [Researcher] output, and for the Reviewer [Writer] output & replies \\
-A1zc & zero-copy broadcast (A1-zc) & task, then the instruction & as A1, then the instruction & replies \\
+A1-zc & zero-copy broadcast & task, then the instruction & as A1, then the instruction & replies \\
 A2 & pipe & task, replies with notes & questions and the previous agent's output & replies \\
 B & shared files & task, saves notes with \texttt{write\_file} & questions, tools & \texttt{draft.md}, \texttt{final.md} \\
 C & files with an index & as B, plus the index and heading rules & as B, plus \texttt{index.md} and the rule to read it first & as B \\
@@ -650,8 +651,8 @@ the rescue. Each pipeline sends a \texttt{cache\_salt} built from its task, chan
 so no KV is shared across pipelines. A request that fails with a server error is retried up to twice.
 
 \paragraph{Servers.} Every server ran vLLM v\nAppVllm with a \nMaxLen-token context, prefix caching, and
-\texttt{--enable-}\allowbreak\texttt{prompt-}\allowbreak\texttt{tokens-}\allowbreak\texttt{details}, so each response reports its cached prompt tokens, from which we
-compute prefill. Tool calls use \texttt{--enable-}\allowbreak\texttt{auto-}\allowbreak\texttt{tool-}\allowbreak\texttt{choice} and the \texttt{hermes} parser, and the
+\texttt{-{}-enable-}\allowbreak\texttt{prompt-}\allowbreak\texttt{tokens-}\allowbreak\texttt{details}, so each response reports its cached prompt tokens, from which we
+compute prefill. Tool calls use \texttt{-{}-enable-}\allowbreak\texttt{auto-}\allowbreak\texttt{tool-}\allowbreak\texttt{choice} and the \texttt{hermes} parser, and the
 server seed is 0. The KV cache is managed in 16-token blocks. The RTX~3090 servers (24\,GB) used a memory
 utilization of \nAppUtilRtx, and vLLM sized the KV cache from the memory the weights left free, \nBigKv tokens
 for Qwen3-8B and \nSmallKv for Qwen3-4B (startup logs). Multi-server runs used \nAppServersWord such servers,
@@ -660,7 +661,7 @@ local, and assigns pipelines to servers in turn. Each server runs at most the ru
 job list is shuffled with a fixed seed, so channels and settings interleave. The RTX~PRO~6000 Blackwell Server
 Edition (96\,GB) runs each used one GPU and a fresh server, except the two $k=8$ folder runs, which ran back
 to back on one server, with the KV cache fixed by
-\texttt{--num-}\allowbreak\texttt{gpu-}\allowbreak\texttt{blocks-}\allowbreak\texttt{override} to \nAppBlocksSmall blocks (\nAppKvExactSmall tokens, the RTX~3090 size),
+\texttt{-{}-num-}\allowbreak\texttt{gpu-}\allowbreak\texttt{blocks-}\allowbreak\texttt{override} to \nAppBlocksSmall blocks (\nAppKvExactSmall tokens, the RTX~3090 size),
 \nAppBlocksMid (\nAppKvExactMid), or \nAppBlocksHi (\nAppKvExactHi), and a memory utilization of \nAppUtilPro
 (\nAppUtilProBig for 32B). The second and third timing runs at six tasks at a time and the runs at 32 went in
 a shuffled order, and a host monitor saw no other GPU process during them. Table~\ref{tab:app-runs} lists every run, read from its configuration, its environment record, and its
@@ -708,7 +709,7 @@ reads the notes, the draft, and documents and keeps the draft's answers. In this
 B and C send more tokens than broadcast but compute less prefill.
 
 \applisting{The worked example's questions and gold answers. Listings~\ref{lst:ex-A1}--\ref{lst:ex-C} show
-Q3 only. In them, lines starting with \texttt{>>} are our labels, tool calls are rendered from the workspace
+Q3 only. In them, lines starting with \texttt{>{}>} are our labels, tool calls are rendered from the workspace
 log, [...] marks cut text, and all other text is verbatim.}{lst:ex-task}
 \VerbatimInput{appendix/ex_task.txt}
 \applisting{A1, broadcast.}{lst:ex-A1}
@@ -991,7 +992,7 @@ Comparison & Diff. & 95\% interval & Tasks & Label \\
 \end{tabular*}
 \end{table}
 
-\paragraph{Handoffs (D).} D's Researcher and Writer save files and then reply with a handoff of at most
+\paragraph{Handoffs (D)\@.} D's Researcher and Writer save files and then reply with a handoff of at most
 \nHandoffWords words that gives each question's key finding and where the details are, and later agents get
 every earlier handoff in their prompts (Table~\ref{tab:app-channels}). We excluded D because it passes a message
 and files at once, so it is neither kind of channel. In the main run at $k=3$, it answers \nAccD\% of questions,
@@ -1025,7 +1026,7 @@ descriptive split, clashes go with less complete notes but differ little in accu
 
 \paragraph{Reply-output arm (Br).} Br's later agents read the workspace with \texttt{list\_files} and
 \texttt{read\_file} but reply instead of writing files. Br trails copied tool-written notes by
-\nRFourteenBrGapMin--\nRFourteenBrGapMax points, more than B at 8B, 14B, and 32B (Table~\ref{tab:app-arms}). Its
+\nRFourteenBrGapMin--\nRFourteenBrGapMax points, more than B at every size (Table~\ref{tab:app-arms}). Its
 Writer opens the notes less often than B's at 8B and 32B, and at 32B it reads no file. We cut Br from
 Table~\ref{tab:cross} because it changes how later agents give outputs as well as how they get inputs.
 

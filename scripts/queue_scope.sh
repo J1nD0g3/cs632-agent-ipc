@@ -11,7 +11,7 @@ scripts/stop_servers.sh > /dev/null
 [ -n "$R" ] || exit 1
 log "done t09_scope $R"
 .venv/bin/python -m agentipc.factpairs --export "$R" "$STORE/factcheck/t09_scope.jsonl" > /dev/null
-/mnt/sda/heojin/cs632-store/alignscore/venv/bin/python /mnt/sda/heojin/cs632/scripts/alignscore_score.py \
+"$STORE"/alignscore/venv/bin/python scripts/alignscore_score.py \
   "$STORE/factcheck/t09_scope.jsonl" "$STORE/factcheck/t09_scope_as.jsonl" 5 > logs/alignscore_t09_scope.log 2>&1 \
   && .venv/bin/python -m agentipc.alignfacts "$R" "$STORE/factcheck/t09_scope_as.jsonl" > /dev/null && log "done alignscore t09_scope" \
   || log "SCORE_FAIL t09_scope"

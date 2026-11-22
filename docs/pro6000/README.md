@@ -12,8 +12,8 @@ The first batch, run by `scripts/queue_pro6000.sh` (one GPU) or `scripts/queue_p
 | Size runs | k = 3 tasks of `t07_main` (first 100 per dataset), 100,000-token KV cache | Qwen3-4B / 8B / 14B / 32B | `configs/p02_size_*.yaml` | 4 x 1,200 |
 
 Later batches (`p03`-`p18`, see [../experiments.md](../experiments.md)) used the same server settings with one
-fresh server per config; their queue scripts (`queue_round*.sh`) are on the `pro6000` branch, where these runs
-were first committed.
+fresh server per config; their queue scripts are `scripts/queue_p04_32b_100k_k8.sh` and
+`scripts/queue_round*.sh`.
 
 ## Setup
 

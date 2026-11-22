@@ -35,3 +35,6 @@ paper/*.out
 
 # Review-round notes (kept locally)
 paper/reviews/
+
+# Figure QA crops
+paper/figs/out/views/

@@ -33,7 +33,7 @@ intervals that resample tasks.
 - **The costs rank the channels differently (Fig. 2a-b, Sec. 4.1).** Files send the most tokens (B and C:
   2.9x and 2.8x broadcast's, from 17.0 and 15.9 model calls per task against 3.0), but the prefix cache absorbs
   the resending, so they compute 0.79x broadcast's prefill. Zero-copy broadcast cuts broadcast's prefill by 61%
-  (38-49% of broadcast's per setting up to five questions) while its accuracy differs by -0.8 points (-2.9 to 1.4).
+  (it computes 38-49% of broadcast's prefill per setting at up to five questions) while its accuracy differs by -0.8 points (-2.9 to 1.4).
 - **Zero-copy does not shorten runs at six concurrent tasks (Fig. 2c, Sec. 4.1).** Its runs take 1.08-1.10x
   broadcast's time, because decoding is 96% of broadcast's prefill-plus-decode time and zero-copy generates 1.2x
   the output tokens. With 32 concurrent tasks its median task took 0.81x and 0.83x broadcast's in two runs, but the
@@ -71,7 +71,8 @@ notes' path for later agents (which helped at 32B but not at 14B), and copying r
 last rule rests on a minimal harness (a 12-call tool budget, 2,048- or 4,096-token caps, and a forced-write rescue
 in 72% of B's main-run tasks); single changes to it recovered 14-20 points in specific settings, so a better file
 harness may close the gap. The study covers one model family, linear pipelines, multi-hop QA whose state fits in
-the context, and no state larger than the context (such as codebases), where files may be the only option.
+the context; it does not cover state larger than the context (such as codebases), where files may be the only
+option.
 
 ## Paper
 
@@ -79,10 +80,15 @@ the context, and no state larger than the context (such as codebases), where fil
 `paper/numbers.tex` and its appendix tables are in `paper/appendix_tables.tex`; both are generated, never typed.
 
 ```bash
-.venv/bin/python -m agentipc.paper_numbers   # results/ -> paper/numbers.tex, appendix_tables.tex, appendix/*.txt
-.venv/bin/python -m agentipc.figdata         # results/ -> paper/figs/data/*.json, *.csv (the plotted values)
-cd paper && latexmk -pdf main.tex            # or: make -C paper (regenerates numbers.tex first)
+make -C paper           # builds main.pdf from the committed numbers.tex, appendix tables and figures
+make -C paper numbers   # regenerates them from results/: runs agentipc.paper_numbers and agentipc.figdata
 ```
+
+`make -C paper numbers` writes `paper/numbers.tex`, `paper/appendix_tables.tex`, `paper/appendix/*.txt`, and the
+plotted values in `paper/figs/data/`. Some macros and the appendix tables also need the datasets in `data/raw/`
+(see [Reproduce](#reproduce)) and the server logs and workspace archives in `results_raw/`, which are not in git.
+Without them it writes fewer macros and the build stops at the first missing one; restore the committed files with
+`git checkout paper/numbers.tex paper/appendix_tables.tex paper/appendix paper/figs/data`.
 
 The figure scripts `paper/figs/fig_*.py` draw with `archfig`, a plotting toolkit not distributed with this
 repository (`make -C paper figures` runs `archfig run` on each). The rendered figures are committed in
@@ -146,8 +152,7 @@ across tasks or channels. Setup notes for the second server: [docs/pro6000/READM
 **Environment.** Python 3.10+, and vLLM 0.33.0 for serving (in the same or a separate environment).
 
 ```bash
-uv venv .venv && uv pip install -p .venv -e ".[dev]"      # or: python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
-uv pip install -p .venv pyarrow                            # reads the HotpotQA parquet (runs, paper_numbers)
+uv venv .venv && uv pip install -p .venv -e ".[dev,data]" # or: python3 -m venv .venv && .venv/bin/pip install -e ".[dev,data]"
 uv pip install -p .venv "vllm==0.33.0"                     # only needed to serve models
 .venv/bin/python -m pytest -q
 ```
@@ -195,8 +200,13 @@ to `results_raw/<exp>/<run_id>/`; copy `rows.jsonl.gz` and `records.jsonl.gz` ne
 .venv/bin/python -m agentipc.alignfacts results/<exp>/<run_id> scored.jsonl
 ```
 
-**Regenerate the paper**: `python -m agentipc.paper_numbers`, `python -m agentipc.figdata`, then `latexmk` (see
-[Paper](#paper)).
+Both commands need the datasets in `data/raw/`. They read the run's records from `results_raw/<exp>/<run_id>/`
+when it exists and otherwise from the copy committed in `results/<exp>/<run_id>/`; `alignfacts` writes
+`alignscore_rows.jsonl.gz` to the same directory. `scripts/alignscore_score.py` finds its checkpoint and Hugging Face cache
+under `$STORE` (`source env.local.sh` first).
+
+**Regenerate the paper**: `make -C paper numbers`, then `make -C paper`; some macros need `data/raw/` and
+`results_raw/` (see [Paper](#paper)).
 
 ## Repository layout
 
@@ -209,14 +219,13 @@ src/agentipc/               the harness (data, pipeline, workspace, llm, metrics
                             appendix_tables, figdata)
 analysis/                   example analysis that recomputes paper numbers from the committed rows
 results/<exp>/<run_id>/     per run: config, environment, summaries, per-task rows and records (docs/data.md)
-results/_failed/            smoke runs and one stopped run, each with a notes.txt
+results/_failed/            three smoke runs, a failed pilot, and a discarded first p02_size_4b attempt, each with a notes.txt
 results/pro6000*_kv_used.txt  KV size and memory utilization of every RTX PRO 6000 run, from its server log
 scripts/                    vLLM server and experiment queue scripts (scripts/README.md)
 docs/                       data dictionary, experiment list, RTX PRO 6000 setup
 paper/                      main.tex, main.pdf, refs.bib, Makefile; generated numbers.tex and appendix_tables.tex
 paper/appendix/             verbatim listings for the appendix (generated)
 paper/figs/                 figure scripts; data/ holds the plotted values, out/ the rendered figures
-paper/related_work.md       annotated related-work notes
 tests/                      unit and smoke tests (pytest)
 ```
 

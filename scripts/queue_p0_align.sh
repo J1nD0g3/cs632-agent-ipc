@@ -8,7 +8,7 @@ for e in p01_cache_35k p01_cache_100k p01_cache_400k p03_corner_32b_35k p02_size
   R=$(ls -d results/$e/2*/ | tail -1)
   P=$STORE/factcheck/$e.jsonl; S=$STORE/factcheck/${e}_as.jsonl
   .venv/bin/python -m agentipc.factpairs --export "$R" "$P" > /dev/null 2>&1 || { log "EXPORT_FAIL $e"; continue; }
-  /mnt/sda/heojin/cs632-store/alignscore/venv/bin/python scripts/alignscore_score.py "$P" "$S" "$GPU" > logs/alignscore_$e.log 2>&1 \
+  "$STORE"/alignscore/venv/bin/python scripts/alignscore_score.py "$P" "$S" "$GPU" > logs/alignscore_$e.log 2>&1 \
     && .venv/bin/python -m agentipc.alignfacts "$R" "$S" > logs/alignfacts_$e.log 2>&1 && log "done $e $(wc -l < $P) pairs" \
     || log "SCORE_FAIL $e"
 done

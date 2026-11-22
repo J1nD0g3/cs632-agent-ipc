@@ -26,4 +26,4 @@ One-off queues, in the order they ran (each lists its runs in its header):
 | `queue_p03_corner.sh` | `p03_corner_32b_35k`. |
 | `queue_p0_align.sh`, `queue_p0_align_par.sh`, `queue_p0_align_more.sh` | AlignScore for the RTX PRO 6000 runs. |
 
-The queues for the later RTX PRO 6000 runs (`p05`-`p18`) are on the `pro6000` branch.
+The queues for the later RTX PRO 6000 runs (`p04`-`p18`) are `queue_p04_32b_100k_k8.sh` and `queue_round*.sh` (round 4 to round 13), one fresh server per config.

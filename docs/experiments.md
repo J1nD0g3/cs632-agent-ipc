@@ -20,7 +20,7 @@ Status: **used** (in the paper body), **appendix** (only in the appendix), **sup
 | ID | Purpose | GPUs / KV | k | Tasks | Arms | Paper | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `t01_smoke` | Harness smoke test | 3x RTX 3090 | 1, 3 | 2 per k (HotpotQA only) | A1 A1zc A2 B C D | -- | setup |
-| `t06_pilot` | Pilot of all channels | 3x RTX 3090 | 1, 3, 5 | 20 per k | A1 A1zc A2 B C D | -- (feeds the unused `fig_channels.py`) | setup |
+| `t06_pilot` | Pilot of all channels | 3x RTX 3090 | 1, 3, 5 | 20 per k | A1 A1zc A2 B C D | -- | setup |
 | `t07_main` | **Main run**: every channel and setting | 3x RTX 3090, 34,864 | 1, 3, 5 | 300 per k | A1 A1zc A2 B C D | Figs. 1, 2a-b, 4a; Sec. 4.1-4.3; App. A-H | used |
 | `t08_k8` | Larger payload, eight questions | 3x RTX 3090, 34,864 | 8 | 200 | A1 A1zc A2 B C D | Fig. 4a; Sec. 5.1 | used |
 | `t08_large` | Sixteen questions, three parallel Researchers | RTX 3090, 34,864 | 16 | 60 | A1 A1zc A2 B Bb C D | Fig. 4a; Sec. 5.1; App. H (path clashes) | used |

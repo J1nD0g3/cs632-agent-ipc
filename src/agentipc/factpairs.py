@@ -30,6 +30,12 @@ from .run import datasets
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def raw_of(cfg: dict, run_dir: Path, name: str = "records.jsonl.gz") -> Path:
+    """results_raw/<exp>/<run_id> if it holds `name`, else the copies committed in run_dir."""
+    raw = ROOT / "results_raw" / cfg["exp"] / run_dir.name
+    return raw if (raw / name).exists() else run_dir
+
+
 def tasks_of(run_dir: Path):
     cfg = yaml.safe_load((run_dir / "config.yaml").read_text())
     out = {}
@@ -76,7 +82,7 @@ def synthetic(tasks, n_per_kind: int, seed: int) -> list[dict]:
 def export_run(run_dir: Path, out_file: Path, k: int | None = None) -> int:
     """One (context, fact) pair per supporting fact, run, and stage (Researcher output, Writer input)."""
     cfg, tasks = tasks_of(run_dir)
-    raw = ROOT / "results_raw" / cfg["exp"] / run_dir.name
+    raw = raw_of(cfg, run_dir)
     n = 0
     with open(out_file, "w") as out:
         for line in gzip.open(raw / "records.jsonl.gz", "rt"):
@@ -106,7 +112,7 @@ def main() -> int:
     with open(out / "synthetic.jsonl", "w") as f:
         for r in syn:
             f.write(json.dumps(r) + "\n")
-    raw = ROOT / "results_raw" / cfg["exp"] / run_dir.name
+    raw = raw_of(cfg, run_dir, "judge_cross.jsonl.gz")
     cross = [json.loads(l) for l in gzip.open(raw / "judge_cross.jsonl.gz", "rt")]
     jx = json.loads((run_dir / "judge_cross.json").read_text())
     # Rebuild judge_cross's sample (same seed and limits) to recover each fact's text.

@@ -8,7 +8,7 @@ one() {  # gpu exp
   local g=$1 e=$2 R P S
   R=$(ls -d results/$e/2*/ | tail -1); P=$STORE/factcheck/$e.jsonl; S=$STORE/factcheck/${e}_as.jsonl
   [ -s "$P" ] || .venv/bin/python -m agentipc.factpairs --export "$R" "$P" > /dev/null 2>&1 || { log "EXPORT_FAIL $e"; return; }
-  /mnt/sda/heojin/cs632-store/alignscore/venv/bin/python scripts/alignscore_score.py "$P" "$S" "$g" > logs/alignscore_$e.log 2>&1 \
+  "$STORE"/alignscore/venv/bin/python scripts/alignscore_score.py "$P" "$S" "$g" > logs/alignscore_$e.log 2>&1 \
     && .venv/bin/python -m agentipc.alignfacts "$R" "$S" > logs/alignfacts_$e.log 2>&1 && log "done $e gpu$g $(wc -l < $P) pairs" \
     || log "SCORE_FAIL $e"
 }

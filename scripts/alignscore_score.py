@@ -10,7 +10,7 @@ import sys
 
 if len(sys.argv) > 3:
     os.environ["CUDA_VISIBLE_DEVICES"] = sys.argv[3]
-STORE = os.environ.get("STORE", "/mnt/sda/heojin/cs632-store")
+STORE = os.environ["STORE"]
 os.environ.setdefault("HF_HOME", os.path.join(STORE, "hf"))
 
 from alignscore import AlignScore  # noqa: E402

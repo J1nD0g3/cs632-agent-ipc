@@ -2,6 +2,8 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
+\providecommand{\bibqmark}{?\csname @ifnextchar\endcsname.{\csname
+  @gobble\endcsname}{}}
 \begin{thebibliography}{32}
 
 %%% ====================================================================
@@ -75,7 +77,7 @@
         {mast}
 \bibfield{author}{\bibinfo{person}{Mert Cemri} {et~al\mbox{.}}}
   \bibinfo{year}{2025}\natexlab{}.
-\newblock \showarticletitle{Why Do Multi-Agent {LLM} Systems Fail?}. In
+\newblock \showarticletitle{Why Do Multi-Agent {LLM} Systems Fail\bibqmark}. In
   \bibinfo{booktitle}{\emph{NeurIPS}}.
 \newblock
 

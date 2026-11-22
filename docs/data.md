@@ -18,7 +18,8 @@ are committed, so the analyses need no GPU or server.
 | `records.jsonl.gz` | **Full record per pipeline**: every model call, every file operation, and each stage's text. |
 | `judge_cross.jsonl.gz` | Main run only: the per-fact labels of the judge cross-check (Appendix E). |
 
-`results/_failed/` keeps smoke runs and one stopped run with a `notes.txt` that says why each is not a result.
+`results/_failed/` keeps three smoke runs, a failed pilot, and a discarded first `p02_size_4b` attempt, each with a
+`notes.txt` that says why it is not a result.
 `results/pro6000*_kv_used.txt` record, per RTX PRO 6000 run, the KV-cache size and memory utilization read from
 the vLLM server log.
 

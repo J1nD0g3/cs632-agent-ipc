@@ -37,7 +37,7 @@
 - 2026-11-18 T02: HotpotQA distractor dev (7405, 6947 usable after dropping yes/no answers and
   questions with fewer than 2 supporting sentences) and 2WikiMultihopQA dev (12576, 11281 usable).
   Documents per task: about 10 / 30 / 50 for k = 1 / 3 / 5 (HotpotQA about 28k characters at k = 5).
-- 2026-11-18 Plan (approved): the goal is now a 6-page workshop paper. Working title "Pipes, Files,
+- 2026-11-18 Plan: the goal is now a 6-page paper. Working title "Pipes, Files,
   or Handles? Revisiting IPC for LLM Multi-Agent Pipelines". Five channels: A1 broadcast (whole
   history, as now), A2 pipe (previous output only), B files, C files + index, D handles (proposed:
   push a short summary with file locations, pull details from files). Cost is reported three ways:
@@ -81,7 +81,7 @@
   (index 5). Four agents: broadcast +38% compute, zero-copy +6%; the pipe gains 5.5 points, B loses 7.8.
   Qwen3-4B: files lose 19-35 points even with an index and zero-copy costs 3-11 points at k=3-5.
 - 2026-11-19 T10: draft at 6 pages with Figs. 1-4 and 253 generated macros. Round-1 reviews (systems
-  3/5, methods 3/5) in paper/reviews/round_1. Text fixes applied (18 mismatches, harness rescue rates,
+  3/5, methods 3/5). Text fixes applied (18 mismatches, harness rescue rates,
   latency, concurrency, missing related work). Revision runs queued: A1w (Researcher writes via a tool
   call, then copied), Researcher replay into A1/A2/B/C, and an A/A repeat; main run being re-judged with
   per-question judge results for Fig. 3b.
@@ -91,9 +91,8 @@
   scope controls answer it: a pipe that also passes the documents (A2d) gains 6.8 points at 0.96x broadcast's
   compute, while files with the documents in the prompt (Bd) gain 0.5 (n.s.), so files lose through their notes.
   Since 11:49 only GPU 5 is used (GPUs 1, 2, 6 returned to another project).
-- 2026-11-19 T10: Style pass in the voice of the style guide, with meaning audits after each step (round 3):
-  detector 6/10 -> 4/10 machine-like; body semicolons 35 -> 0; three meaning audits found 8, 6 and 7 issues
-  (dropped scopes and intervals, overclaims), all fixed. Still 6 pages.
+- 2026-11-19 T10: Style and consistency pass, with meaning audits after each step (round 3): three audits found
+  8, 6 and 7 issues (dropped scopes and intervals, overclaims), all fixed. Still 6 pages.
 - 2026-11-20 T10: Round 4. Reviews (3/5, 3/5) asked for causal controls; ran 4,020 runs on the PRO 6000 (KV 100k):
   writing control at 4 sizes (the tool call, not the wording, shortens notes and costs accuracy at 4B/8B/32B; not at
   14B), 32B with normalized paths (files still 8-17 points behind), serving time per channel (zero-copy saves no
@@ -122,7 +121,7 @@
 - 2026-11-21 T10: Round 14, final text pass; experiments closed. The 14B Reviewer reads draft.md in 1-8% of tasks
   (71-100% at other sizes) and answers again from docs/, stated as an observation. Rules scoped to this harness;
   8B write vs file costs as point estimates; zero-copy timing, 4B layout cost and the pipe's 8B loss in the abstract;
-  cross-GPU drift computed from existing runs. Meaning audit applied. Next: Jin reads; appendix after approval.
+  cross-GPU drift computed from existing runs. Meaning audit applied. Next: appendix.
 - 2026-11-22 T10: Appendix A-H added (tasks, prompts, serving, worked example, fact measures, statistics, full
   results, cut results); the paper is 15 pages in total. T08 and T09 closed; key numbers aligned with the paper
   (handoff channel D dropped from them; fact coverage replaces information loss).

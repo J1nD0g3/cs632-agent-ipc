@@ -1,3 +1,5 @@
+% The style puts ". " after every title, and \bibqmark is a "?" that drops the period right after it.
+@preamble{"\providecommand{\bibqmark}{?\csname @ifnextchar\endcsname.{\csname @gobble\endcsname}{}}"}
 @inproceedings{autogen,
   title = {{AutoGen}: Enabling Next-Gen {LLM} Applications via Multi-Agent Conversation},
   author = {Wu, Qingyun and others},
@@ -65,7 +67,7 @@
   year = {2025}
 }
 @inproceedings{mast,
-  title = {Why Do Multi-Agent {LLM} Systems Fail?},
+  title = {Why Do Multi-Agent {LLM} Systems Fail\bibqmark},
   author = {Cemri, Mert and others},
   booktitle = {NeurIPS},
   year = {2025},

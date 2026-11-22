@@ -17,6 +17,7 @@ from pathlib import Path
 import yaml
 
 from .data import LOADERS, make_tasks
+from .factpairs import raw_of
 from .judge import kappa
 from .judge_all import PROMPT, parse
 from .llm import ChatClient
@@ -29,7 +30,7 @@ ROOT = Path(__file__).resolve().parents[2]
 def sample_units(run_dir: Path, n: int, max_chars: int, seed: int) -> list[tuple]:
     """(channel, stage, question, text) units, evenly across channels; deterministic for a seed."""
     cfg = yaml.safe_load((run_dir / "config.yaml").read_text())
-    raw = ROOT / "results_raw" / cfg["exp"] / run_dir.name
+    raw = raw_of(cfg, run_dir)
     by_task = {}
     for name, path in datasets(cfg).items():
         qs = LOADERS[name](ROOT / path)

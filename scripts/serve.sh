@@ -5,6 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 source env.local.sh
+mkdir -p logs
 GPU=${1:?gpu index}
 PORT=${2:-8100}
 export HF_HUB_OFFLINE=1

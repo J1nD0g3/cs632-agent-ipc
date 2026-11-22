@@ -27,7 +27,7 @@ W = fig.area.w
 
 
 def robot(cx, top, role, s=12.5):
-    """Robot head in the user's reference style; returns the label's bottom y and the face rect."""
+    """Robot-head icon; returns the label's bottom y and the face rect."""
     ink, fill = color("ink"), ROLE_FILL[role]
     fw, fh = s, s * 0.78
     fx, fy = cx - fw / 2, top + s * 0.30

@@ -1,7 +1,8 @@
 """Turn AlignScore pair scores into per-run fact metrics and failure attribution.
 
 python -m agentipc.alignfacts results/<exp>/<run_id> SCORED.jsonl [threshold]
-Writes results_raw/.../alignscore_rows.jsonl.gz (one row per run, merged by analyze.load_rows) and
+Writes alignscore_rows.jsonl.gz (one row per task and channel, merged by analyze.load_rows) to
+results_raw/<exp>/<run_id>/, or to results/<exp>/<run_id>/ when results_raw/ is absent, and
 results/<exp>/<run_id>/alignscore.json (means per dataset, k and channel).
 A fact counts as stated when AlignScore >= threshold (0.5 by default, the operating point checked on the
 synthetic pairs).
@@ -17,11 +18,10 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-from .factpairs import tasks_of
+from .factpairs import raw_of, tasks_of
 from .metrics import correct, parse_answers
 from .stats import ci
 
-ROOT = Path(__file__).resolve().parents[2]
 KINDS = ("ok", "reviewer_fixed", "overflow", "no_answer", "research_miss", "delivery_miss", "writer_wrong",
          "reviewer_broke")
 
@@ -30,7 +30,7 @@ def main() -> int:
     run_dir, scored = Path(sys.argv[1]), Path(sys.argv[2])
     thr = float(sys.argv[3]) if len(sys.argv) > 3 else 0.5
     cfg, tasks = tasks_of(run_dir)
-    raw = ROOT / "results_raw" / cfg["exp"] / run_dir.name
+    raw = raw_of(cfg, run_dir)
     have = defaultdict(dict)
     for line in open(scored):
         r = json.loads(line)
