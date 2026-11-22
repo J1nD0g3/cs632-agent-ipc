@@ -1,0 +1,9 @@
+question: Which Australian professional women's basketball team has an American playing in it?
+answer: Adelaide Lightning
+type: bridge
+paragraphs (10; * = holds a supporting sentence):
+  Nera White | University of Canberra Capitals | South East Queensland Stars | Dandenong Rangers | *Colleen Planeta | *Adelaide Lightning | Colorado Chill | Melbourne Boomers | Liaoning Flying Eagles | Logan Thunder (WNBL)
+supporting sentences [title, sentence index]:
+  [Colleen Planeta, 0] Colleen Planeta (born September 3, 1988) is an American professional basketball player.
+  [Colleen Planeta, 1] She currently plays for the Adelaide Lightning in the WNBL.
+  [Adelaide Lightning, 0] The Adelaide Lightning are an Australian professional women's basketball team competing in the Women's Na [...]

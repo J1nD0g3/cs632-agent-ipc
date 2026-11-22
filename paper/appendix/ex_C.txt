@@ -1,0 +1,10 @@
+>> Researcher's tool calls
+write_file("notes/Q1-Q3_notes.md", <1025 chars>)
+>> Writer's tool calls
+list_files()
+read_file("notes/Q1-Q3_notes.md")
+write_file("draft.md", <812 chars>)
+>> draft.md, Q3
+Q3: A Sound Of Trumpets
+Evidence: A Social Celebrity was directed by Malcolm St. Clair, who was born on 17 May [...]
+>> final.md, Q3: same text as the draft

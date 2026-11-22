@@ -1698,9 +1698,83 @@ def judges(m: Macros) -> None:
     m.add("JxLexKappa", f"{d['qwen_vs_lexical']['kappa']:.2f}")
 
 
+def appendix(m: Macros) -> None:
+    """Numbers the appendix prose uses (its tables come from agentipc.appendix_tables): dataset sizes before the
+    filter, serving settings from the configs and the PRO 6000 ledgers, fact-measure sample sizes, the worked
+    example's selection rule, D's tokens and prefill relative to broadcast, and the k=16 clash split."""
+    import re
+
+    from .appendix_tables import EXAMPLE, example_candidates, pro6000_kv
+    from .data import load_2wiki, load_hotpot
+
+    m.add("AppHotpotAll", f"{len(load_hotpot(ROOT / 'data/raw/hotpot_distractor_validation.parquet')):,}")
+    m.add("AppWikiAll", f"{len(load_2wiki(ROOT / 'data/raw/2wiki_dev.json')):,}")
+    q = (ROOT / "scripts" / "queue_pro6000.sh").read_text()
+    blocks = dict(re.findall(r"(\d+k):(\d+)", re.search(r"for spec in ([0-9k: ]+);", q).group(1)))
+    for lab, key in (("Small", "35k"), ("Mid", "100k"), ("Hi", "400k")):
+        m.add(f"AppBlocks{lab}", f"{int(blocks[key]):,}")
+        m.add(f"AppKvExact{lab}", f"{int(blocks[key]) * 16:,}")
+    utils = {}
+    for (exp, _), (_, util) in pro6000_kv().items():
+        utils.setdefault("big" if "32b" in exp else "rest", set()).add(util)
+    assert len(utils["big"]) == 1 and len(utils["rest"]) == 1, utils
+    m.add("AppUtilPro", utils["rest"].pop())
+    m.add("AppUtilProBig", utils["big"].pop())
+    env = json.loads((latest("t07_main") / "env.json").read_text())
+    m.add("AppUtilRtx", re.search(r"--gpu-memory-utilization (\S+)", env["server_flags"]).group(1))
+    m.add("AppVllm", env["vllm_version"])
+    cfg = yaml.safe_load((latest("t07_main") / "config.yaml").read_text())
+    m.add("AppServersWord", word(len(cfg["server"]["base_urls"])))
+
+    # Fact measures: synthetic pairs per kind, the real-pair sample, and the AlignScore threshold.
+    av = json.loads((latest("t07_main") / "alignscore_validation.json").read_text())
+    m.add("AppSynPerKind", av["synthetic"]["n"] // 3)
+    m.add("AppThreshold", av["threshold"])
+    jx = json.loads((latest("t07_main") / "judge_cross.json").read_text())
+    m.add("AppRealFacts", jx["facts"])
+    m.add("AppRealUnits", jx["units"])
+    m.add("AppRealMaxChars", f"{jx['max_chars']:,}")
+
+    # The worked example: k=3 main-run tasks that meet the selection rule, out of those run in all five channels.
+    hits, total = example_candidates()
+    m.add("AppExHits", len(hits))
+    m.add("AppExTotal", total)
+    m.add("AppExRank", hits.index(EXAMPLE) + 1)
+
+    # D (handles) in the main run at k=3, both datasets pooled: tokens sent and prefill relative to broadcast, and
+    # tasks whose Writer never opened a Researcher's file.
+    rows = [r for r in load_rows(latest("t07_main")) if r["k"] == 3]
+    pool = lambda ch, met: np.mean([r[met] for r in rows if r["channel"] == ch])
+    m.add("AppDSent", f"{pool('D', 'total_tokens') / pool('A1', 'total_tokens'):.2f}")
+    m.add("AppDComp", f"{pool('D', 'prefill_tokens') / pool('A1', 'prefill_tokens'):.2f}")
+    d_recs = [r for r in raw_records(latest("t07_main")) if r["k"] == 3 and r["channel"] == "D" and "error" not in r]
+    m.add("AppDNoNotes", f"{np.mean([not writer_opened_notes(r) for r in d_recs]) * 100:.0f}")
+
+    # Four-agent chain (t08_chain4) against the main run: largest accuracy move of A1, A1-zc, C, and D, in points.
+    d = paired_with_main(latest("t08_chain4"), CH)
+    m.add("AppChainOtherMax", f"{max(abs(d[c]['new']['acc'] - d[c]['ref']['acc']) for c in ('A1', 'A1zc', 'C', 'D')) * 100:.1f}")
+
+    # k=16 run (RTX 3090): B's tasks split by whether two parallel Researchers wrote the same path (descriptive).
+    big = latest("t08_large")
+    clashed = {}
+    for rec in raw_records(big):
+        if rec["channel"] == "B" and "error" not in rec:
+            paths = {}
+            for o in rec["io_ops"]:
+                if o["op"] == "write" and o["agent"].startswith("researcher") and "error" not in o:
+                    paths.setdefault(o["path"], set()).add(o["agent"])
+            clashed[rec["task_id"]] = any(len(v) > 1 for v in paths.values())
+    brows = [r for r in load_rows(big) if r["channel"] == "B"]
+    for flag, tag in ((True, "Clash"), (False, "NoClash")):
+        rs = [r for r in brows if clashed.get(r["task_id"]) is flag]
+        m.add(f"App{tag}N", len(rs))
+        m.add(f"App{tag}Notes", f"{np.mean([r['as_recall_notes'] for r in rs]) * 100:.0f}")
+        m.add(f"App{tag}Acc", pct(np.mean([r["acc"] for r in rs])))
+
+
 SECTIONS = [main_run, setup, batch_and_budget, scaling, file_compute_range, chain4, chain4_ci, qwen4b, harness, a1w,
             fanout, replay, repeat, judges, pressure, scope, pro6000, round4, round6, round8, round10, round10_text,
-            round12, round12_fix, round12_told, round13, round13_first, round14]
+            round12, round12_fix, round12_told, round13, round13_first, round14, appendix]
 
 
 def main() -> int:
@@ -1713,6 +1787,11 @@ def main() -> int:
     out = ROOT / "paper" / "numbers.tex"
     m.write(out)
     print(f"wrote {len(m.lines)} macros to {out}")
+    try:
+        from . import appendix_tables
+        appendix_tables.main()
+    except Exception as e:  # reported like a section, so a missing run does not stop numbers.tex
+        print(f"skipped appendix_tables: {type(e).__name__}: {e}")
     return 0
 
 

@@ -7,8 +7,14 @@
 
 \usepackage{booktabs}
 \usepackage{xspace}
+\usepackage{multirow}
+\usepackage{fvextra}
+\fvset{breaklines=true,breakafter={/_.-},fontsize=\fontsize{6.5pt}{7.5pt}\selectfont}
 \setlength{\emergencystretch}{1.5em}
 \input{numbers}
+\input{appendix_tables}
+\newcounter{applisting}
+\newcommand{\applisting}[2]{\par\smallskip\noindent\refstepcounter{applisting}\label{#2}\textbf{Listing~\theapplisting.}~#1\par\nopagebreak}
 
 \newcommand{\figdir}{figs/out}
 \newcommand{\ch}[1]{\textsf{#1}}
@@ -141,19 +147,19 @@ passed between agents grows with $k$, and its documents are the union of its que
 at $k=3$). We drop yes/no questions and questions with fewer than two supporting sentences, and draw
 \nMainTasks tasks for each dataset and each $k \in \{1,3,5\}$, each pair a \emph{setting}. Every channel
 runs the same tasks, so comparisons are paired. We also draw \nKEightPerSet ($k=8$) and \nKSixteenPerSet
-($k=16$) tasks per dataset. At $k=16$, the work fans out to three parallel Researchers.
+($k=16$) tasks per dataset. At $k=16$, the work fans out to three parallel Researchers (App.~\ref{app:tasks}).
 
 \paragraph{Serving.} We served Qwen3 models~\cite{qwen3}, with greedy decoding and thinking disabled, on
 vLLM v0.33.0 with prefix caching, a \nMaxLen-token context, and its function-calling parser. Each server
 ran \nConcWord tasks at a time, interleaved across channels, so channels compete for its KV cache.
 Each pipeline gets its own cache namespace (\texttt{cache\_salt}), so no KV is reused across tasks
-or channels. Pipelines rotate across servers, so a task's channels may run on different servers.
+or channels. Pipelines rotate across servers, so a task's channels may run on different servers (App.~\ref{app:serving}).
 
 \paragraph{Harness.} An agent with file tools may make up to \nTurns tool calls (its \emph{tool
 budget}), and every model call in any channel may generate up to \nCapMain tokens (the \emph{token cap}).
 An agent that ends without leaving its output file, by replying, by repeating its last tool call, or by
 using up its tool budget, gets one forced write call (the \emph{rescue}). If the Reviewer's \texttt{final.md} is still missing, its
-reply supplies the final answers, in at most \nRTwelveFinalReplyKThreeMax task per channel at $k=3$ in the
+reply supplies the final answers (App.~\ref{app:prompts}), in at most \nRTwelveFinalReplyKThreeMax task per channel at $k=3$ in the
 main and crossed runs and \nRTwelveFinalReplyMax of \nRTwelveFinalReplyMaxN at any $k$ in the main run.
 
 \paragraph{Runs.} The \emph{main run} served Qwen3-8B on three RTX 3090 servers, each with a
@@ -182,7 +188,7 @@ cached-input discounts. \emph{Prefill} (tokens computed) counts uncached prompt 
 coverage} is the share of supporting sentences that AlignScore~\cite{alignscore}, a factual-consistency
 model, judges a text to state. It separates kept from removed or altered sentences in \nSynN synthetic
 pairs (AUC \nSynAAuc), but on real notes it matches a Qwen3-8B judge only weakly (Cohen's
-$\kappa$~=~\nAsQKappa).
+$\kappa$~=~\nAsQKappa, App.~\ref{app:facts}).
 
 \paragraph{Statistics.} We report paired differences against broadcast (A1) with 95\% bootstrap intervals
 that resample tasks with replacement (\nBootN resamples), so a task's questions stay together. Counts of
@@ -192,7 +198,7 @@ holds the \nRTenHolmTests simple effects of Table~\ref{tab:cross} and was chosen
 same tasks had estimated several of them. The second, chosen post hoc, holds per size the interaction and
 the file channel's cost on tool-written notes minus the tool-call write's cost on copied notes
 (\nRTwelveHolmTests tests). The told and first-listed runs' comparisons are uncorrected, and the first-listed run's are post hoc.
-Comparisons across runs, marked cross-run, may include drift, which we measure next.
+Comparisons across runs, marked cross-run, may include drift, which we measure next (App.~\ref{app:stats}).
 
 \paragraph{Noise.} Batched greedy decoding is nondeterministic, and each task runs once per channel, so
 decoding noise is part of the intervals. Rerunning broadcast and B on \nAAN main-run tasks keeps their
@@ -245,7 +251,7 @@ tasks and a \nKvProHi-token cache, zero-copy's median task took \nRThirteenHiMed
 
 Broadcast is the most accurate channel at three questions. Across the six settings, B trails it
 significantly in all \nGapBSigWord, the pipe in \nGapATwoSigWord, and C in \nGapCSigWord. Broadcast
-answers \nAccAOne{}\% of questions (Figure~\ref{fig:tradeoff}). Zero-copy answers \nAccAZc{}\%,
+answers \nAccAOne{}\% of questions (Figure~\ref{fig:tradeoff}, App.~\ref{app:results}). Zero-copy answers \nAccAZc{}\%,
 \nZcPooledDiff points from broadcast (\nZcPooledDiffLo to \nZcPooledDiffHi). Its point estimates are within
 \nGapAZcMax points of broadcast per setting (\nZcEmGapMax by exact match). B's gap to
 broadcast ranges from \nGapBMin to \nGapBMax points and C's from \nGapCMin to \nGapCMax (Figure~\ref{fig:tradeoff}a, $k=3$). C is significantly above B in \nCoverBSigWord of
@@ -261,7 +267,7 @@ control, the documents in later prompts change B's accuracy by \nScopeBDVsB poin
 \nScopeBDVsBHi, cross-run). In the replay control (broadcast's notes in every channel), B and C each trail broadcast by \nRepFileGap points
 (\nRepFileGapLo to \nRepFileGapHi), and the pipe by \nRepATwoGap.
 
-\paragraph{Two excluded variants also trail copying.} A handoff channel (D), excluded because its Researcher
+\paragraph{Two excluded variants also trail copying.} A handoff channel (D, App.~\ref{app:cut}), excluded because its Researcher
 and Writer pass a message of at most \nHandoffWords words plus file paths, trails broadcast by
 \nGapDMin--\nGapDMax points across the main run's six settings (significantly in \nGapDSigWord). Br, excluded
 because its later agents reply rather than write, trails copied tool-written notes by
@@ -348,7 +354,7 @@ rescued tasks than on others at 14B and 32B (\nRTwelveFourteenFileToolResc again
 but not at 8B (\nRTwelveEightFileToolResc against \nRTwelveEightFileToolKept).
 
 \paragraph{B's Writer often skips the notes, and later agents often miss the stored reply.} In the main run,
-B's Writer never opens the notes in \nNoNotesB{}\% of tasks (Figure~\ref{fig:channels}). C's Writer, whose index names the notes, skips
+B's Writer never opens the notes in \nNoNotesB{}\% of tasks (Figure~\ref{fig:channels}, App.~\ref{app:example}). C's Writer, whose index names the notes, skips
 them in only \nNoNotesC{}\% of tasks, but C also adds the heading rule. In the reply-output runs, Br's Writer opens the notes in \nRThirteenFourBrOpen{}\%,
 \nRThirteenEightBrOpen{}\%, and \nRThirteenFourteenBrOpen{}\% of tasks at 4B, 8B, and 14B and reads no file
 at 32B. In the crossed runs, files cost more on the stored reply than on tool-written notes at 4B, 14B, and
@@ -495,4 +501,567 @@ test whether what it reads sets final accuracy.
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}
 
+\appendix
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\dbltopfraction}{0.95}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.75}
+\renewcommand{\dblfloatpagefraction}{0.75}
+\setcounter{topnumber}{4}
+\setcounter{dbltopnumber}{4}
+\setcounter{totalnumber}{6}
+
+\section{Tasks and data}
+\label{app:tasks}
+
+\paragraph{Sources.} HotpotQA's distractor validation set has \nAppHotpotAll questions, and the
+2WikiMultihopQA development set has \nAppWikiAll. Each question comes with its gold answer, a type, ten
+paragraphs, and the (title, sentence index) pairs of its supporting sentences. 2Wiki also gives reasoning
+triples, its \emph{evidences}. Listing~\ref{lst:raw} shows one question from each dataset. We keep the
+questions whose answer is not yes or no and that have at least two supporting sentences, which leaves
+\nHotpotUsable HotpotQA and \nWikiUsable 2Wiki questions.
+
+\applisting{One HotpotQA and one 2Wiki question as loaded. Field names are ours, values are verbatim, and [...]
+marks cut text. The second question is Q3 of the worked example.}{lst:raw}
+\VerbatimInput{appendix/raw_hotpot.txt}
+\smallskip
+\VerbatimInput{appendix/raw_2wiki.txt}
+
+\paragraph{From questions to tasks.} For each dataset, $k$, and seed, we sort the kept questions by id, draw
+$n k$ distinct ones with Python's \texttt{random.Random(seed).sample}, and cut the draw into $n$ tasks of $k$
+consecutive questions. A task's documents are its questions' paragraphs, deduplicated by title and shuffled
+with the same generator. Each document is stored as \texttt{docs/d<index>\_<slug>.txt}, with a slug of its title, holding the title
+and the paragraph's sentences joined by spaces. A run that uses fewer tasks takes the first ones of the same
+draw, so it stays paired with the larger run. Table~\ref{tab:app-tasks} gives each task set's seed and size.
+Listing~\ref{lst:task} shows how the three 2Wiki questions of the worked example
+(Appendix~\ref{app:example}) reach the Researcher and, in B, the later agents. Two of Q2's paragraphs share a
+title, so deduplication drops one of them.
+
+\applisting{The worked example's task. Top: the Researcher's user message, the same in every channel (two of
+its documents shown). Bottom: what \texttt{list\_files} returned to B's Writer, with the Researcher's notes file
+after the documents.}{lst:task}
+\VerbatimInput{appendix/task_message.txt}
+\smallskip
+\VerbatimInput{appendix/task_listing.txt}
+
+\begin{table*}[t]
+\caption{Task sets. Documents, characters, and supporting sentences are means per task. The Researcher's prompt
+is the prompt of its first call in broadcast, in thousands of tokens, mean (max), and at $k=16$ that of each of
+the three Researchers, which split the questions. Question types: HotpotQA bridge/comparison, and 2Wiki
+compositional/comparison/inference/bridge-comparison.}
+\label{tab:app-tasks}
+\footnotesize
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrrrrrl@{}}
+\toprule
+Dataset & $k$ & Seed & Tasks & Questions & Documents & Characters (k) & Supporting sentences & Researcher's prompt & Question types \\
+\midrule
+\appTabTasks
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+
+\section{Prompts and harness}
+\label{app:prompts}
+
+\paragraph{Instructions.} Every agent's system prompt starts with the team description and continues with its
+role instruction and its channel's output rule, separated by blank lines (Listing~\ref{lst:prompts}).
+Variants add rules after the output rule or replace it, as the labels in Listing~\ref{lst:prompts} say.
+A1-zc keeps only the team description in the system prompt and moves the rest into a last user message. The
+user messages hold the inputs of Table~\ref{tab:app-channels}, which also defines the code names that the
+appendix uses for the arms of later runs. Tools are OpenAI-style function definitions
+(Listing~\ref{lst:tools}).
+
+\applisting{Every instruction, verbatim from \texttt{pipeline.py}. Lines starting with \texttt{>>} are our
+labels, and [...] stands for the answer format, shown once.}{lst:prompts}
+\VerbatimInput{appendix/prompts.txt}
+
+\applisting{The tools: name, arguments (optional ones marked ?), and description. Only the batched-reads arm
+has \texttt{read\_files}.}{lst:tools}
+\VerbatimInput{appendix/tools.txt}
+
+
+\begin{table*}[t]
+\caption{What each agent receives. ``Task'' is the questions and all documents (Listing~\ref{lst:task}), and
+``[Role] output'' is an earlier agent's output under a label line. ``Tools'' are \texttt{list\_files},
+\texttt{read\_file}, and \texttt{write\_file}. A Researcher with files gets only \texttt{write\_file}, and agents
+in message channels make one call without tools. Every input part is a separate user message.}
+\label{tab:app-channels}
+\footnotesize
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lp{2.9cm}p{4.3cm}p{5.6cm}p{2.0cm}@{}}
+\toprule
+Code & Name in the paper & Researcher & Writer and Reviewer & Their outputs \\
+\midrule
+A1 & broadcast & task, replies with notes & task, [Researcher] output, and for the Reviewer [Writer] output & replies \\
+A1zc & zero-copy broadcast (A1-zc) & task, then the instruction & as A1, then the instruction & replies \\
+A2 & pipe & task, replies with notes & questions and the previous agent's output & replies \\
+B & shared files & task, saves notes with \texttt{write\_file} & questions, tools & \texttt{draft.md}, \texttt{final.md} \\
+C & files with an index & as B, plus the index and heading rules & as B, plus \texttt{index.md} and the rule to read it first & as B \\
+D & handoff channel (excluded) & as B, then replies with a handoff & as B, plus every earlier handoff & as B, and the Writer's handoff \\
+\midrule
+A1r & reply-written notes, copied & task, B's wording with the notes in its reply & as A1 & replies \\
+A1w & tool-written notes, copied & as B & as A1, with the text of the Researcher's files & replies \\
+Bs & stored reply & as A1r, the system saves the reply as \texttt{notes.md} & as B & as B \\
+Bt & told stored reply & as Bs & as B, plus ``The Researcher's notes are in notes.md.'' & as B \\
+Bs0, Bt0 & first-listed stored reply & as Bs, saved as \texttt{00\_notes.md} & as Bs or Bt, with \texttt{00\_notes.md} & as B \\
+Br & reply-output arm & as B & questions (Reviewer: and the [Writer] output), \texttt{list\_files} and \texttt{read\_file} & replies \\
+\midrule
+A2d, Bd & documents control & as A2, B & as A2, B, with the documents in the prompt & as A2, B \\
+--- & replay control & not run & as A1, A2, B, C, with broadcast's main-run notes (B, C: in \texttt{notes.md}) & as A1, A2, B, C \\
+Bn & write guard ($k=16$) & as B, but writes to another Researcher's file fail & as B & as B \\
+Bh & heading rule ($k=16$) & as B, plus the heading rule & as B & as B \\
+Bf & separate folders ($k=8$) & as B, writing under \texttt{researcher<i>/} & as B & as B \\
+Bb & batched reads (App.~\ref{app:cut}) & as B & as B, plus \texttt{read\_files} & as B \\
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+\paragraph{Harness rules.} The harness applies these rules to every agent with tools.
+\begin{itemize}
+\item Each model call counts against the tool budget (\nTurns calls unless Table~\ref{tab:app-runs} says
+otherwise). Once three or
+fewer calls are left, every tool result ends with ``\texttt{[$n$ tool turns left]}''. A successful write
+returns ``\texttt{OK: wrote $N$ chars to <path>. If you are finished, reply without calling a tool.}''
+\item An agent stops when it replies without a tool call, when its tool calls repeat its previous call's
+verbatim, or when its budget runs out.
+\item If it stopped without its output (\texttt{draft.md}, \texttt{final.md}, or for a Researcher any file), the
+harness appends its reply, if it replied, and the user message ``\texttt{Save your output to draft.md now.}'' (for a Researcher
+``\texttt{Save your notes now.}'') and makes one more call with \texttt{tool\_choice} forced to
+\texttt{write\_file}. This is the rescue.
+\item If \texttt{final.md} is still missing, the Reviewer's last reply is scored as the final answers. A Br agent
+that used up its budget gets ``\texttt{Reply with your output now.}'' and one call without tools.
+\item Reading a missing path returns an error that names up to three similar paths. Absolute paths and paths with
+\texttt{..} are refused. In the 32B path rerun and in the wording, crossed, reply-output, told, and first-listed
+runs, a leading \texttt{workspace/} is stripped from paths.
+\item In C, the workspace rewrites \texttt{index.md} after every write. It lists agent files first, with author,
+line count, and first line, and then each document with its first line.
+\item The final answers are the lines ``\texttt{Q$i$: <answer>}'' of the final text, and a missing line counts
+as wrong.
+\end{itemize}
+
+\section{Models and serving}
+\label{app:serving}
+
+\paragraph{Models.} All agents are Qwen3 models~\cite{qwen3} (Hugging Face \texttt{Qwen/}\allowbreak\texttt{Qwen3-4B}, \texttt{-8B},
+\texttt{-14B}, and \texttt{-32B}), served with bf16 weights, their default. One model plays all three roles in
+a run. Every RTX~3090 run uses Qwen3-8B except one 4B run (Appendix~\ref{app:cut}), and the RTX~PRO~6000 runs
+use the sizes in Table~\ref{tab:app-runs}. The fact judges of Appendix~\ref{app:facts} are Qwen3-8B and
+Meta-Llama-3-8B-Instruct, also served with vLLM.
+
+\paragraph{Requests.} The harness calls vLLM's OpenAI-compatible chat endpoint with temperature 0 (greedy
+decoding), seed 0, and \texttt{max\_tokens} set to the token cap (\nCapMain, or \nCapSplit in the wording,
+crossed, reply-output, told, and first-listed runs). It sends \texttt{"enable\_thinking": false} as a chat-template
+argument, so Qwen3 answers without a thinking block. With tools, \texttt{tool\_choice} is \texttt{auto} except in
+the rescue. Each pipeline sends a \texttt{cache\_salt} built from its task, channel, chain length, and start time,
+so no KV is shared across pipelines. A request that fails with a server error is retried up to twice.
+
+\paragraph{Servers.} Every server ran vLLM v\nAppVllm with a \nMaxLen-token context, prefix caching, and
+\texttt{--enable-}\allowbreak\texttt{prompt-}\allowbreak\texttt{tokens-}\allowbreak\texttt{details}, so each response reports its cached prompt tokens, from which we
+compute prefill. Tool calls use \texttt{--enable-}\allowbreak\texttt{auto-}\allowbreak\texttt{tool-}\allowbreak\texttt{choice} and the \texttt{hermes} parser, and the
+server seed is 0. The KV cache is managed in 16-token blocks. The RTX~3090 servers (24\,GB) used a memory
+utilization of \nAppUtilRtx, and vLLM sized the KV cache from the memory the weights left free, \nBigKv tokens
+for Qwen3-8B and \nSmallKv for Qwen3-4B (startup logs). Multi-server runs used \nAppServersWord such servers,
+one GPU each. The client sends all calls of a pipeline to one server, so the pipeline's prefix cache stays
+local, and assigns pipelines to servers in turn. Each server runs at most the run's concurrency of pipelines at once (\nConc in most runs), and the
+job list is shuffled with a fixed seed, so channels and settings interleave. The RTX~PRO~6000 Blackwell Server
+Edition (96\,GB) runs each used one GPU and a fresh server, except the two $k=8$ folder runs, which ran back
+to back on one server, with the KV cache fixed by
+\texttt{--num-}\allowbreak\texttt{gpu-}\allowbreak\texttt{blocks-}\allowbreak\texttt{override} to \nAppBlocksSmall blocks (\nAppKvExactSmall tokens, the RTX~3090 size),
+\nAppBlocksMid (\nAppKvExactMid), or \nAppBlocksHi (\nAppKvExactHi), and a memory utilization of \nAppUtilPro
+(\nAppUtilProBig for 32B). The second and third timing runs at six tasks at a time and the runs at 32 went in
+a shuffled order, and a host monitor saw no other GPU process during them. Table~\ref{tab:app-runs} lists every run, read from its configuration, its environment record, and its
+server log.
+
+\begin{table*}[t]
+\caption{Every run. KV: cache capacity in tokens, from the server log. Tasks: per $k$, both datasets together.
+R: Researchers per task. Cap: token cap. Budget: tool calls per agent. Conc.: pipelines at a time per server.
+Date: start, month/day. Use: where the run is reported. Superseded runs were replaced by a later design and are
+not reported. Arms use the code names of Table~\ref{tab:app-channels}.}
+\label{tab:app-runs}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llllrrrlrrrll@{}}
+\toprule
+Run & Qwen3 & GPU & KV & $k$ & Tasks & R & Arms & Cap & Budget & Conc. & Date & Use \\
+\midrule
+\appTabRuns
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+\section{Worked example}
+\label{app:example}
+
+\paragraph{How we chose the task.} We chose it by a rule. Of the \nAppExTotal main-run tasks with $k=3$ that
+ran in A1, A1-zc, A2, B, and C, \nAppExHits meet three conditions: broadcast answers every question, the pipe's
+Reviewer turns a right draft answer wrong, and B's Writer never opens the notes. The rule selects the failures
+of \S\ref{sec:accuracy} and \S\ref{sec:cause}, so the task is not typical. Over the main run at $k=3$, broadcast
+answers \nAccAOne\% of questions, and B's Writer skips the notes in \nNoNotesB\% of tasks. Among the
+\nAppExHits tasks, we show \texttt{2wiki-k3-s2-0117}, because all its errors in these five channels fall on one
+question, which keeps the excerpts short. Table~\ref{tab:app-example} gives each channel's outcome, and
+Listings~\ref{lst:ex-task}--\ref{lst:ex-C} give the excerpts.
+
+\paragraph{What happens.} Q3 needs two hops, from each film to its director and from each director to a birth
+date. In every channel, the Researcher's notes state both directors and their birth dates. Broadcast and
+zero-copy copy the notes, and both answer Q3 correctly. The pipe's Writer is also correct, but its Reviewer,
+which sees only the draft, switches Q3 to the other film and keeps evidence that gives Henri Safran the later
+birth date. B's Researcher saves its notes as \texttt{research\_notes.txt}, which \texttt{list\_files} lists after
+the documents (Listing~\ref{lst:task}). B's Writer reads documents, none of them a director's page, and
+never opens the notes. Its draft gives the directors birth years that appear in no document of the task, cites a
+director's page it never read, and picks the wrong film. B's Reviewer reads the draft and the notes but leaves
+Q3 unchanged. C's Researcher names its file \texttt{notes/Q1-Q3\_notes.md}. C's Writer does not open
+\texttt{index.md}, but it opens this file right after listing the workspace and answers correctly. C's Reviewer
+reads the notes, the draft, and documents and keeps the draft's answers. In this task,
+B and C send more tokens than broadcast but compute less prefill.
+
+\applisting{The worked example's questions and gold answers. Listings~\ref{lst:ex-A1}--\ref{lst:ex-C} show
+Q3 only. In them, lines starting with \texttt{>>} are our labels, tool calls are rendered from the workspace
+log, [...] marks cut text, and all other text is verbatim.}{lst:ex-task}
+\VerbatimInput{appendix/ex_task.txt}
+\applisting{A1, broadcast.}{lst:ex-A1}
+\VerbatimInput{appendix/ex_A1.txt}
+\applisting{A1-zc, zero-copy broadcast. Its notes, not shown, state the same Q3 facts.}{lst:ex-A1zc}
+\VerbatimInput{appendix/ex_A1zc.txt}
+\applisting{A2, pipe. Its notes, not shown, state the same Q3 facts.}{lst:ex-A2}
+\VerbatimInput{appendix/ex_A2.txt}
+\applisting{B, shared files.}{lst:ex-B}
+\VerbatimInput{appendix/ex_B.txt}
+\applisting{C, files with an index. The notes file, not shown, states the same Q3 facts.}{lst:ex-C}
+\VerbatimInput{appendix/ex_C.txt}
+
+\begin{table}[tb]
+\caption{The worked example per channel: final answers to Q1 and Q2, the Q3 draft, and the final Q3 answer
+(\checkmark\ right, $\times$ wrong), whether the Writer received the notes, and tokens sent and prefill.}
+\label{tab:app-example}
+\scriptsize
+\setlength{\tabcolsep}{1.5pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lccclrrr@{}}
+\toprule
+ & Q1 & Q2 & Q3 draft & Q3, final & Notes & Sent & Prefill \\
+\midrule
+\appTabExample
+\bottomrule
+\end{tabular*}
+\end{table}
+
+
+\section{Fact measures}
+\label{app:facts}
+
+\paragraph{Fact coverage and delivery.} A fact is one supporting sentence of a question. For each run and fact,
+AlignScore~\cite{alignscore} scores whether a text states the fact. We use AlignScore-large, a RoBERTa-large
+model, in its \texttt{nli\_sp} mode, which splits a long text into chunks and the fact into sentences, scores each
+sentence against its best chunk, and averages over the sentences. A fact counts as stated at a score of at least \nAppThreshold. \emph{Fact coverage}
+is the share of a task's facts that the Researcher's output states. This output is the Researcher's reply in
+message channels and the text of every file a Researcher wrote in file channels, plus the handoff in D.
+\emph{Delivery} is the share of the facts in the Researcher's output that the Writer's input also states. The
+Writer's input is the copied output in message channels and the text of every \texttt{read\_file} result the
+Writer got in file channels, plus the handoff in D. A task whose Researcher output states no fact has no
+delivery value.
+
+\paragraph{Validation on synthetic pairs.} These pairs have labels by construction. For each of
+\nAppSynPerKind main-run questions, we take one supporting sentence $F$ and the shuffled sentences of the
+question's supporting paragraphs, in three versions. \emph{Present} keeps $F$, \emph{dropped} removes it, and
+\emph{swapped} keeps $F$ but replaces its key entity (the answer, or the title of another supporting paragraph
+that $F$ names) with another question's short answer. Listing~\ref{lst:facts} shows one triple, and
+Table~\ref{tab:app-facts} gives each measure's accuracy per version. AlignScore separates present facts from
+the other two versions with an AUC of \nSynAAuc.
+
+\paragraph{Agreement on real text.} We sampled \nAppRealUnits units, each one question's facts against one text,
+evenly across the six main-run channels at $k=3$, from Researcher outputs and Writer inputs of at most
+\nAppRealMaxChars characters (\nAppRealFacts facts). Qwen3-8B and Llama-3-8B-Instruct judged each unit in one
+call with the prompt of Listing~\ref{lst:facts}, and the lexical anchors below labeled each fact too.
+AlignScore agrees only weakly with either judge on these facts, and the two judges agree weakly with each other
+(Table~\ref{tab:app-facts}). This is why the body calls fact coverage a weak measure.
+
+\paragraph{Other measures.} \emph{Lexical anchors} count a fact as stated when the text holds at least half of
+the fact's content words, which are the words not in the question, not stop words, and longer than one
+character, after HotpotQA's answer normalization. \emph{Entity match} checks whether the subject and object of
+each 2Wiki evidence triple, or each HotpotQA supporting title without a trailing parenthetical, occur in the
+normalized text. It misses facts stated by pronoun, so it is a lower bound. Before AlignScore, a Qwen3-8B
+judge labeled the runs with the prompt of Listing~\ref{lst:facts}. It accepted \nSynQAcceptSwapped\% of
+swapped facts, so we replaced it.
+
+\applisting{Top: the first synthetic triple in the file, with AlignScore's score for each version. Bottom:
+the LLM judges' prompt, where \texttt{\{facts\}} holds one line ``\texttt{F$j$: <sentence>}'' per fact.}{lst:facts}
+\VerbatimInput{appendix/synthetic.txt}
+\smallskip
+\VerbatimInput{appendix/judge_prompt.txt}
+
+\begin{table}[tb]
+\caption{Fact measures. Left: accuracy (\%) on the \nSynN synthetic pairs per version, and AlignScore's AUC.
+Right: Cohen's $\kappa$ between measures on \nAppRealFacts real facts.}
+\label{tab:app-facts}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrrrrrrr@{}}
+\toprule
+ & \multicolumn{4}{c}{Synthetic} & \multicolumn{4}{c}{$\kappa$ with} \\
+\cmidrule(lr){2-5}\cmidrule(l){6-9}
+Measure & Pres. & Drop. & Swap. & AUC & AS & Qwen & Llama & Lex. \\
+\midrule
+\appTabFacts
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\paragraph{Where wrong answers start.} A figure cut from the body assigned each wrong answer to the first stage
+that explains it. An answer with no final line is \emph{no answer}. A wrong final answer after a right draft is
+\emph{Reviewer broke}. Otherwise, it is a \emph{research miss} if the Researcher's output lacks one of the
+question's facts, a \emph{delivery miss} if the Writer's input lacks one, and \emph{Writer wrong} if the Writer
+received every fact. Table~\ref{tab:app-stage} gives this split for the main run at $k=3$, with all three
+coverage measures. We cut it because it rests on AlignScore's per-fact labels.
+
+\begin{table}[tb]
+\caption{Main run, $k=3$: facts (\%) in the Researcher's output (Out) and delivered to the Writer (Del.) by
+AlignScore, entity match, and the Qwen3-8B judge, and wrong answers (\% of questions) by the first stage that
+explains them (research miss, delivery miss, Writer wrong, Reviewer broke, no answer).}
+\label{tab:app-stage}
+\scriptsize
+\setlength{\tabcolsep}{1.5pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrrrrrrrrrr@{}}
+\toprule
+ & \multicolumn{2}{c}{AlignScore} & \multicolumn{2}{c}{Entity} & Judge & & \multicolumn{5}{c}{Wrong, first stage} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(l){8-12}
+ & Out & Del. & Out & Del. & Out & Wrong & Res. & Del. & Wri. & Rev. & None \\
+\midrule
+\appTabStage
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\section{Statistics}
+\label{app:stats}
+
+\paragraph{Intervals.} A task's accuracy is the share of its $k$ questions answered correctly, and an arm's
+accuracy is the mean over its tasks. A paired difference between arms $X$ and $Y$ uses the tasks both ran,
+$d_t = \mathrm{acc}_X(t) - \mathrm{acc}_Y(t)$. Its 95\% interval spans the 2.5th to 97.5th percentiles of the
+mean of $d$ over \nBootN resamples of the tasks with replacement (NumPy, seed 0). Intervals of one arm's mean, of
+differences in differences, and of the share of a gap that a repair recovers resample tasks the same way.
+Within a setting, tasks pair by id, and pooled over datasets, by dataset and id.
+
+\paragraph{Tests.} The sign-flip permutation test draws 20,000 random sign vectors for the per-task differences
+(seed 0). Its two-sided $p$ is one plus the number of flipped means at least as far from zero as the observed
+mean, over 20,001. Holm's step-down procedure at $\alpha=0.05$ then runs within each family.
+Table~\ref{tab:app-holm} gives every $p$-value, and Table~\ref{tab:cross} the estimates. Counts of significant
+settings elsewhere are uncorrected and use the bootstrap interval.
+
+\begin{table}[tb]
+\caption{Permutation $p$-values of the crossed runs' tests, to three decimals. \dag: Holm-significant within
+its family. Family 1 holds the simple effects of Table~\ref{tab:cross}. Family 2 (post hoc) holds the interaction
+and the contrast of the file channel's cost on tool-written notes with the tool-call write's cost on copied notes,
+$(\mathrm{A1w}-\mathrm{B})-(\mathrm{A1r}-\mathrm{A1w})$, whose estimates (points) are in the last row.}
+\label{tab:app-holm}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}llrrrr@{}}
+\toprule
+ & Test & 4B & 8B & 14B & 32B \\
+\midrule
+\multirow{4}{*}{1} & Copy$\to$files, reply & \nRTenHolmFileReplyPFour\nRTenMarkFileReplyFour & \nRTenHolmFileReplyPEight\nRTenMarkFileReplyEight & \nRTenHolmFileReplyPFourteen\nRTenMarkFileReplyFourteen & \nRTenHolmFileReplyPThirtyTwo\nRTenMarkFileReplyThirtyTwo \\
+ & Copy$\to$files, tool & \nRTenHolmFileToolPFour\nRTenMarkFileToolFour & \nRTenHolmFileToolPEight\nRTenMarkFileToolEight & \nRTenHolmFileToolPFourteen\nRTenMarkFileToolFourteen & \nRTenHolmFileToolPThirtyTwo\nRTenMarkFileToolThirtyTwo \\
+ & Reply$\to$tool, copy & \nRTenHolmWriteCopyPFour\nRTenMarkWriteCopyFour & \nRTenHolmWriteCopyPEight\nRTenMarkWriteCopyEight & \nRTenHolmWriteCopyPFourteen\nRTenMarkWriteCopyFourteen & \nRTenHolmWriteCopyPThirtyTwo\nRTenMarkWriteCopyThirtyTwo \\
+ & Reply$\to$tool, files & \nRTenHolmWriteFilePFour\nRTenMarkWriteFileFour & \nRTenHolmWriteFilePEight\nRTenMarkWriteFileEight & \nRTenHolmWriteFilePFourteen\nRTenMarkWriteFileFourteen & \nRTenHolmWriteFilePThirtyTwo\nRTenMarkWriteFileThirtyTwo \\
+\midrule
+\multirow{2}{*}{2} & Interaction & \nRTwelveFourInterP\nRTwelveMarkInterFour & \nRTwelveEightInterP\nRTwelveMarkInterEight & \nRTwelveFourteenInterP\nRTwelveMarkInterFourteen & \nRTwelveThirtyTwoInterP\nRTwelveMarkInterThirtyTwo \\
+ & Contrast & \nRTwelveFourDvwP\nRTwelveMarkDvwFour & \nRTwelveEightDvwP\nRTwelveMarkDvwEight & \nRTwelveFourteenDvwP\nRTwelveMarkDvwFourteen & \nRTwelveThirtyTwoDvwP\nRTwelveMarkDvwThirtyTwo \\
+ & Contrast, estimate & \nRTwelveFourDvw & \nRTwelveEightDvw & \nRTwelveFourteenDvw & \nRTwelveThirtyTwoDvw \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\paragraph{Comparisons across runs.} These comparisons pair the same tasks across two runs, so drift between
+the runs adds to their differences (\S\ref{sec:method}): the documents control against the main run, the timing
+runs against each other, the 32B path rerun's B and C against the size run's broadcast, the told 32B stored
+reply against copied reply notes in the crossed run, separate folders against one Researcher at $k=8$, the
+doubled tool budget at $k=16$, accuracy across the cache runs, and the read cost across the wording, crossed,
+and reply-output runs. In Appendix~\ref{app:cut}, the batched reads, the fact-checker chain, and the $k=3$
+fan-out are cross-run too.
+
+\section{Full results}
+\label{app:results}
+
+Table~\ref{tab:app-main} covers the RTX~3090 runs for every $k$ and dataset, behind Figures~\ref{fig:tradeoff}
+and~\ref{fig:scaling}a. Table~\ref{tab:app-size} gives the size runs (\S\ref{sec:size}), and
+Table~\ref{tab:app-cache} the cache runs and the 32B corner cell (\S\ref{sec:larger}).
+Table~\ref{tab:app-arms} gives every arm of the wording, crossed, reply-output, told, and first-listed runs
+(\S\ref{sec:cause}), and Table~\ref{tab:app-timing} the timing runs (\S\ref{sec:cost}).
+
+\begin{table*}[t]
+\caption{RTX~3090 runs (Qwen3-8B): accuracy (\%), its paired difference to A1 (points, 95\% interval), and mean
+tokens sent and prefill per task (thousands), per $k$, dataset, and channel. The number after $k$ is the tasks
+per dataset. $k \le 5$ is the main run, and $k=8$ and 16 are separate runs.}
+\label{tab:app-main}
+\scriptsize
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llrlrrrlrr@{}}
+\toprule
+ & & \multicolumn{4}{c}{HotpotQA} & \multicolumn{4}{c}{2Wiki} \\
+\cmidrule(lr){3-6}\cmidrule(l){7-10}
+$k$ (tasks) & Channel & Acc. & Diff.\ to A1 & Sent & Prefill & Acc. & Diff.\ to A1 & Sent & Prefill \\
+\midrule
+\appTabMain
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+\begin{table*}[t]
+\caption{Size runs (one RTX~PRO~6000, \nKvPro-token cache, $k=3$, \nPSizeEightN tasks per size): accuracy (\%),
+paired difference to A1 (points, 95\% interval), and prefill relative to A1. $^\ast$The 32B rerun of B, C, and D
+with stripped \texttt{workspace/} paths, paired with the size run's A1 (cross-run).}
+\label{tab:app-size}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrlrrlrrlrrlr@{}}
+\toprule
+ & \multicolumn{3}{c}{Qwen3-4B} & \multicolumn{3}{c}{Qwen3-8B} & \multicolumn{3}{c}{Qwen3-14B} & \multicolumn{3}{c}{Qwen3-32B} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(l){11-13}
+Channel & Acc. & Diff.\ to A1 & Prefill & Acc. & Diff.\ to A1 & Prefill & Acc. & Diff.\ to A1 & Prefill & Acc. & Diff.\ to A1 & Prefill \\
+\midrule
+\appTabSize
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+\begin{table}[tb]
+\caption{Cache runs (Qwen3-8B, one RTX~PRO~6000, $k=8$, \nPKvHundredN tasks) and the 32B corner cell
+(Qwen3-32B, \nKvProSmall-token cache, the same tasks, Appendix~\ref{app:cut}): accuracy (\%) and prefill
+relative to A1.}
+\label{tab:app-cache}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrrrrrrr@{}}
+\toprule
+ & \multicolumn{2}{c}{8B, \nKvProSmall} & \multicolumn{2}{c}{8B, \nKvPro} & \multicolumn{2}{c}{8B, \nKvProHi} & \multicolumn{2}{c}{32B, \nKvProSmall} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(l){8-9}
+ & Acc. & Prefill & Acc. & Prefill & Acc. & Prefill & Acc. & Prefill \\
+\midrule
+\appTabCache
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\begin{table}[tb]
+\caption{Accuracy (\%) of every arm of the RTX~PRO~6000 runs at $k=3$, and after the slash, for file arms, the
+share of tasks (\%) in which the Writer opened the notes. Tasks per run in parentheses. Arms as in
+Table~\ref{tab:app-channels}.}
+\label{tab:app-arms}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}llrrrr@{}}
+\toprule
+Run & Arm & 4B & 8B & 14B & 32B \\
+\midrule
+\appTabArms
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\begin{table}[tb]
+\caption{Timing runs: each channel alone on one RTX~PRO~6000 (Qwen3-8B, \nKvPro-token cache, \nRSixAloneN tasks
+at $k=3$, \nConcWord at a time). Wall time of each of three runs (s), mean wall time relative to A1's, generated
+tokens, summed prefill time, and summed decode time relative to A1, and decode time per generated token (ms).
+vLLM's counters come from the second and third runs.}
+\label{tab:app-timing}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrrrrrrr@{}}
+\toprule
+ & \multicolumn{3}{c}{Wall time (s)} & \multicolumn{4}{c}{Relative to A1} & \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-8}
+ & Run 1 & Run 2 & Run 3 & Time & Gen. & Prefill & Decode & ms/tok. \\
+\midrule
+\appTabTiming
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\section{Results cut for space}
+\label{app:cut}
+
+Table~\ref{tab:app-cut} lists the cut results that compare two arms. We cut each one because a later design
+superseded it, because it needs a caveat the body has no room for, or because it answers a question the paper
+does not ask. In-run comparisons pair arms that ran interleaved in one run, cross-run comparisons pair the same
+tasks across runs, and descriptive splits group tasks by an outcome of the channel.
+
+\begin{table}[tb]
+\caption{Cut results that compare two arms at $k=3$: paired difference in accuracy (points), 95\% interval, and
+tasks. Main-run arms are pooled over datasets.}
+\label{tab:app-cut}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrlrl@{}}
+\toprule
+Comparison & Diff. & 95\% interval & Tasks & Label \\
+\midrule
+\appTabCut
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\paragraph{Handoffs (D).} D's Researcher and Writer save files and then reply with a handoff of at most
+\nHandoffWords words that gives each question's key finding and where the details are, and later agents get
+every earlier handoff in their prompts (Table~\ref{tab:app-channels}). We excluded D because it passes a message
+and files at once, so it is neither kind of channel. In the main run at $k=3$, it answers \nAccD\% of questions,
+sends \nAppDSent$\times$ broadcast's tokens, and computes \nAppDComp$\times$ its prefill. It trails broadcast by
+\nGapDMin--\nGapDMax points across the six settings, significantly in \nGapDSigWord. Its Writer opens no
+Researcher file in \nAppDNoNotes\% of tasks, and only \nDelivD\% of the facts in its notes reach the Writer by
+AlignScore (Table~\ref{tab:app-stage}). Its serving time is in Table~\ref{tab:app-timing}.
+
+\paragraph{Batched reads (Bb).} Bb adds a \texttt{read\_files} tool that reads several files in one call, the
+agent analogue of \texttt{readv}. On \nBbN main-run tasks, it cut B's model calls from \nBbCallsB to \nBbCalls
+per task and its tokens sent by \nBbTokCut\%, but accuracy fell from \nBbAccB\% to \nBbAcc\% (cross-run). Its
+Writer skipped the notes in \nBbNoNotes\% of tasks, and \nBbDocReads\% of its reads went to documents. We cut it
+because it changes the tools rather than the channel.
+
+\paragraph{A fact-checker stage.} A Fact-checker between the Writer and the Reviewer (role in
+Listing~\ref{lst:prompts}) checks the draft against the notes and the documents. On \nChainN main-run tasks
+at $k=3$, the four-agent chain raised the pipe's accuracy, lowered B's, and moved every other channel by at most
+\nAppChainOtherMax points (cross-run). It added \nChainBSent\% to B's tokens sent. We cut it because chain length is
+a separate question.
+
+\paragraph{Three Researchers at $k=3$.} Each Researcher covered one question. Against one Researcher on the same
+tasks, B and broadcast both lost accuracy, and B's change minus broadcast's has an interval that includes zero
+(cross-run). In \nFanClashB\% of B's tasks, two Researchers wrote the same path. The in-run $k=8$ design of
+\S\ref{sec:writers} replaced this run.
+
+\paragraph{Path clashes at $k=16$.} In the RTX~3090 run at $k=16$, B's \nAppClashN tasks in which two
+Researchers wrote the same path have notes that state \nAppClashNotes\% of the facts and \nAppClashAcc\%
+accuracy, against \nAppNoClashNotes\% and \nAppNoClashAcc\% for the other \nAppNoClashN tasks. In this post hoc,
+descriptive split, clashes go with less complete notes but differ little in accuracy. The guard run of
+\S\ref{sec:writers} tests the clash directly.
+
+\paragraph{Reply-output arm (Br).} Br's later agents read the workspace with \texttt{list\_files} and
+\texttt{read\_file} but reply instead of writing files. Br trails copied tool-written notes by
+\nRFourteenBrGapMin--\nRFourteenBrGapMax points, more than B at 8B, 14B, and 32B (Table~\ref{tab:app-arms}). Its
+Writer opens the notes less often than B's at 8B and 32B, and at 32B it reads no file. We cut Br from
+Table~\ref{tab:cross} because it changes how later agents give outputs as well as how they get inputs.
+
+\paragraph{Qwen3-4B on the RTX~3090s.} Before the size runs, we ran all six channels with Qwen3-4B on the
+RTX~3090s at $k \in \{1, 3, 5\}$ (\nSmallKv-token cache). Zero-copy was significantly below broadcast in
+\nSmallAZcSigThreeFiveWord of the four settings with $k \in \{3,5\}$, as in the 4B size run, and B and C
+trailed broadcast by \nSmallBGapMinThreeFive--\nSmallBGapMaxThreeFive and
+\nSmallCGapMinThreeFive--\nSmallCGapMaxThreeFive points there. We report the size runs instead, which hold the
+cache fixed across sizes.
+
+\paragraph{The 32B corner cell.} Qwen3-32B with the \nKvProSmall-token cache at $k=8$ tests the largest model
+with the smallest cache. Zero-copy computes \nPCornerCompAZc$\times$ broadcast's prefill, as 8B does with this
+cache, and B and C compute \nPCornerCompB$\times$ and \nPCornerCompC$\times$ (Table~\ref{tab:app-cache}). B and C
+answer \nPRescueCornerBMeasured\% and \nPRescueCornerCMeasured\%, against broadcast's \nPCornerAccAOne\%. The run
+predates the path fix, and reading final answers saved under \texttt{workspace/} would raise B and C only to
+\nPRescueCornerB\% and \nPRescueCornerC\% (post hoc). We cut the cell because it ran before the fix and has no
+8B counterpart in the same run.
+
+\paragraph{Rescues counted as failures.} If every main-run task at $k=3$ whose Writer or Reviewer was rescued
+counted as wrong, B would answer \nStrictB\% and C \nStrictC\% of questions, against their measured \nAccB\%
+and \nAccC\% (post hoc). The body reports rescue rates instead.
+
+\paragraph{Zero-copy equivalence.} The 90\% interval of zero-copy minus broadcast at $k=3$, datasets pooled, runs
+from \nRTwelveZcNinetyLo to \nRTwelveZcNinetyHi points, \nRTwelveZcEquiv a margin of $\pm$\nRTwelveZcMargin
+points. We claim no equivalence, because we chose the margin post hoc.
+
+\paragraph{The first LLM judge.} Appendix~\ref{app:facts} gives its prompt, its synthetic accuracy, and its
+agreement with the other measures.
+
+% Flush the appendix floats before acmart balances the last page's columns.
+\clearpage
 \end{document}

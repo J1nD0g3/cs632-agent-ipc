@@ -1,0 +1,5 @@
+question: Who is the Mexican actor that starred in Sex and Breakfast?
+fact F: Sex and Breakfast is a 2007 independent dark comedy film starring Macaulay Culkin, Eliza Dushku, Alexis Dziena and Kuno Becker.
+present: F is among the paragraphs' other sentences, shuffled   AlignScore 0.985
+dropped: F removed   AlignScore 0.008
+swapped: F replaced by "Sex and Breakfast is a 2007 independent dark comedy film starring Macaulay Culkin, Eliza Dushku, Alexis Dziena and Florence."   AlignScore 0.000

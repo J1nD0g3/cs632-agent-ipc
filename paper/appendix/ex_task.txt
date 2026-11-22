@@ -1,0 +1,6 @@
+Q1: Who was born earlier, Thomas Pernes or William Cavendish, 1St Earl Of Devonshire?
+    gold: William Cavendish, 1St Earl Of Devonshire
+Q2: Which film was released more recently, High School Musical: El Desafío or North Of Arizona?
+    gold: High School Musical: El Desafío
+Q3: Which film whose director is younger, A Social Celebrity or A Sound Of Trumpets?
+    gold: A Sound Of Trumpets

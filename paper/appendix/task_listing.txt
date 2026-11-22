@@ -1,0 +1,6 @@
+docs/d000_robert_payne_natural_philosopher.txt (2 lines, 376 chars)
+docs/d001_samuel_ware.txt (2 lines, 311 chars)
+docs/d002_charles_cavendish_1st_baron_chesham.txt (2 lines, 1168 chars)
+[...]
+docs/d028_henri_safran.txt (2 lines, 369 chars)
+research_notes.txt (15 lines, 878 chars)

@@ -1,0 +1,9 @@
+Below are numbered FACTS and a TEXT. For each fact, decide whether the TEXT states it, possibly in other words. A fact counts as stated only if the information it adds (names, dates, places, numbers, relations) is in the TEXT.
+
+FACTS:
+{facts}
+
+TEXT:
+{text}
+
+Answer with one line per fact, in order, like `F1: yes` or `F1: no`, and nothing else.
