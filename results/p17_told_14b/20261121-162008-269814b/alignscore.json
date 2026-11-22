@@ -1,0 +1,354 @@
+{
+ "threshold": 0.5,
+ "scored": "/mnt/sda/heojin/cs632-store/factcheck/p17_told_14b_as.jsonl",
+ "groups": {
+  "2wiki|3|B": {
+   "n": 75,
+   "aq_delivery_miss": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_no_answer": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_ok": {
+    "mean": 0.6756,
+    "lo": 0.6088,
+    "hi": 0.7467
+   },
+   "aq_overflow": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_research_miss": {
+    "mean": 0.2178,
+    "lo": 0.1644,
+    "hi": 0.2756
+   },
+   "aq_reviewer_broke": {
+    "mean": 0.0667,
+    "lo": 0.0222,
+    "hi": 0.12
+   },
+   "aq_reviewer_fixed": {
+    "mean": 0.0044,
+    "lo": 0.0,
+    "hi": 0.0133
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.6089,
+    "lo": 0.5378,
+    "hi": 0.6844
+   },
+   "aq_writer_wrong": {
+    "mean": 0.0356,
+    "lo": 0.0133,
+    "hi": 0.0667
+   },
+   "as_kept_writer_input": {
+    "mean": 0.9717,
+    "lo": 0.9405,
+    "hi": 0.9955
+   },
+   "as_recall_notes": {
+    "mean": 0.3108,
+    "lo": 0.2514,
+    "hi": 0.3709
+   }
+  },
+  "2wiki|3|Bs": {
+   "n": 75,
+   "aq_delivery_miss": {
+    "mean": 0.0489,
+    "lo": 0.0222,
+    "hi": 0.0756
+   },
+   "aq_no_answer": {
+    "mean": 0.0044,
+    "lo": 0.0,
+    "hi": 0.0133
+   },
+   "aq_ok": {
+    "mean": 0.3067,
+    "lo": 0.2444,
+    "hi": 0.3644
+   },
+   "aq_overflow": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_research_miss": {
+    "mean": 0.4533,
+    "lo": 0.3867,
+    "hi": 0.52
+   },
+   "aq_reviewer_broke": {
+    "mean": 0.08,
+    "lo": 0.0489,
+    "hi": 0.1156
+   },
+   "aq_reviewer_fixed": {
+    "mean": 0.0889,
+    "lo": 0.0489,
+    "hi": 0.1333
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.3556,
+    "lo": 0.2844,
+    "hi": 0.4222
+   },
+   "aq_writer_wrong": {
+    "mean": 0.0178,
+    "lo": 0.0044,
+    "hi": 0.0356
+   },
+   "as_kept_writer_input": {
+    "mean": 0.7596,
+    "lo": 0.6699,
+    "hi": 0.8357
+   },
+   "as_recall_notes": {
+    "mean": 0.2699,
+    "lo": 0.22,
+    "hi": 0.3208
+   }
+  },
+  "2wiki|3|Bt": {
+   "n": 75,
+   "aq_delivery_miss": {
+    "mean": 0.0444,
+    "lo": 0.0178,
+    "hi": 0.0711
+   },
+   "aq_no_answer": {
+    "mean": 0.0044,
+    "lo": 0.0,
+    "hi": 0.0133
+   },
+   "aq_ok": {
+    "mean": 0.32,
+    "lo": 0.2578,
+    "hi": 0.3822
+   },
+   "aq_overflow": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_research_miss": {
+    "mean": 0.4222,
+    "lo": 0.36,
+    "hi": 0.4889
+   },
+   "aq_reviewer_broke": {
+    "mean": 0.0844,
+    "lo": 0.0489,
+    "hi": 0.12
+   },
+   "aq_reviewer_fixed": {
+    "mean": 0.0978,
+    "lo": 0.0622,
+    "hi": 0.1378
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.3956,
+    "lo": 0.3244,
+    "hi": 0.4667
+   },
+   "aq_writer_wrong": {
+    "mean": 0.0267,
+    "lo": 0.0044,
+    "hi": 0.0533
+   },
+   "as_kept_writer_input": {
+    "mean": 0.7768,
+    "lo": 0.6973,
+    "hi": 0.8565
+   },
+   "as_recall_notes": {
+    "mean": 0.2574,
+    "lo": 0.2092,
+    "hi": 0.3072
+   }
+  },
+  "hotpotqa|3|B": {
+   "n": 75,
+   "aq_delivery_miss": {
+    "mean": 0.0044,
+    "lo": 0.0,
+    "hi": 0.0133
+   },
+   "aq_no_answer": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_ok": {
+    "mean": 0.56,
+    "lo": 0.48,
+    "hi": 0.6267
+   },
+   "aq_overflow": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_research_miss": {
+    "mean": 0.1911,
+    "lo": 0.1378,
+    "hi": 0.2489
+   },
+   "aq_reviewer_broke": {
+    "mean": 0.1067,
+    "lo": 0.0667,
+    "hi": 0.1556
+   },
+   "aq_reviewer_fixed": {
+    "mean": 0.0356,
+    "lo": 0.0133,
+    "hi": 0.0667
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.3467,
+    "lo": 0.2756,
+    "hi": 0.4178
+   },
+   "aq_writer_wrong": {
+    "mean": 0.1022,
+    "lo": 0.0578,
+    "hi": 0.1511
+   },
+   "as_kept_writer_input": {
+    "mean": 0.9876,
+    "lo": 0.9692,
+    "hi": 1.0
+   },
+   "as_recall_notes": {
+    "mean": 0.6483,
+    "lo": 0.5838,
+    "hi": 0.709
+   }
+  },
+  "hotpotqa|3|Bs": {
+   "n": 75,
+   "aq_delivery_miss": {
+    "mean": 0.0711,
+    "lo": 0.0356,
+    "hi": 0.1111
+   },
+   "aq_no_answer": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_ok": {
+    "mean": 0.4444,
+    "lo": 0.3777,
+    "hi": 0.5157
+   },
+   "aq_overflow": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_research_miss": {
+    "mean": 0.3333,
+    "lo": 0.2711,
+    "hi": 0.3956
+   },
+   "aq_reviewer_broke": {
+    "mean": 0.0711,
+    "lo": 0.0356,
+    "hi": 0.1111
+   },
+   "aq_reviewer_fixed": {
+    "mean": 0.0267,
+    "lo": 0.0089,
+    "hi": 0.0489
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.2978,
+    "lo": 0.2356,
+    "hi": 0.3644
+   },
+   "aq_writer_wrong": {
+    "mean": 0.0533,
+    "lo": 0.0222,
+    "hi": 0.0844
+   },
+   "as_kept_writer_input": {
+    "mean": 0.7775,
+    "lo": 0.7173,
+    "hi": 0.8351
+   },
+   "as_recall_notes": {
+    "mean": 0.5677,
+    "lo": 0.5141,
+    "hi": 0.618
+   }
+  },
+  "hotpotqa|3|Bt": {
+   "n": 75,
+   "aq_delivery_miss": {
+    "mean": 0.0844,
+    "lo": 0.0444,
+    "hi": 0.1289
+   },
+   "aq_no_answer": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_ok": {
+    "mean": 0.44,
+    "lo": 0.3689,
+    "hi": 0.5067
+   },
+   "aq_overflow": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "aq_research_miss": {
+    "mean": 0.3511,
+    "lo": 0.2889,
+    "hi": 0.4178
+   },
+   "aq_reviewer_broke": {
+    "mean": 0.0489,
+    "lo": 0.0178,
+    "hi": 0.0846
+   },
+   "aq_reviewer_fixed": {
+    "mean": 0.0267,
+    "lo": 0.0089,
+    "hi": 0.0489
+   },
+   "aq_right_notes_miss": {
+    "mean": 0.3156,
+    "lo": 0.2444,
+    "hi": 0.3867
+   },
+   "aq_writer_wrong": {
+    "mean": 0.0489,
+    "lo": 0.0222,
+    "hi": 0.08
+   },
+   "as_kept_writer_input": {
+    "mean": 0.7479,
+    "lo": 0.6893,
+    "hi": 0.8019
+   },
+   "as_recall_notes": {
+    "mean": 0.558,
+    "lo": 0.509,
+    "hi": 0.6079
+   }
+  }
+ }
+}

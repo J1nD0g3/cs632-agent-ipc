@@ -103,27 +103,9 @@ def tasks_table() -> str:
     return "\n".join(lines)
 
 
-def raw_question_listing(q, ds: str) -> str:
-    sup = {f.title for f in q.facts}
-    out = [f"question: {q.question}", f"answer: {q.answer}", f"type: {q.qtype}",
-           "paragraphs (10; * = holds a supporting sentence):"]
-    out.append("  " + " | ".join(("*" if t in sup else "") + t for t, _ in q.paragraphs))
-    out.append("supporting sentences [title, sentence index]:")
-    for f in q.facts:
-        text = f.text if len(f.text) <= 110 else f.text[:105].rstrip() + " [...]"
-        out.append(f"  [{f.title}, {f.sent_id}] {text}")
-    if q.evidences:
-        out.append("evidences (2Wiki reasoning triples):")
-        out += [f"  ({s}; {r}; {o})" for s, r, o in q.evidences]
-    return "\n".join(out) + "\n"
-
-
 def task_listings(tasks) -> None:
-    """One raw question per dataset, and how the worked example's three questions become one task."""
-    hq = tasks["hotpotqa-k3-s2-0000"].questions[0]
-    (OUT / "raw_hotpot.txt").write_text(raw_question_listing(hq, "hotpotqa"))
+    """How the worked example's three questions become one task."""
     t = tasks[EXAMPLE]
-    (OUT / "raw_2wiki.txt").write_text(raw_question_listing(t.questions[2], "2wiki"))
     # The Researcher's user message for the task (questions, then the shuffled documents).
     docs = P.documents_block(t).split("\n\n")
     head = docs[0]
@@ -217,11 +199,6 @@ RUNS = [
     ("$k{=}3$ fan-out", ["t08_fanout"], "App.~\\ref{app:cut}"),
     ("4B on RTX 3090", ["t08_qwen4b"], "App.~\\ref{app:cut}"),
     ("32B corner", ["p03_corner_32b_35k"], "App.~\\ref{app:cut}"),
-    ("Earlier write control", ["t09_a1w"], "superseded"),
-    ("Earlier write controls", [f"p05_a1{x}_{s}" for s, _ in SIZES for x in "rw"], "superseded"),
-    ("Earlier $k{=}8$ fan-out", ["p13_k8_fanout"], "superseded"),
-    ("Budget 24, $k{=}3$", ["t08_turns24"], "superseded"),
-    ("Load runs, $k{=}16$", ["t08_pressure_c1", "t08_pressure_c2"], "superseded"),
 ]
 ARM = {"A1": "A1", "A1zc": "A1-zc", "A2": "A2", "B": "B", "C": "C", "D": "D", "A1r": "A1r", "A1w": "A1w",
        "Bs": "Bs", "Bt": "Bt", "Bs0": "Bs0", "Bt0": "Bt0", "Br": "Br", "Bb": "Bb", "A2d": "A2d", "Bd": "Bd",

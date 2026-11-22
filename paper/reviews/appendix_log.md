@@ -97,3 +97,21 @@ tables. Candidates to cut if 6 pages is firm:
 - No plan item was skipped for missing data. The stage-attribution result is a table, not the old figure.
 - Superseded runs (`t09_a1w`, `p05_*`, `p13_k8_fanout`, `t08_turns24`, `t08_pressure_*`) appear in the run
   table with their settings, but their results are not reported, since the plan did not list them.
+
+## Cuts, 2026-11-22
+
+Two cuts from the length candidates above (items 2 and 3); nothing else changed.
+
+- Run table: removed the 5 superseded rows (`t09_a1w`; `p05_a1r_*`/`p05_a1w_*`; `p13_k8_fanout`;
+  `t08_turns24`; `t08_pressure_c1`/`c2`) from `RUNS` in `appendix_tables.py`, so the table now has 25 rows.
+  The caption sentence on superseded runs now reads "Earlier pilot and superseded runs are omitted." No
+  macro used in `main.tex` comes from these runs (the `TwFour*`, `Press*`, `RSixFan*`, `W*` macros are still
+  written to `numbers.tex` but unused), and no text or table refers to the removed rows. The note under
+  "Not included" above no longer holds: these runs are no longer listed.
+- Appendix A: removed the raw-questions listing (old Listing 1, `lst:raw`) and the sentence pointing to it.
+  `raw_question_listing` and the writes of `appendix/raw_hotpot.txt` and `appendix/raw_2wiki.txt` are gone
+  from the generator, and the two files are deleted. The "From questions to tasks" paragraph and the worked
+  task listing (now Listing 1) are unchanged. Listings renumber from 1.
+- Regenerated with `python -m agentipc.paper_numbers` (no "skipped"; `numbers.tex` unchanged). Build has no
+  LaTeX warnings and no undefined references. The body still ends on page 6 (References start on page 7).
+  Total: 15 pages (was 16). `pytest -q`: 17 passed.

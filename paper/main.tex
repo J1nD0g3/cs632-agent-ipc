@@ -517,15 +517,9 @@ test whether what it reads sets final accuracy.
 \paragraph{Sources.} HotpotQA's distractor validation set has \nAppHotpotAll questions, and the
 2WikiMultihopQA development set has \nAppWikiAll. Each question comes with its gold answer, a type, ten
 paragraphs, and the (title, sentence index) pairs of its supporting sentences. 2Wiki also gives reasoning
-triples, its \emph{evidences}. Listing~\ref{lst:raw} shows one question from each dataset. We keep the
+triples, its \emph{evidences}. We keep the
 questions whose answer is not yes or no and that have at least two supporting sentences, which leaves
 \nHotpotUsable HotpotQA and \nWikiUsable 2Wiki questions.
-
-\applisting{One HotpotQA and one 2Wiki question as loaded. Field names are ours, values are verbatim, and [...]
-marks cut text. The second question is Q3 of the worked example.}{lst:raw}
-\VerbatimInput{appendix/raw_hotpot.txt}
-\smallskip
-\VerbatimInput{appendix/raw_2wiki.txt}
 
 \paragraph{From questions to tasks.} For each dataset, $k$, and seed, we sort the kept questions by id, draw
 $n k$ distinct ones with Python's \texttt{random.Random(seed).sample}, and cut the draw into $n$ tasks of $k$
@@ -675,8 +669,7 @@ server log.
 \begin{table*}[t]
 \caption{Every run. KV: cache capacity in tokens, from the server log. Tasks: per $k$, both datasets together.
 R: Researchers per task. Cap: token cap. Budget: tool calls per agent. Conc.: pipelines at a time per server.
-Date: start, month/day. Use: where the run is reported. Superseded runs were replaced by a later design and are
-not reported. Arms use the code names of Table~\ref{tab:app-channels}.}
+Date: start, month/day. Use: where the run is reported. Earlier pilot and superseded runs are omitted. Arms use the code names of Table~\ref{tab:app-channels}.}
 \label{tab:app-runs}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
