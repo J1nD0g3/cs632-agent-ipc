@@ -23,9 +23,16 @@ METRICS = ("acc", "total_tokens", "prefill_tokens", "completion_tokens", "llm_ca
            "aq_research_miss", "aq_delivery_miss", "aq_writer_wrong", "aq_reviewer_broke", "aq_no_answer")
 
 
-def load_rows(run_dir: Path) -> list[dict]:
+def raw_dir(run_dir: Path) -> Path:
+    """Where a run's per-task files live: results_raw/<exp>/<run_id> if present, else the copies committed in run_dir."""
     cfg = yaml.safe_load((run_dir / "config.yaml").read_text())
     raw = ROOT / "results_raw" / cfg["exp"] / run_dir.name
+    return raw if (raw / "rows.jsonl.gz").exists() else run_dir
+
+
+def load_rows(run_dir: Path, raw: Path | None = None) -> list[dict]:
+    """One row per (task, channel) without errors, with LLM-judge and AlignScore columns merged in when present."""
+    raw = raw or raw_dir(run_dir)
     rows = {(r["task_id"], r["channel"]): r for r in map(json.loads, gzip.open(raw / "rows.jsonl.gz", "rt"))}
     judged = raw / "judged.jsonl.gz"
     if judged.exists():

@@ -7,9 +7,9 @@ env.local.sh
 # Large or machine-local data (kept on nvme, not in git)
 .venv
 venv/
-data
-logs
-results_raw
+/data
+/logs
+/results_raw
 docs/*.pdf
 docs/*.pptx
 hf/

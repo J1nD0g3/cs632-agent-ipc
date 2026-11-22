@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-from .analyze import analyze, load_rows, paired
+from .analyze import analyze, load_rows, paired, raw_dir
 from .stats import ci
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -66,8 +66,7 @@ def ktok(x: float) -> str:
 
 
 def raw_records(run: Path):
-    cfg = yaml.safe_load((run / "config.yaml").read_text())
-    return map(json.loads, gzip.open(ROOT / "results_raw" / cfg["exp"] / run.name / "records.jsonl.gz", "rt"))
+    return map(json.loads, gzip.open(raw_dir(run) / "records.jsonl.gz", "rt"))
 
 
 def _norm_path(path: str) -> str:

@@ -2,26 +2,26 @@
 
 | Task | Phase | Priority | Status | Updated | Result | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| T00 Preflight and repo setup | Setup | Must | Done | 2026-11-18 | Repo, Notion sync, Qwen3-8B (16 GB) | |
-| T01 vLLM server, smoke test, throughput | Setup | Must | Done | 2026-11-18 | results/t01_smoke/20261118-205929-9eaaec7 | GPUs 5, 1, 2; 20 runs/min |
-| T02 Task data: loaders, samples, key facts | Build | Must | Done | 2026-11-18 | HotpotQA 6947 / 2Wiki 11281 usable dev questions | |
+| T00 Preflight: repository, status page, environment | Setup | Must | Done | 2026-11-18 | Repository, status page, Qwen3-8B (16 GB) | |
+| T01 vLLM server, smoke test, throughput | Setup | Must | Done | 2026-11-18 | results/t01_smoke/20261118-205929-9eaaec7 | 20 runs/min |
+| T02 Task data: loaders, samples, supporting facts | Build | Must | Done | 2026-11-18 | HotpotQA 6947 / 2Wiki 11281 usable dev questions | |
 | T03 Agent runtime: roles, prompts, tools, logging | Build | Must | Done | 2026-11-18 | Checked on Qwen3-8B in the pilot | |
-| T04 Channels A1/A2/B/C/D and zero-copy A1 | Build | Must | Done | 2026-11-18 | Six channels, per-run cache_salt | Five-agent chain ready |
-| T05 Metrics: success, tokens, latency, I/O, loss, failure types | Build | Must | Done | 2026-11-18 | LLM judge for facts (lexical agrees 87.5%, kappa 0.72) | |
-| T06 Pilot run and checks | Experiments | Must | Done | 2026-11-18 | results/t06_pilot/20261118-210200-08f1221 | 360 runs, 0 errors |
-| T07 Main experiments: 5 channels x 2 datasets x 3 k | Experiments | Must | Done | 2026-11-19 | results/t07_main/20261118-212337-5d6c70f | 5400 runs, 0 errors, judged |
-| T08 Sensitivity: k = 8, five agents, zero-copy A1, Qwen3-4B | Experiments | Should | In progress | 2026-11-19 | Bb, 24-turn done | k8, chain4, 4B, k16, pressure, fan-out queued |
-| T09 Analysis and figures | Report | Must | In progress | 2026-11-19 | Figs. 1-4 | paper/figs/out |
-| T10 Workshop paper and review rounds | Report | Must | In progress | 2026-11-19 | paper/main.pdf, final text (round 14: 3/5, 3/5); awaiting Jin's review | AlignScore is the fact measure; scope controls added |
+| T04 Channels: A1, A1-zc, A2, B, C | Build | Must | Done | 2026-11-20 | Five channels in the paper (handoff D cut), per-pipeline cache_salt | |
+| T05 Metrics: accuracy, tokens sent, prefill, time, fact coverage | Build | Must | Done | 2026-11-19 | Fact coverage by AlignScore (AUC 0.996 synthetic; kappa 0.29 vs LLM judge) | |
+| T06 Pilot (10 tasks per cell) and checks | Experiments | Must | Done | 2026-11-18 | results/t06_pilot/20261118-210200-08f1221 | 360 runs, 0 errors |
+| T07 Main run: all channels x 2 datasets x k = 1, 3, 5 (Qwen3-8B) | Experiments | Must | Done | 2026-11-19 | results/t07_main/20261118-212337-5d6c70f | 5400 runs, 0 errors |
+| T08 Sensitivity and controls: larger tasks, cache size, model sizes, crossed runs | Experiments | Should | Done | 2026-11-21 | Size, cache, timing, fan-out, crossed, told, first-listed runs (paper sections 4.3, 5) | Experiments closed in round 14 |
+| T09 Analysis and figures | Report | Must | Done | 2026-11-22 | paper/figs/out, Figs. 1-4 | |
+| T10 Paper, recommendations, and review rounds | Report | Must | Done | 2026-11-22 | paper/main.pdf: 6-page body + appendix A-H (15 pages) | 14 review rounds |
 
 ## Key numbers
 | Key | Metric | Result | Source |
 | --- | --- | --- | --- |
-| success | Task success rate: A / B / C | k=3 pooled: A1 72.3%, A1-zc 71.6%, A2 62.1%, B 62.8%, C 66.3%, D 65.1% | results/t07_main/20261118-212337-5d6c70f |
-| tokens | Total tokens per task: A / B / C | k=3 sent / computed: A1 13.3k/12.4k, A1-zc 13.6k/4.8k, A2 5.6k/4.7k, B 38.2k/9.8k, C 37.4k/9.8k, D 17.5k/7.2k | results/t07_main/20261118-212337-5d6c70f |
-| file_io | File reads and writes per task: A / B / C | k=3 file I/O ops: B 13.4-15.3, C 12.1-14.4, D 5.6-5.8 (message channels 0) | results/t07_main/20261118-212337-5d6c70f |
-| info_loss | Key facts lost between stages: A / B / C | k=3 AlignScore, facts in Researcher output / share delivered: A1 45%/100%, A1-zc 50%/100%, A2 45%/100%, B 32%/91%, C 30%/95%, D 25%/51% | results/t07_main/20261118-212337-5d6c70f/alignscore.json |
-| recommendation | Which channel, and when | History fits in context: copy it with the shared prefix first (zero-copy; saves prefill, not serving time). Pipe is cheap but drops the documents. In this harness, copy results forward rather than share files (single harness fixes recovered 14-20 points, so a better file harness may close the gap). If results are stored as files, tell later agents where they are (helped at 32B, not at 14B, where the Reviewer rarely reads the draft). With parallel writers, give each its own folder (or guard writes / head files with their questions). | paper/main.tex (Conclusion) |
+| accuracy | Accuracy, Qwen3-8B, k = 3 | A1 72.3%, A1-zc 71.6% (−0.8 points, −2.9 to 1.4), A2 62.1%, B 62.8%, C 66.3% (datasets pooled) | results/t07_main/20261118-212337-5d6c70f |
+| tokens | Tokens sent / prefill per task | Thousands, sent / prefill: A1 13.3 / 12.4, A1-zc 13.6 / 4.8, A2 5.6 / 4.7, B 38.2 / 9.8, C 37.4 / 9.8. Files send 2.9× and 2.8× broadcast's tokens but compute 0.79× its prefill; zero-copy cuts broadcast's prefill by 61% | results/t07_main/20261118-212337-5d6c70f |
+| file_io | Model calls and note reads per task | Model calls per task: A1 3.0, B 17.0, C 15.9. B's Writer never opened the notes in 42% of tasks, C's in 8% | results/t07_main/20261118-212337-5d6c70f |
+| fact_coverage | Fact coverage and delivery | Facts in the Researcher's output / share delivered to the Writer (AlignScore): A1 45% / 100%, A1-zc 50% / 100%, A2 45% / 100%, B 32% / 91%, C 30% / 95%. A weak measure (Cohen's κ = 0.29 against a Qwen3-8B judge) | results/t07_main/20261118-212337-5d6c70f/alignscore.json |
+| recommendation | Which channel, and when | For pipelines and harnesses like ours: put the shared history first except with the smallest model; give concurrent writers separate folders; name the notes' path for later agents (helped at 32B, not at 14B); copy rather than share files. The last rule rests on a 12-call budget, 2,048- or 4,096-token caps, and a rescue in 72% of B's main-run tasks; single harness changes recovered 14–20 points in specific settings, so a better file harness may close the gap | paper/main.tex (Conclusion) |
 
 ## Log
 - 2026-11-18 T00: Repo created from the proposal. Model Qwen3-8B (thinking off) on vLLM v0.33.0;
@@ -123,3 +123,6 @@
   (71-100% at other sizes) and answers again from docs/, stated as an observation. Rules scoped to this harness;
   8B write vs file costs as point estimates; zero-copy timing, 4B layout cost and the pipe's 8B loss in the abstract;
   cross-GPU drift computed from existing runs. Meaning audit applied. Next: Jin reads; appendix after approval.
+- 2026-11-22 T10: Appendix A-H added (tasks, prompts, serving, worked example, fact measures, statistics, full
+  results, cut results); the paper is 15 pages in total. T08 and T09 closed; key numbers aligned with the paper
+  (handoff channel D dropped from them; fact coverage replaces information loss).
